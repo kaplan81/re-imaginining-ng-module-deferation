@@ -1,0 +1,51 @@
+@use 'tokens' as t;
+
+.shl-unavailable {
+  @include t.card(2rem);
+
+  border-color: t.$color-danger;
+  border-left-width: 4px;
+  margin: 0 auto;
+  max-width: 40rem;
+}
+
+.shl-unavailable__eyebrow {
+  @include t.eyebrow;
+
+  color: t.$color-danger;
+  margin: 0 0 0.5rem;
+}
+
+.shl-unavailable__title {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.shl-unavailable__body {
+  color: t.$color-ink-muted;
+  margin: 0 0 1.25rem;
+
+  code {
+    background: t.$color-surface-sunken;
+    border-radius: t.$radius-sm;
+    font-family: t.$font-mono;
+    font-size: 0.875em;
+    padding: 0.0625rem 0.25rem;
+  }
+}
+
+.shl-unavailable__command {
+  background: t.$color-brand-dark;
+  border-radius: t.$radius-md;
+  color: t.$color-ink-inverse;
+  font-family: t.$font-mono;
+  font-size: 0.875rem;
+  margin: 0 0 1.25rem;
+  overflow-x: auto;
+  padding: 0.875rem 1rem;
+}
+
+.shl-unavailable__link {
+  color: t.$color-brand;
+  font-weight: 650;
+}

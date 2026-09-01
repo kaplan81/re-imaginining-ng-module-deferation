@@ -1,0 +1,68 @@
+@use 'tokens' as t;
+
+.cat-table {
+  background: t.$color-surface;
+  border: 1px solid t.$color-border;
+  border-radius: t.$radius-lg;
+  box-shadow: t.$shadow-sm;
+  overflow-x: auto;
+}
+
+.cat-table__table {
+  @include t.data-table;
+}
+
+.cat-table__sort {
+  @include t.button-base;
+
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
+  padding: 0;
+  text-transform: inherit;
+
+  &:hover {
+    color: t.$color-accent-catalog;
+  }
+}
+
+.cat-table__caret {
+  color: t.$color-accent-catalog;
+  font-size: 0.625rem;
+}
+
+.cat-table__cell--numeric {
+  text-align: right;
+}
+
+.cat-table__name {
+  display: block;
+  font-weight: 650;
+}
+
+.cat-table__lot {
+  color: t.$color-ink-subtle;
+  display: block;
+  font-family: t.$font-mono;
+  font-size: 0.6875rem;
+}
+
+.cat-table__muted {
+  color: t.$color-ink-subtle;
+  display: block;
+  font-size: 0.75rem;
+}
+
+.cat-table__mono {
+  font-family: t.$font-mono;
+  font-variant-numeric: tabular-nums;
+}
+
+.cat-table__empty {
+  color: t.$color-ink-muted;
+  padding: 2.5rem 1rem;
+  text-align: center;
+}

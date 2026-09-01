@@ -1,0 +1,66 @@
+@use 'tokens' as t;
+
+.cat-toolbar {
+  @include t.card(1rem 1.125rem);
+
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.875rem;
+}
+
+.cat-toolbar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+  min-width: 9rem;
+}
+
+.cat-toolbar__field--grow {
+  flex: 1 1 15rem;
+}
+
+.cat-toolbar__label {
+  @include t.eyebrow;
+}
+
+.cat-toolbar__input {
+  @include t.text-field;
+
+  width: 100%;
+}
+
+.cat-toolbar__select {
+  @include t.text-field;
+}
+
+.cat-toolbar__toggle {
+  background: t.$color-surface-sunken;
+  border: 1px solid t.$color-border-strong;
+  border-radius: t.$radius-sm;
+  display: flex;
+  padding: 0.1875rem;
+}
+
+.cat-toolbar__toggle-button {
+  @include t.button-base;
+
+  background: transparent;
+  border: 1px solid transparent;
+  color: t.$color-ink-muted;
+  font-size: 0.8125rem;
+  padding: 0.3125rem 0.625rem;
+}
+
+.cat-toolbar__toggle-button--active {
+  background: t.$color-surface;
+  border-color: t.$color-border-strong;
+  box-shadow: t.$shadow-sm;
+  color: t.$color-accent-catalog;
+}
+
+.cat-toolbar__reset {
+  @include t.button-quiet;
+
+  margin-left: auto;
+}

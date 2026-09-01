@@ -1,0 +1,51 @@
+<div class="cat-table" role="region" aria-label="Green coffee lots" tabindex="0">
+  <table class="cat-table__table">
+    <thead>
+      <tr>
+        @for (column of columns; track column.field) {
+          <th
+            scope="col"
+            [class.cat-table__cell--numeric]="column.numeric"
+            [attr.aria-sort]="ariaSortFor(column.field)"
+          >
+            <button type="button" class="cat-table__sort" (click)="onHeaderClick(column.field)">
+              <span>{{ column.label }}</span>
+              @if (directionFor(column.field) === 'asc') {
+                <span class="cat-table__caret" aria-hidden="true">▲</span>
+              } @else if (directionFor(column.field) === 'desc') {
+                <span class="cat-table__caret" aria-hidden="true">▼</span>
+              }
+            </button>
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (bean of items(); track bean.id) {
+        <tr>
+          <td>
+            <span class="cat-table__name">{{ bean.name }}</span>
+            <span class="cat-table__lot">{{ bean.id }} · {{ processLabels[bean.process] }}</span>
+          </td>
+          <td>
+            {{ bean.origin }}
+            <span class="cat-table__muted">{{ bean.region }}</span>
+          </td>
+          <td>{{ roastLabels[bean.roast] }}</td>
+          <td class="cat-table__cell--numeric cat-table__mono">{{ bean.score }}</td>
+          <td class="cat-table__cell--numeric cat-table__mono">
+            {{ bean.pricePerKg | currency: 'EUR' : 'symbol' : '1.2-2' }}
+          </td>
+          <td class="cat-table__cell--numeric cat-table__mono">{{ bean.stockKg | number }} kg</td>
+        </tr>
+      } @empty {
+        <tr>
+          <td class="cat-table__empty" [attr.colspan]="columns.length">
+            No lots match these filters.
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

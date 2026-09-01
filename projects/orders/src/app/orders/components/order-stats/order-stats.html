@@ -1,0 +1,27 @@
+<ul class="ord-stats">
+  <li class="ord-stats__tile">
+    <span class="ord-stats__label">Open orders</span>
+    <strong class="ord-stats__value">{{ summary().openOrders }}</strong>
+    <span class="ord-stats__hint">Intake, roasting, packed or on hold</span>
+  </li>
+
+  <li class="ord-stats__tile">
+    <span class="ord-stats__label">In roasting</span>
+    <strong class="ord-stats__value">{{ summary().kgInRoasting | number }} kg</strong>
+    <span class="ord-stats__hint">Currently on the drum schedule</span>
+  </li>
+
+  <li class="ord-stats__tile ord-stats__tile--alert">
+    <span class="ord-stats__label">Past due</span>
+    <strong class="ord-stats__value">{{ summary().lateOrders }}</strong>
+    <span class="ord-stats__hint">{{ lateShare() }}% of open orders</span>
+  </li>
+
+  <li class="ord-stats__tile">
+    <span class="ord-stats__label">Booked value</span>
+    <strong class="ord-stats__value">
+      {{ summary().revenueEur | currency: 'EUR' : 'symbol' : '1.0-0' }}
+    </strong>
+    <span class="ord-stats__hint">All orders in the pipeline</span>
+  </li>
+</ul>

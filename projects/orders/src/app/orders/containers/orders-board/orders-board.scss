@@ -1,0 +1,91 @@
+@use 'tokens' as t;
+
+.ord-board {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ord-board__header {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.ord-board__heading {
+  max-width: 42rem;
+}
+
+.ord-board__eyebrow {
+  @include t.eyebrow;
+
+  color: t.$color-accent-orders;
+  margin: 0 0 0.25rem;
+}
+
+.ord-board__title {
+  font-size: clamp(1.625rem, 3.5vw, 2.125rem);
+  letter-spacing: -0.02em;
+}
+
+.ord-board__lead {
+  color: t.$color-ink-muted;
+  margin: 0.5rem 0 0;
+}
+
+.ord-board__status {
+  color: t.$color-ink-subtle;
+  font-size: 0.8125rem;
+  min-height: 1.25rem;
+}
+
+.ord-board__loading {
+  align-items: center;
+  color: t.$color-accent-orders;
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.ord-board__spinner {
+  animation: ord-spin 700ms linear infinite;
+  border: 2px solid rgba(15, 107, 98, 0.25);
+  border-radius: 50%;
+  border-top-color: t.$color-accent-orders;
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
+@keyframes ord-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ord-board__error {
+  align-items: center;
+  background: t.$color-danger-soft;
+  border: 1px solid t.$color-danger;
+  border-radius: t.$radius-md;
+  color: t.$color-danger;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+
+  button {
+    @include t.button-quiet;
+  }
+}
+
+.ord-board__results {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: opacity 140ms ease;
+}
+
+.ord-board__results--stale {
+  opacity: 0.55;
+}

@@ -1,0 +1,41 @@
+// Global page frame. Loaded by whichever application owns the document: the
+// shell in federated mode, the remote itself when it runs standalone. Remotes
+// must never rely on this file being present — see the note in `_tokens.scss`.
+@use 'tokens' as t;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: t.$color-page;
+  color: t.$color-ink;
+  font-family: t.$font-sans;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: t.$color-ink;
+  line-height: 1.25;
+  margin: 0;
+}
+
+a {
+  color: t.$color-brand;
+}
+
+:focus-visible {
+  @include t.focus-ring;
+}

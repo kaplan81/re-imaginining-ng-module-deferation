@@ -1,0 +1,27 @@
+<nav class="ord-pager" aria-label="Orders pagination">
+  <p class="ord-pager__summary">
+    Showing <strong>{{ rangeStart() }}–{{ rangeEnd() }}</strong> of
+    <strong>{{ total() | number }}</strong> orders
+  </p>
+
+  <div class="ord-pager__controls">
+    <label class="ord-pager__page-size">
+      <span>Per page</span>
+      <select [value]="pageSize()" (change)="onPageSizeChange($event)">
+        @for (size of pageSizeOptions; track size) {
+          <option [value]="size">{{ size }}</option>
+        }
+      </select>
+    </label>
+
+    <button type="button" class="ord-pager__button" [disabled]="!canGoPrev()" (click)="onPrev()">
+      ← Previous
+    </button>
+
+    <span class="ord-pager__indicator">Page {{ page() }} / {{ totalPages() }}</span>
+
+    <button type="button" class="ord-pager__button" [disabled]="!canGoNext()" (click)="onNext()">
+      Next →
+    </button>
+  </div>
+</nav>

@@ -1,0 +1,128 @@
+@use 'tokens' as t;
+
+.shl-remote-status {
+  @include t.card(1.5rem);
+}
+
+.shl-remote-status__header {
+  align-items: flex-end;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.shl-remote-status__eyebrow {
+  @include t.eyebrow;
+
+  margin: 0 0 0.25rem;
+}
+
+.shl-remote-status__title {
+  font-size: 1.125rem;
+}
+
+.shl-remote-status__refresh {
+  @include t.button-quiet;
+}
+
+.shl-remote-status__list {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.shl-remote-status__item {
+  background: t.$color-surface-sunken;
+  border: 1px solid t.$color-border;
+  border-radius: t.$radius-md;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.125rem;
+}
+
+.shl-remote-status__item-head {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.shl-remote-status__name {
+  font-size: 1rem;
+}
+
+.shl-remote-status__chip {
+  @include t.chip(t.$color-ink-muted, t.$color-neutral-soft);
+}
+
+.shl-remote-status__chip--online {
+  @include t.chip(t.$color-positive, t.$color-positive-soft);
+}
+
+.shl-remote-status__chip--offline {
+  @include t.chip(t.$color-danger, t.$color-danger-soft);
+}
+
+.shl-remote-status__chip--checking {
+  @include t.chip(t.$color-warning, t.$color-warning-soft);
+}
+
+.shl-remote-status__dot {
+  background: currentcolor;
+  border-radius: 50%;
+  height: 0.4375rem;
+  width: 0.4375rem;
+}
+
+.shl-remote-status__tagline {
+  color: t.$color-ink-muted;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.shl-remote-status__meta {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+
+  div {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+  }
+
+  dt {
+    color: t.$color-ink-subtle;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    font-size: 0.8125rem;
+    margin: 0;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+}
+
+.shl-remote-status__mono {
+  font-family: t.$font-mono;
+}
+
+.shl-remote-status__cta {
+  color: t.$color-brand;
+  font-size: 0.875rem;
+  font-weight: 650;
+  margin-top: auto;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

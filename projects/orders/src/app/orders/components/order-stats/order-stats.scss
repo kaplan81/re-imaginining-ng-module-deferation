@@ -1,0 +1,43 @@
+@use 'tokens' as t;
+
+.ord-stats {
+  display: grid;
+  gap: 0.875rem;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ord-stats__tile {
+  @include t.card(1rem 1.125rem);
+
+  border-left: 3px solid t.$color-accent-orders;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+}
+
+.ord-stats__tile--alert {
+  border-left-color: t.$color-danger;
+
+  .ord-stats__value {
+    color: t.$color-danger;
+  }
+}
+
+.ord-stats__label {
+  @include t.eyebrow;
+}
+
+.ord-stats__value {
+  font-size: 1.625rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.ord-stats__hint {
+  color: t.$color-ink-subtle;
+  font-size: 0.75rem;
+}

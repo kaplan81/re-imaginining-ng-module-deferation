@@ -1,0 +1,140 @@
+@use 'tokens' as t;
+
+.cat-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cat-grid__item {
+  @include t.card(1.125rem);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition:
+    box-shadow 140ms ease,
+    transform 140ms ease;
+
+  &:hover {
+    box-shadow: t.$shadow-md;
+    transform: translateY(-2px);
+  }
+}
+
+.cat-grid__head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cat-grid__lot {
+  @include t.eyebrow;
+
+  font-family: t.$font-mono;
+}
+
+.cat-grid__score {
+  @include t.chip(t.$color-accent-catalog, t.$color-accent-catalog-soft);
+
+  font-family: t.$font-mono;
+}
+
+.cat-grid__name {
+  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
+}
+
+.cat-grid__origin {
+  color: t.$color-ink-muted;
+  font-size: 0.8125rem;
+  margin: 0;
+}
+
+.cat-grid__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.cat-grid__chip {
+  @include t.chip(t.$color-ink-muted, t.$color-neutral-soft);
+}
+
+.cat-grid__chip--roast-light {
+  @include t.chip(#8a6b1f, #fbf3d8);
+}
+
+.cat-grid__chip--roast-medium {
+  @include t.chip(#8a4a12, #f8e6d4);
+}
+
+.cat-grid__chip--roast-mediumDark {
+  @include t.chip(#6b3210, #efd9c6);
+}
+
+.cat-grid__chip--roast-dark {
+  @include t.chip(#3f2109, #e2cebb);
+}
+
+.cat-grid__chip--process {
+  @include t.chip(t.$color-accent-orders, t.$color-accent-orders-soft);
+}
+
+.cat-grid__notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3125rem;
+  margin: 0;
+}
+
+.cat-grid__note {
+  border: 1px solid t.$color-border;
+  border-radius: t.$radius-sm;
+  color: t.$color-ink-subtle;
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.375rem;
+}
+
+.cat-grid__figures {
+  border-top: 1px solid t.$color-border;
+  display: flex;
+  gap: 1.5rem;
+  margin: auto 0 0;
+  padding-top: 0.75rem;
+
+  dt {
+    @include t.eyebrow;
+  }
+
+  dd {
+    font-size: 1rem;
+    font-weight: 650;
+    margin: 0.125rem 0 0;
+  }
+
+  small {
+    color: t.$color-ink-subtle;
+    font-size: 0.6875rem;
+    font-weight: 500;
+  }
+}
+
+.cat-grid__stock--low {
+  color: t.$color-danger;
+}
+
+.cat-grid__stock--high {
+  color: t.$color-positive;
+}
+
+.cat-grid__empty {
+  @include t.card(2rem);
+
+  color: t.$color-ink-muted;
+  grid-column: 1 / -1;
+  text-align: center;
+}

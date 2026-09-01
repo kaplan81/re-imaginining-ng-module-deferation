@@ -1,0 +1,69 @@
+<div class="cat-toolbar">
+  <div class="cat-toolbar__field cat-toolbar__field--grow">
+    <label class="cat-toolbar__label" for="cat-search">Search lots</label>
+    <input
+      class="cat-toolbar__input"
+      id="cat-search"
+      type="search"
+      placeholder="Origin, region or tasting note"
+      [value]="search()"
+      (input)="onSearchInput($event)"
+    />
+  </div>
+
+  <div class="cat-toolbar__field">
+    <label class="cat-toolbar__label" for="cat-roast">Roast</label>
+    <select
+      class="cat-toolbar__select"
+      id="cat-roast"
+      [value]="roast()"
+      (change)="onRoastChange($event)"
+    >
+      <option value="">All roasts</option>
+      @for (level of roastLevels; track level) {
+        <option [value]="level">{{ roastLabels[level] }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="cat-toolbar__field">
+    <label class="cat-toolbar__label" for="cat-origin">Origin</label>
+    <select
+      class="cat-toolbar__select"
+      id="cat-origin"
+      [value]="origin()"
+      (change)="onOriginChange($event)"
+    >
+      <option value="">All origins</option>
+      @for (country of origins(); track country) {
+        <option [value]="country">{{ country }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="cat-toolbar__field">
+    <span class="cat-toolbar__label" id="cat-layout-label">Layout</span>
+    <div class="cat-toolbar__toggle" role="group" aria-labelledby="cat-layout-label">
+      <button
+        type="button"
+        class="cat-toolbar__toggle-button"
+        [class.cat-toolbar__toggle-button--active]="layout() === 'grid'"
+        [attr.aria-pressed]="layout() === 'grid'"
+        (click)="layout.set('grid')"
+      >
+        Cards
+      </button>
+      <button
+        type="button"
+        class="cat-toolbar__toggle-button"
+        [class.cat-toolbar__toggle-button--active]="layout() === 'table'"
+        [attr.aria-pressed]="layout() === 'table'"
+        (click)="layout.set('table')"
+      >
+        Table
+      </button>
+    </div>
+  </div>
+
+  <button type="button" class="cat-toolbar__reset" (click)="reset.emit()">Clear filters</button>
+</div>

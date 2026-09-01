@@ -56,3 +56,51 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use the `providedIn: 'root'` option for singleton services
 - Prefer the `@Service` decorator over `@Injectable({providedIn: 'root'})` for new singleton services (Angular v22+)
 - Use the `inject()` function instead of constructor injection
+
+---
+
+## This workspace
+
+Three independently built Angular applications composed at runtime by Angular
+Architects Native Federation. See `README.md` and `docs/ARCHITECTURE.md` first.
+
+| Project   | Role   | Port | Prefix | Feature folder                      |
+| --------- | ------ | ---- | ------ | ----------------------------------- |
+| `shell`   | host   | 4200 | `shl`  | `projects/shell/src/app/{app,home}` |
+| `catalog` | remote | 4201 | `cat`  | `projects/catalog/src/app/catalog`  |
+| `orders`  | remote | 4202 | `ord`  | `projects/orders/src/app/orders`    |
+
+### Rules that federation makes non-negotiable
+
+- **Never import across projects.** No file under `projects/shell` may import from
+  `projects/catalog` or `projects/orders`, or vice versa — not even a type. The
+  only contract is the exposed `./Routes` key plus the URL in
+  `projects/shell/public/federation.manifest.json`.
+- **Never add `provideHttpClient` to a shell `ApplicationConfig`.** Remotes provide
+  their own HTTP stack in their route providers so their interceptors cannot leak
+  into each other or into the host. The shell uses `fetch` when it needs the
+  network.
+- **Feature services use `@Service({ autoProvided: false })`** and are listed in
+  route providers. Root-provided singletons land in whichever injector is around —
+  the shell's, in federated mode.
+- **Component styles must be self-sufficient.** A remote's `styles.scss` is not
+  loaded by the shell. Use the compile-time SCSS tokens in `styles/_tokens.scss`
+  (`@use 'tokens' as t;`), never a CSS custom property defined in a global sheet.
+- **Do not extract a shared UI library** between the three applications. The
+  duplicated `remote-origin` component is intentional.
+- **Mocks stay deterministic.** Seeds are generated from fixed indices, and
+  `orders` computes dates against `REFERENCE_TODAY`, not `Date.now()`.
+
+### Layout conventions inside a feature folder
+
+`components/` (presentational) · `containers/` (stateful, route entry) ·
+`services/` · `models/` · `enums/` · `interceptors/` · `mocks/`. Enums follow the
+`enum X {...}` + `type XET = keyof typeof X` pattern. File names carry no
+`.component` / `.service` suffix (Angular v22 style guide).
+
+### After changing federation wiring
+
+Rebuild the affected project and confirm `dist/<project>/browser/remoteEntry.json`
+still lists the expected `exposes` keys. `tsconfig.federation.json` must name the
+exposed entry points — it is what the federation build compiles, separately from
+`tsconfig.app.json`.

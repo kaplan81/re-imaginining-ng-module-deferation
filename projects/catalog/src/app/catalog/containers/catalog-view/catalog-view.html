@@ -1,0 +1,76 @@
+<section class="cat-view">
+  <header class="cat-view__header">
+    <div class="cat-view__heading">
+      <p class="cat-view__eyebrow">Sourcing</p>
+      <h1 class="cat-view__title">Bean catalog</h1>
+      <p class="cat-view__lead">
+        Every green-coffee lot currently on offer. Search, filtering, sorting and paging are all
+        resolved by the catalog backend — the browser only ever holds one page.
+      </p>
+    </div>
+
+    <cat-remote-origin remote="catalog" />
+  </header>
+
+  @if (currentPage(); as page) {
+    <ul class="cat-view__stats">
+      <li>
+        <span class="cat-view__stat-label">Lots matching</span>
+        <strong class="cat-view__stat-value">{{ page.total | number }}</strong>
+      </li>
+      <li>
+        <span class="cat-view__stat-label">Average cupping score</span>
+        <strong class="cat-view__stat-value">{{ page.facets.averageScore }}</strong>
+      </li>
+      <li>
+        <span class="cat-view__stat-label">Stock in scope</span>
+        <strong class="cat-view__stat-value">{{ page.facets.totalStockKg | number }} kg</strong>
+      </li>
+    </ul>
+  }
+
+  <cat-catalog-toolbar
+    [origins]="origins()"
+    [(search)]="searchInput"
+    [(roast)]="roast"
+    [(origin)]="origin"
+    [(layout)]="layout"
+    (reset)="onReset()"
+  />
+
+  <div class="cat-view__status" role="status" aria-live="polite">
+    @if (pageResource.isLoading()) {
+      <span class="cat-view__loading">
+        <span class="cat-view__spinner" aria-hidden="true"></span>
+        Loading lots from /api/beans…
+      </span>
+    } @else if (isFiltered()) {
+      <span class="cat-view__filtered">Filters applied</span>
+    }
+  </div>
+
+  @if (pageResource.error()) {
+    <div class="cat-view__error" role="alert">
+      <span>The catalog backend did not answer.</span>
+      <button type="button" (click)="onReload()">Retry</button>
+    </div>
+  }
+
+  @if (currentPage(); as page) {
+    <div class="cat-view__results" [class.cat-view__results--stale]="pageResource.isLoading()">
+      @if (layout() === 'grid') {
+        <cat-bean-grid [items]="page.items" />
+      } @else {
+        <cat-bean-table [items]="page.items" [sort]="sort()" (sortChange)="onSortChange($event)" />
+      }
+
+      <cat-catalog-pager
+        [page]="page.page"
+        [pageSize]="page.pageSize"
+        [total]="page.total"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      />
+    </div>
+  }
+</section>

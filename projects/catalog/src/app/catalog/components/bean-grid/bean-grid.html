@@ -1,0 +1,45 @@
+<ul class="cat-grid">
+  @for (bean of items(); track bean.id) {
+    <li class="cat-grid__item">
+      <div class="cat-grid__head">
+        <span class="cat-grid__lot">{{ bean.id }}</span>
+        <span class="cat-grid__score" [attr.title]="'Cupping score ' + bean.score">
+          {{ bean.score }}
+        </span>
+      </div>
+
+      <h3 class="cat-grid__name">{{ bean.name }}</h3>
+      <p class="cat-grid__origin">{{ bean.origin }} · {{ bean.region }} · {{ bean.harvestYear }}</p>
+
+      <div class="cat-grid__chips">
+        <span class="cat-grid__chip cat-grid__chip--roast-{{ bean.roast }}">
+          {{ roastLabels[bean.roast] }}
+        </span>
+        <span class="cat-grid__chip cat-grid__chip--process">
+          {{ processLabels[bean.process] }}
+        </span>
+      </div>
+
+      <p class="cat-grid__notes">
+        @for (note of bean.tastingNotes; track note) {
+          <span class="cat-grid__note">{{ note }}</span>
+        }
+      </p>
+
+      <dl class="cat-grid__figures">
+        <div>
+          <dt>Price</dt>
+          <dd>{{ bean.pricePerKg | currency: 'EUR' : 'symbol' : '1.2-2' }}<small>/kg</small></dd>
+        </div>
+        <div>
+          <dt>Stock</dt>
+          <dd class="cat-grid__stock cat-grid__stock--{{ stockState(bean) }}">
+            {{ bean.stockKg | number }} kg
+          </dd>
+        </div>
+      </dl>
+    </li>
+  } @empty {
+    <li class="cat-grid__empty">No lots match these filters.</li>
+  }
+</ul>

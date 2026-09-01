@@ -1,0 +1,43 @@
+<div class="ord-toolbar">
+  <div class="ord-toolbar__search">
+    <label class="ord-toolbar__label" for="ord-search">Search orders</label>
+    <input
+      class="ord-toolbar__input"
+      id="ord-search"
+      type="search"
+      placeholder="Customer, city, blend or reference"
+      [value]="search()"
+      (input)="onSearchInput($event)"
+    />
+  </div>
+
+  <div class="ord-toolbar__filters">
+    <span class="ord-toolbar__label" id="ord-status-label">Status</span>
+
+    <div class="ord-toolbar__chips" role="group" aria-labelledby="ord-status-label">
+      <button
+        type="button"
+        class="ord-toolbar__chip"
+        [class.ord-toolbar__chip--active]="status() === ''"
+        [attr.aria-pressed]="status() === ''"
+        (click)="status.set('')"
+      >
+        All
+        <span class="ord-toolbar__count">{{ total() }}</span>
+      </button>
+
+      @for (option of statuses; track option) {
+        <button
+          type="button"
+          class="ord-toolbar__chip ord-toolbar__chip--{{ option }}"
+          [class.ord-toolbar__chip--active]="status() === option"
+          [attr.aria-pressed]="status() === option"
+          (click)="status.set(option)"
+        >
+          {{ statusLabels[option] }}
+          <span class="ord-toolbar__count">{{ counts()[option] }}</span>
+        </button>
+      }
+    </div>
+  </div>
+</div>

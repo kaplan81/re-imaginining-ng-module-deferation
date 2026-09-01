@@ -1,0 +1,16 @@
+<section class="shl-unavailable" role="alert">
+  <p class="shl-unavailable__eyebrow">Runtime composition failed</p>
+
+  <h1 class="shl-unavailable__title">{{ label() }} could not be loaded</h1>
+
+  <p class="shl-unavailable__body">
+    The shell is running, but the <code>{{ remote() }}</code> remote did not answer on
+    <code>localhost:{{ port() }}</code
+    >. Because composition happens at runtime, this is a deployment condition rather than a build
+    error &mdash; the rest of the shell keeps working.
+  </p>
+
+  <pre class="shl-unavailable__command"><code>{{ command() }}</code></pre>
+
+  <a class="shl-unavailable__link" routerLink="/home">Back to the overview</a>
+</section>

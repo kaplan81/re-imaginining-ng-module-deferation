@@ -1,0 +1,47 @@
+<section class="shl-home">
+  <div class="shl-home__hero">
+    <p class="shl-home__eyebrow">Angular 22 · Native Federation</p>
+
+    <h1 class="shl-home__title">One console, three <span>independently deployed</span> builds</h1>
+
+    <p class="shl-home__lead">
+      Roast Republic is a shell that owns nothing but layout, navigation and the federation
+      manifest. The bean catalog and the roast-orders board are separate Angular applications with
+      their own build, their own dev server and their own mocked backend. They meet for the first
+      time in the browser.
+    </p>
+
+    <ul class="shl-home__facts">
+      <li>
+        <strong>0</strong>
+        <span>build-time imports between shell and remotes</span>
+      </li>
+      <li>
+        <strong>3</strong>
+        <span>independent <code>ng build</code> targets</span>
+      </li>
+      <li>
+        <strong>1</strong>
+        <span>shared Angular instance on the page</span>
+      </li>
+    </ul>
+  </div>
+
+  <shl-remote-status />
+
+  <section class="shl-home__how" aria-labelledby="shl-home-how-title">
+    <h2 class="shl-home__section-title" id="shl-home-how-title">
+      What happens before the first route renders
+    </h2>
+
+    <ol class="shl-home__steps">
+      @for (step of steps; track step.order) {
+        <li class="shl-home__step">
+          <span class="shl-home__step-order" aria-hidden="true">{{ step.order }}</span>
+          <h3 class="shl-home__step-title">{{ step.title }}</h3>
+          <p class="shl-home__step-body">{{ step.body }}</p>
+        </li>
+      }
+    </ol>
+  </section>
+</section>

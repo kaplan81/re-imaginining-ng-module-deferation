@@ -1,0 +1,27 @@
+<header class="shl-header">
+  <div class="shl-header__inner">
+    <a class="shl-header__brand" routerLink="/home">
+      <span class="shl-header__mark" aria-hidden="true">RR</span>
+      <span class="shl-header__brand-text">
+        <strong>Roast Republic</strong>
+        <small>Specialty coffee operations</small>
+      </span>
+    </a>
+
+    <nav class="shl-header__nav" aria-label="Primary">
+      <a class="shl-header__link" routerLink="/home" routerLinkActive="shl-header__link--active">
+        Overview
+      </a>
+      @for (remote of remotes; track remote.name) {
+        <a
+          class="shl-header__link"
+          [routerLink]="remote.route"
+          routerLinkActive="shl-header__link--active"
+        >
+          {{ remote.label }}
+          <span class="shl-header__link-badge" aria-hidden="true">remote</span>
+        </a>
+      }
+    </nav>
+  </div>
+</header>

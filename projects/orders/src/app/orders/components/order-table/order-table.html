@@ -1,0 +1,62 @@
+<div class="ord-table" role="region" aria-label="Roast orders" tabindex="0">
+  <table class="ord-table__table">
+    <thead>
+      <tr>
+        @for (column of columns; track column.field) {
+          <th
+            scope="col"
+            [class.ord-table__cell--numeric]="column.numeric"
+            [attr.aria-sort]="ariaSortFor(column.field)"
+          >
+            <button type="button" class="ord-table__sort" (click)="onHeaderClick(column.field)">
+              <span>{{ column.label }}</span>
+              @if (directionFor(column.field) === 'asc') {
+                <span class="ord-table__caret" aria-hidden="true">▲</span>
+              } @else if (directionFor(column.field) === 'desc') {
+                <span class="ord-table__caret" aria-hidden="true">▼</span>
+              }
+            </button>
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (order of items(); track order.id) {
+        <tr [class.ord-table__row--late]="isLate(order)">
+          <td>
+            <span class="ord-table__reference">{{ order.reference }}</span>
+            <span class="ord-table__muted">{{ order.blend }}</span>
+          </td>
+          <td>
+            <span class="ord-table__customer">{{ order.customer }}</span>
+            <span class="ord-table__muted">{{ order.city }}</span>
+          </td>
+          <td>
+            <span class="ord-table__status ord-table__status--{{ order.status }}">
+              {{ statusLabels[order.status] }}
+            </span>
+          </td>
+          <td class="ord-table__cell--numeric ord-table__mono">
+            {{ order.quantityKg | number }} kg
+          </td>
+          <td class="ord-table__cell--numeric ord-table__mono">
+            {{ order.totalEur | currency: 'EUR' : 'symbol' : '1.0-0' }}
+          </td>
+          <td>
+            <span class="ord-table__due">{{ order.dueAt | date: 'mediumDate' }}</span>
+            <span class="ord-table__muted" [class.ord-table__muted--late]="isLate(order)">
+              {{ dueLabel(order) }}
+            </span>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td class="ord-table__empty" [attr.colspan]="columns.length">
+            No orders match these filters.
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

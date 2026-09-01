@@ -1,0 +1,55 @@
+<section class="ord-board">
+  <header class="ord-board__header">
+    <div class="ord-board__heading">
+      <p class="ord-board__eyebrow">Fulfilment</p>
+      <h1 class="ord-board__title">Roast orders</h1>
+      <p class="ord-board__lead">
+        Wholesale orders from intake to delivery. The tiles are aggregated by the fulfilment backend
+        over the full pipeline, so they stay correct while you page through results.
+      </p>
+    </div>
+
+    <ord-remote-origin remote="orders" />
+  </header>
+
+  @if (currentPage(); as page) {
+    <ord-order-stats [summary]="page.summary" />
+
+    <ord-orders-toolbar
+      [counts]="page.summary.byStatus"
+      [total]="totalOrders()"
+      [(search)]="searchInput"
+      [(status)]="status"
+    />
+  }
+
+  <div class="ord-board__status" role="status" aria-live="polite">
+    @if (pageResource.isLoading()) {
+      <span class="ord-board__loading">
+        <span class="ord-board__spinner" aria-hidden="true"></span>
+        Loading orders from /api/orders…
+      </span>
+    }
+  </div>
+
+  @if (pageResource.error()) {
+    <div class="ord-board__error" role="alert">
+      <span>The fulfilment backend did not answer.</span>
+      <button type="button" (click)="onReload()">Retry</button>
+    </div>
+  }
+
+  @if (currentPage(); as page) {
+    <div class="ord-board__results" [class.ord-board__results--stale]="pageResource.isLoading()">
+      <ord-order-table [items]="page.items" [sort]="sort()" (sortChange)="onSortChange($event)" />
+
+      <ord-orders-pager
+        [page]="page.page"
+        [pageSize]="page.pageSize"
+        [total]="page.total"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      />
+    </div>
+  }
+</section>

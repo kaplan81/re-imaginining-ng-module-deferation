@@ -1,0 +1,3 @@
+// The shell owns the document, so it owns the global page frame. Federated
+// remotes never get this stylesheet - see `styles/_tokens.scss`.
+@use 'base';

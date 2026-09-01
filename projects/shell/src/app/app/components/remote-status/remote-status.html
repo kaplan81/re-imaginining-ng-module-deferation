@@ -1,0 +1,74 @@
+<section class="shl-remote-status" aria-labelledby="shl-remote-status-title">
+  <header class="shl-remote-status__header">
+    <div>
+      <p class="shl-remote-status__eyebrow">Runtime topology</p>
+      <h2 class="shl-remote-status__title" id="shl-remote-status-title">Remotes in the manifest</h2>
+    </div>
+
+    <button type="button" class="shl-remote-status__refresh" (click)="onRefresh()">Re-probe</button>
+  </header>
+
+  <ul class="shl-remote-status__list">
+    @for (status of statuses(); track status.name) {
+      <li class="shl-remote-status__item">
+        <div class="shl-remote-status__item-head">
+          <h3 class="shl-remote-status__name">{{ status.label }}</h3>
+
+          @switch (status.health) {
+            @case ('online') {
+              <span class="shl-remote-status__chip shl-remote-status__chip--online">
+                <span class="shl-remote-status__dot" aria-hidden="true"></span>
+                Reachable
+              </span>
+            }
+            @case ('offline') {
+              <span class="shl-remote-status__chip shl-remote-status__chip--offline">
+                <span class="shl-remote-status__dot" aria-hidden="true"></span>
+                Unreachable
+              </span>
+            }
+            @default {
+              <span class="shl-remote-status__chip shl-remote-status__chip--checking">
+                <span class="shl-remote-status__dot" aria-hidden="true"></span>
+                Probing…
+              </span>
+            }
+          }
+        </div>
+
+        <p class="shl-remote-status__tagline">{{ status.tagline }}</p>
+
+        <dl class="shl-remote-status__meta">
+          <div>
+            <dt>Remote name</dt>
+            <dd class="shl-remote-status__mono">{{ status.name }}</dd>
+          </div>
+          <div>
+            <dt>Entry</dt>
+            <dd class="shl-remote-status__mono">
+              {{ status.remoteEntryUrl ?? 'not in manifest' }}
+            </dd>
+          </div>
+          <div>
+            <dt>Exposes</dt>
+            <dd class="shl-remote-status__mono">
+              {{ status.exposed.length ? status.exposed.join(', ') : '—' }}
+            </dd>
+          </div>
+          <div>
+            <dt>Shared packages</dt>
+            <dd class="shl-remote-status__mono">{{ status.sharedCount ?? '—' }}</dd>
+          </div>
+          <div>
+            <dt>Owned by</dt>
+            <dd>{{ status.owner }}</dd>
+          </div>
+        </dl>
+
+        <a class="shl-remote-status__cta" [routerLink]="status.route">
+          Open {{ status.label }} →
+        </a>
+      </li>
+    }
+  </ul>
+</section>
