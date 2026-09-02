@@ -2,11 +2,11 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 > **This file is the single source of truth for agent instructions here.**
 > `.claude/CLAUDE.md` and `.gemini/GEMINI.md` do nothing but `@`-import it, so
-> every tool
-> reads the same text. Add or change instructions in this file only — never in
-> the importers, and never by copying a section across. Keep both importers:
-> Claude Code loads `CLAUDE.md` and never `AGENTS.md`, so deleting it would leave
-> a session with no project instructions.
+> every tool reads the same text. Add or change instructions in this file only —
+> never in the importers, and never by copying a section across.
+>
+> Keep the importers. Claude Code loads `CLAUDE.md` and never `AGENTS.md`, so
+> deleting it would leave a session with no project instructions at all.
 
 ## TypeScript Best Practices
 
