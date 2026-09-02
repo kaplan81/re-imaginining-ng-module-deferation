@@ -6,10 +6,10 @@ import type { OrderSummary } from '../../models/order.model';
 @Component({
   selector: 'ord-order-stats',
   imports: [CurrencyPipe, DecimalPipe],
-  templateUrl: './order-stats.html',
-  styleUrl: './order-stats.scss',
+  templateUrl: './order-stats.component.html',
+  styleUrl: './order-stats.component.scss',
 })
-export class OrderStats {
+export class OrderStatsComponent {
   readonly summary = input.required<OrderSummary>();
 
   protected readonly lateShare = computed(() => {

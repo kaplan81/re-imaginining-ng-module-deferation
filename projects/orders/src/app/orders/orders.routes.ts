@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import type { Routes } from '@angular/router';
 
 import { ordersMockInterceptor } from './interceptors/orders-mock/orders-mock.interceptor';
-import { Orders } from './services/orders/orders';
+import { OrdersService } from './services/orders/orders.service';
 
 /**
  * Exposed as `./Routes` by `federation.config.mjs`. Same shape as the catalog
@@ -12,8 +12,10 @@ import { Orders } from './services/orders/orders';
 export const routes: Routes = [
   {
     path: '',
-    providers: [provideHttpClient(withInterceptors([ordersMockInterceptor])), Orders],
+    providers: [provideHttpClient(withInterceptors([ordersMockInterceptor])), OrdersService],
     loadComponent: () =>
-      import('./containers/orders-board/orders-board').then((m) => m.OrdersBoard),
+      import('./containers/orders-board/orders-board.component').then(
+        (m) => m.OrdersBoardComponent,
+      ),
   },
 ];

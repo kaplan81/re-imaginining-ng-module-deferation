@@ -47,7 +47,7 @@ import { Component, input } from '@angular/core';
     }
   `,
 })
-export class RemoteOrigin {
+export class RemoteOriginComponent {
   readonly remote = input.required<string>();
 
   /**

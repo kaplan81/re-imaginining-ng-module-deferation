@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 
-import { RemoteStatus } from '../../../app/components/remote-status/remote-status';
+import { RemoteStatusComponent } from '../../../app/components/remote-status/remote-status.component';
 
 @Component({
   selector: 'shl-home',
-  imports: [RemoteStatus],
-  templateUrl: './home.html',
-  styleUrl: './home.scss',
+  imports: [RemoteStatusComponent],
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss',
 })
-export class Home {
+export class HomeComponent {
   protected readonly steps = [
     {
       order: '01',

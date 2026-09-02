@@ -17,10 +17,10 @@ interface Column {
 @Component({
   selector: 'cat-bean-table',
   imports: [CurrencyPipe, DecimalPipe],
-  templateUrl: './bean-table.html',
-  styleUrl: './bean-table.scss',
+  templateUrl: './bean-table.component.html',
+  styleUrl: './bean-table.component.scss',
 })
-export class BeanTable {
+export class BeanTableComponent {
   readonly items = input.required<readonly Bean[]>();
   readonly sort = input<BeanSort | null>(null);
 

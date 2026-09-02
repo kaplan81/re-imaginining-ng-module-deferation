@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { REMOTES } from '../../models/remote.model';
-import { RemoteRegistry } from './remote-registry';
+import { RemoteRegistryService } from './remote-registry.service';
 
 const MANIFEST = {
   catalog: 'http://localhost:4201/remoteEntry.json',
@@ -12,12 +12,12 @@ function jsonResponse(body: unknown): Response {
   return { ok: true, status: 200, json: async () => body } as Response;
 }
 
-describe('RemoteRegistry', () => {
-  let registry: RemoteRegistry;
+describe('RemoteRegistryService', () => {
+  let registry: RemoteRegistryService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    registry = TestBed.inject(RemoteRegistry);
+    registry = TestBed.inject(RemoteRegistryService);
   });
 
   afterEach(() => {

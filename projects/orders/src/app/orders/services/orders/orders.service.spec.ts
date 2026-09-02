@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { ORDER_STATUSES } from '../../enums/order-status.enum';
 import type { OrderPage } from '../../models/order.model';
-import { Orders } from './orders';
+import { OrdersService } from './orders.service';
 
 const emptyPage: OrderPage = {
   items: [],
@@ -22,15 +22,15 @@ const emptyPage: OrderPage = {
   },
 };
 
-describe('Orders', () => {
-  let orders: Orders;
+describe('OrdersService', () => {
+  let orders: OrdersService;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), Orders],
+      providers: [provideHttpClient(), provideHttpClientTesting(), OrdersService],
     });
-    orders = TestBed.inject(Orders);
+    orders = TestBed.inject(OrdersService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 

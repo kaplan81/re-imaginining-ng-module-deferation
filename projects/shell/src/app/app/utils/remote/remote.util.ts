@@ -2,7 +2,7 @@ import type { Routes } from '@angular/router';
 
 import { federation } from '../../../../federation';
 import type { RemoteName } from '../../models/remote.model';
-import { RemoteUnavailable } from '../../containers/remote-unavailable/remote-unavailable';
+import { RemoteUnavailableComponent } from '../../containers/remote-unavailable/remote-unavailable.component';
 
 /** Every remote in this workspace exposes its route table under the same key. */
 export const EXPOSED_ROUTES = './Routes';
@@ -36,7 +36,7 @@ function remoteUnavailableRoutes(remote: RemoteName): Routes {
   return [
     {
       path: '**',
-      component: RemoteUnavailable,
+      component: RemoteUnavailableComponent,
       data: { remote },
     },
   ];

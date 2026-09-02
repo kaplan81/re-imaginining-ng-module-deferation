@@ -15,10 +15,10 @@ const PORTS: Record<RemoteName, number> = {
 @Component({
   selector: 'shl-remote-unavailable',
   imports: [RouterLink],
-  templateUrl: './remote-unavailable.html',
-  styleUrl: './remote-unavailable.scss',
+  templateUrl: './remote-unavailable.component.html',
+  styleUrl: './remote-unavailable.component.scss',
 })
-export class RemoteUnavailable {
+export class RemoteUnavailableComponent {
   readonly #route = inject(ActivatedRoute);
 
   protected readonly remote = computed<RemoteName>(

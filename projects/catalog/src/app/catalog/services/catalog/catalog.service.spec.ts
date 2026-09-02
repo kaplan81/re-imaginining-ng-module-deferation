@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 
 import type { BeanPage } from '../../models/bean.model';
-import { Catalog } from './catalog';
+import { CatalogService } from './catalog.service';
 
 const emptyPage: BeanPage = {
   items: [],
@@ -13,15 +13,15 @@ const emptyPage: BeanPage = {
   facets: { origins: [], totalStockKg: 0, averageScore: 0 },
 };
 
-describe('Catalog', () => {
-  let catalog: Catalog;
+describe('CatalogService', () => {
+  let catalog: CatalogService;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), Catalog],
+      providers: [provideHttpClient(), provideHttpClientTesting(), CatalogService],
     });
-    catalog = TestBed.inject(Catalog);
+    catalog = TestBed.inject(CatalogService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 

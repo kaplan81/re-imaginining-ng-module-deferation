@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-import { Header } from '../../components/header/header';
+import { HeaderComponent } from '../../components/header/header.component';
 
 @Component({
   selector: 'shl-root',
-  imports: [RouterOutlet, Header],
+  imports: [RouterOutlet, HeaderComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

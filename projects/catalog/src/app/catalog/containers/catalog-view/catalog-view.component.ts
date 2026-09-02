@@ -10,18 +10,18 @@ import {
 import { DecimalPipe } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 
-import { BeanGrid } from '../../components/bean-grid/bean-grid';
-import { BeanTable } from '../../components/bean-table/bean-table';
-import { CatalogPager } from '../../components/catalog-pager/catalog-pager';
+import { BeanGridComponent } from '../../components/bean-grid/bean-grid.component';
+import { BeanTableComponent } from '../../components/bean-table/bean-table.component';
+import { CatalogPagerComponent } from '../../components/catalog-pager/catalog-pager.component';
 import {
   type CatalogLayout,
-  CatalogToolbar,
-} from '../../components/catalog-toolbar/catalog-toolbar';
-import { RemoteOrigin } from '../../components/remote-origin/remote-origin';
+  CatalogToolbarComponent,
+} from '../../components/catalog-toolbar/catalog-toolbar.component';
+import { RemoteOriginComponent } from '../../components/remote-origin/remote-origin.component';
 import type { RoastLevelET } from '../../enums/roast-level.enum';
 import type { BeanPage } from '../../models/bean.model';
 import type { BeanSort, CatalogQuery } from '../../models/catalog-query.model';
-import { Catalog } from '../../services/catalog/catalog';
+import { CatalogService } from '../../services/catalog/catalog.service';
 
 const DEFAULT_PAGE_SIZE = 12;
 const DEFAULT_SORT: BeanSort = { field: 'score', direction: 'desc' };
@@ -29,12 +29,19 @@ const SEARCH_DEBOUNCE_MS = 250;
 
 @Component({
   selector: 'cat-catalog-view',
-  imports: [DecimalPipe, BeanGrid, BeanTable, CatalogPager, CatalogToolbar, RemoteOrigin],
-  templateUrl: './catalog-view.html',
-  styleUrl: './catalog-view.scss',
+  imports: [
+    DecimalPipe,
+    BeanGridComponent,
+    BeanTableComponent,
+    CatalogPagerComponent,
+    CatalogToolbarComponent,
+    RemoteOriginComponent,
+  ],
+  templateUrl: './catalog-view.component.html',
+  styleUrl: './catalog-view.component.scss',
 })
-export class CatalogView {
-  readonly #catalog = inject(Catalog);
+export class CatalogViewComponent {
+  readonly #catalog = inject(CatalogService);
 
   /** Raw input value; `debounced` is the experimental v22 signal equivalent of `debounceTime`. */
   protected readonly searchInput = signal('');

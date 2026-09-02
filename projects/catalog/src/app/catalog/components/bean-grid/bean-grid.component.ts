@@ -8,10 +8,10 @@ import type { Bean } from '../../models/bean.model';
 @Component({
   selector: 'cat-bean-grid',
   imports: [CurrencyPipe, DecimalPipe],
-  templateUrl: './bean-grid.html',
-  styleUrl: './bean-grid.scss',
+  templateUrl: './bean-grid.component.html',
+  styleUrl: './bean-grid.component.scss',
 })
-export class BeanGrid {
+export class BeanGridComponent {
   readonly items = input.required<readonly Bean[]>();
 
   protected readonly roastLabels = ROAST_LEVEL_LABELS;

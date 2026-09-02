@@ -2,13 +2,13 @@ import { DecimalPipe } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
 
 @Component({
-  selector: 'cat-catalog-pager',
+  selector: 'ord-orders-pager',
   imports: [DecimalPipe],
-  templateUrl: './catalog-pager.html',
-  styleUrl: './catalog-pager.scss',
+  templateUrl: './orders-pager.component.html',
+  styleUrl: './orders-pager.component.scss',
 })
-export class CatalogPager {
-  static readonly pageSizes: readonly number[] = [12, 24, 48];
+export class OrdersPagerComponent {
+  static readonly pageSizes: readonly number[] = [10, 25, 50];
 
   readonly page = input.required<number>();
   readonly pageSize = input.required<number>();
@@ -17,7 +17,7 @@ export class CatalogPager {
   readonly pageChange = output<number>();
   readonly pageSizeChange = output<number>();
 
-  protected readonly pageSizeOptions = CatalogPager.pageSizes;
+  protected readonly pageSizeOptions = OrdersPagerComponent.pageSizes;
 
   protected readonly totalPages = computed(() =>
     Math.max(1, Math.ceil(this.total() / this.pageSize())),

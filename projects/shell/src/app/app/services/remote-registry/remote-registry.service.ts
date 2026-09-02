@@ -25,7 +25,7 @@ interface RemoteEntry {
  * providers in `catalog.routes.ts` / `orders.routes.ts`.
  */
 @Service()
-export class RemoteRegistry {
+export class RemoteRegistryService {
   readonly #statuses = signal<readonly RemoteStatus[]>(REMOTES.map((remote) => toChecking(remote)));
 
   readonly statuses = this.#statuses.asReadonly();

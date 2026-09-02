@@ -129,8 +129,9 @@ Each remote ships its own mocked backend and provides it **at route level**:
 // projects/catalog/src/app/catalog/catalog.routes.ts
 {
   path: '',
-  providers: [provideHttpClient(withInterceptors([catalogMockInterceptor])), Catalog],
-  loadComponent: () => import('./containers/catalog-view/catalog-view').then((m) => m.CatalogView),
+  providers: [provideHttpClient(withInterceptors([catalogMockInterceptor])), CatalogService],
+  loadComponent: () =>
+    import('./containers/catalog-view/catalog-view.component').then((m) => m.CatalogViewComponent),
 }
 ```
 
@@ -207,12 +208,12 @@ the code path a down remote takes in production.
 
 42 specs, no browser required:
 
-| Level             | Where                               | What it protects                                            |
-| ----------------- | ----------------------------------- | ----------------------------------------------------------- |
-| Mock backend      | `*-mock.interceptor.spec.ts`        | The API contract: paging, filters, sort, facets, aggregates |
-| Service           | `catalog.spec.ts`, `orders.spec.ts` | Query-param encoding, via `HttpTestingController`           |
-| Shell composition | `app.routes.spec.ts`                | Route table shape, lazy loading, and the fallback path      |
-| Shell runtime     | `remote-registry.spec.ts`           | Manifest reading and health mapping, with `fetch` stubbed   |
+| Level             | Where                                               | What it protects                                            |
+| ----------------- | --------------------------------------------------- | ----------------------------------------------------------- |
+| Mock backend      | `*-mock.interceptor.spec.ts`                        | The API contract: paging, filters, sort, facets, aggregates |
+| Service           | `catalog.service.spec.ts`, `orders.service.spec.ts` | Query-param encoding, via `HttpTestingController`           |
+| Shell composition | `app.routes.spec.ts`                                | Route table shape, lazy loading, and the fallback path      |
+| Shell runtime     | `remote-registry.service.spec.ts`                   | Manifest reading and health mapping, with `fetch` stubbed   |
 
 What is deliberately **not** unit-tested is the federation runtime itself: shared
 version negotiation and import-map installation are integration behaviour. Under

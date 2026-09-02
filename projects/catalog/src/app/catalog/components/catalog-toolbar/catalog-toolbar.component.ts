@@ -6,10 +6,10 @@ export type CatalogLayout = 'grid' | 'table';
 
 @Component({
   selector: 'cat-catalog-toolbar',
-  templateUrl: './catalog-toolbar.html',
-  styleUrl: './catalog-toolbar.scss',
+  templateUrl: './catalog-toolbar.component.html',
+  styleUrl: './catalog-toolbar.component.scss',
 })
-export class CatalogToolbar {
+export class CatalogToolbarComponent {
   readonly origins = input.required<readonly string[]>();
 
   readonly search = model.required<string>();

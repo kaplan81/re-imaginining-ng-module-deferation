@@ -1,6 +1,6 @@
 import type { Route, Routes } from '@angular/router';
 
-import { RemoteUnavailable } from './containers/remote-unavailable/remote-unavailable';
+import { RemoteUnavailableComponent } from './containers/remote-unavailable/remote-unavailable.component';
 import { routes } from './app.routes';
 
 function routeFor(path: string): Route {
@@ -48,7 +48,7 @@ describe('shell routes', () => {
         const loaded = (await routeFor(remote).loadChildren!()) as Routes;
 
         expect(loaded).toHaveLength(1);
-        expect(loaded[0].component).toBe(RemoteUnavailable);
+        expect(loaded[0].component).toBe(RemoteUnavailableComponent);
         expect(loaded[0].data).toEqual({ remote });
         expect(error).toHaveBeenCalled();
 

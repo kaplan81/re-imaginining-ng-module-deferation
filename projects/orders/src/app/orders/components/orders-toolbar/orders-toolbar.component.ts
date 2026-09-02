@@ -8,10 +8,10 @@ import {
 
 @Component({
   selector: 'ord-orders-toolbar',
-  templateUrl: './orders-toolbar.html',
-  styleUrl: './orders-toolbar.scss',
+  templateUrl: './orders-toolbar.component.html',
+  styleUrl: './orders-toolbar.component.scss',
 })
-export class OrdersToolbar {
+export class OrdersToolbarComponent {
   readonly counts = input.required<Readonly<Record<OrderStatusET, number>>>();
   readonly total = input.required<number>();
 

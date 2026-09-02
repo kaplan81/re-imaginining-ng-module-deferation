@@ -5,14 +5,39 @@
     "packageManager": "npm"
   },
   "newProjectRoot": "projects",
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss",
+      "type": "component",
+      "addTypeToClassName": true
+    },
+    "@schematics/angular:directive": {
+      "type": "directive",
+      "addTypeToClassName": true
+    },
+    "@schematics/angular:service": {
+      "type": "service",
+      "addTypeToClassName": true
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
+    }
+  },
   "projects": {
     "shell": {
       "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
       "root": "projects/shell",
       "sourceRoot": "projects/shell/src",
       "prefix": "shl",
@@ -115,11 +140,6 @@
     },
     "catalog": {
       "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
       "root": "projects/catalog",
       "sourceRoot": "projects/catalog/src",
       "prefix": "cat",
@@ -222,11 +242,6 @@
     },
     "orders": {
       "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
       "root": "projects/orders",
       "sourceRoot": "projects/orders/src",
       "prefix": "ord",

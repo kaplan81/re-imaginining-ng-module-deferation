@@ -16,10 +16,10 @@ interface Column {
 @Component({
   selector: 'ord-order-table',
   imports: [CurrencyPipe, DatePipe, DecimalPipe],
-  templateUrl: './order-table.html',
-  styleUrl: './order-table.scss',
+  templateUrl: './order-table.component.html',
+  styleUrl: './order-table.component.scss',
 })
-export class OrderTable {
+export class OrderTableComponent {
   readonly items = input.required<readonly Order[]>();
   readonly sort = input<OrderSort | null>(null);
 

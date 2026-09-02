@@ -14,7 +14,7 @@ const ENDPOINT = '/api/beans';
  * the catalog feature and keeps the shell free of catalog concepts.
  */
 @Service({ autoProvided: false })
-export class Catalog {
+export class CatalogService {
   readonly #http = inject(HttpClient);
 
   search(query: CatalogQuery): Observable<BeanPage> {

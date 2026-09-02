@@ -9,15 +9,15 @@ import {
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
-import { OrderStats } from '../../components/order-stats/order-stats';
-import { OrderTable } from '../../components/order-table/order-table';
-import { OrdersPager } from '../../components/orders-pager/orders-pager';
-import { OrdersToolbar } from '../../components/orders-toolbar/orders-toolbar';
-import { RemoteOrigin } from '../../components/remote-origin/remote-origin';
+import { OrderStatsComponent } from '../../components/order-stats/order-stats.component';
+import { OrderTableComponent } from '../../components/order-table/order-table.component';
+import { OrdersPagerComponent } from '../../components/orders-pager/orders-pager.component';
+import { OrdersToolbarComponent } from '../../components/orders-toolbar/orders-toolbar.component';
+import { RemoteOriginComponent } from '../../components/remote-origin/remote-origin.component';
 import type { OrderStatusET } from '../../enums/order-status.enum';
 import type { OrderPage } from '../../models/order.model';
 import type { OrderSort, OrdersQuery } from '../../models/orders-query.model';
-import { Orders } from '../../services/orders/orders';
+import { OrdersService } from '../../services/orders/orders.service';
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_SORT: OrderSort = { field: 'dueAt', direction: 'asc' };
@@ -25,12 +25,18 @@ const SEARCH_DEBOUNCE_MS = 250;
 
 @Component({
   selector: 'ord-orders-board',
-  imports: [OrderStats, OrderTable, OrdersPager, OrdersToolbar, RemoteOrigin],
-  templateUrl: './orders-board.html',
-  styleUrl: './orders-board.scss',
+  imports: [
+    OrderStatsComponent,
+    OrderTableComponent,
+    OrdersPagerComponent,
+    OrdersToolbarComponent,
+    RemoteOriginComponent,
+  ],
+  templateUrl: './orders-board.component.html',
+  styleUrl: './orders-board.component.scss',
 })
-export class OrdersBoard {
-  readonly #orders = inject(Orders);
+export class OrdersBoardComponent {
+  readonly #orders = inject(OrdersService);
 
   protected readonly searchInput = signal('');
   readonly #search = debounced(this.searchInput, SEARCH_DEBOUNCE_MS);

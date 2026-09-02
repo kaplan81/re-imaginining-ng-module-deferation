@@ -95,8 +95,38 @@ Architects Native Federation. See `README.md` and `docs/ARCHITECTURE.md` first.
 
 `components/` (presentational) · `containers/` (stateful, route entry) ·
 `services/` · `models/` · `enums/` · `interceptors/` · `mocks/`. Enums follow the
-`enum X {...}` + `type XET = keyof typeof X` pattern. File names carry no
-`.component` / `.service` suffix (Angular v22 style guide).
+`enum X {...}` + `type XET = keyof typeof X` pattern.
+
+### Naming: the 2016 style guide, deliberately
+
+This workspace does **not** follow the suffix-less Angular v20+ style guide. Every
+file carries its type in the name, and every class repeats it:
+
+| Kind        | File                          | Class / symbol           |
+| ----------- | ----------------------------- | ------------------------ |
+| Component   | `bean-grid.component.ts`      | `BeanGridComponent`      |
+| Directive   | `x.directive.ts`              | `XDirective`             |
+| Service     | `catalog.service.ts`          | `CatalogService`         |
+| Pipe        | `x.pipe.ts`                   | `XPipe`                  |
+| Guard       | `x.guard.ts`                  | `xGuard`                 |
+| Resolver    | `x.resolver.ts`               | `xResolver`              |
+| Interceptor | `catalog-mock.interceptor.ts` | `catalogMockInterceptor` |
+
+- **Template and style siblings carry the same suffix** —
+  `bean-grid.component.html`, `bean-grid.component.scss`.
+- **Specs mirror the file they test** — `catalog.service.spec.ts`.
+- **Containers are components, so they are suffixed `.component.ts` with a
+  `Component` class suffix** — never `.container.ts` / `Container`. The
+  `containers/` folder is what marks the stateful, route-entry role; the filename
+  does not need to say it twice.
+- **The one exception is each project's `app/containers/app/app.ts`** (class
+  `App`, with `app.html` / `app.scss`). It stays suffix-free on purpose: it is the
+  application wrapper that `bootstrap.ts` mounts, not a feature component, and the
+  missing suffix is the signal.
+- The workspace-level `schematics` block in `angular.json` encodes all of this
+  (`type` + `addTypeToClassName: true`, and `typeSeparator: "."` for the kinds
+  that need it), so `ng generate` produces conforming files for every project. Do
+  not add per-project `schematics` overrides — they shadow it.
 
 ### After changing federation wiring
 
