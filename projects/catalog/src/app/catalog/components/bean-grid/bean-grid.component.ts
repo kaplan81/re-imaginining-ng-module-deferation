@@ -12,12 +12,12 @@ import type { Bean } from '../../models/bean.model';
   styleUrl: './bean-grid.component.scss',
 })
 export class BeanGridComponent {
-  readonly items = input.required<readonly Bean[]>();
+  items = input.required<readonly Bean[]>();
 
-  protected readonly roastLabels = ROAST_LEVEL_LABELS;
-  protected readonly processLabels = COFFEE_PROCESS_LABELS;
+  roastLabels = ROAST_LEVEL_LABELS;
+  processLabels = COFFEE_PROCESS_LABELS;
 
-  protected stockState(bean: Bean): 'low' | 'ok' | 'high' {
+  stockState(bean: Bean): 'low' | 'ok' | 'high' {
     if (bean.stockKg < 60) {
       return 'low';
     }

@@ -36,16 +36,16 @@ const SEARCH_DEBOUNCE_MS = 250;
   styleUrl: './orders-board.component.scss',
 })
 export class OrdersBoardComponent {
-  readonly #orders = inject(OrdersService);
+  #orders = inject(OrdersService);
 
-  protected readonly searchInput = signal('');
-  readonly #search = debounced(this.searchInput, SEARCH_DEBOUNCE_MS);
+  searchInput = signal('');
+  #search = debounced(this.searchInput, SEARCH_DEBOUNCE_MS);
 
-  protected readonly status = signal<OrderStatusET | ''>('');
-  protected readonly pageSize = signal(DEFAULT_PAGE_SIZE);
-  protected readonly sort = signal<OrderSort | null>(DEFAULT_SORT);
+  status = signal<OrderStatusET | ''>('');
+  pageSize = signal(DEFAULT_PAGE_SIZE);
+  sort = signal<OrderSort | null>(DEFAULT_SORT);
 
-  protected readonly page = linkedSignal<string, number>({
+  page = linkedSignal<string, number>({
     source: () =>
       [
         this.#search.value(),
@@ -57,7 +57,7 @@ export class OrdersBoardComponent {
     computation: () => 1,
   });
 
-  readonly #query = computed<OrdersQuery>(() => ({
+  #query = computed<OrdersQuery>(() => ({
     q: this.#search.value().trim() || undefined,
     status: this.status() || undefined,
     page: this.page(),
@@ -65,36 +65,36 @@ export class OrdersBoardComponent {
     sort: this.sort() ?? undefined,
   }));
 
-  protected readonly pageResource = resource({
+  pageResource = resource({
     params: () => this.#query(),
     loader: ({ params }) => firstValueFrom(this.#orders.search(params)),
   });
 
   /** Stale-while-revalidate: the board keeps its shape while the next page loads. */
-  protected readonly currentPage = linkedSignal<OrderPage | undefined, OrderPage | undefined>({
+  currentPage = linkedSignal<OrderPage | undefined, OrderPage | undefined>({
     source: () => this.pageResource.value(),
     computation: (next, previous) => next ?? previous?.value,
   });
 
-  protected readonly totalOrders = computed(() => {
+  totalOrders = computed(() => {
     const counts = this.currentPage()?.summary.byStatus;
 
     return counts ? Object.values(counts).reduce((sum, count) => sum + count, 0) : 0;
   });
 
-  protected onSortChange(sort: OrderSort | null): void {
+  onSortChange(sort: OrderSort | null): void {
     this.sort.set(sort);
   }
 
-  protected onPageChange(page: number): void {
+  onPageChange(page: number): void {
     this.page.set(page);
   }
 
-  protected onPageSizeChange(size: number): void {
+  onPageSizeChange(size: number): void {
     this.pageSize.set(size);
   }
 
-  protected onReload(): void {
+  onReload(): void {
     this.pageResource.reload();
   }
 }

@@ -11,5 +11,5 @@ import { REMOTES } from '../../models/remote.model';
 })
 export class HeaderComponent {
   /** Navigation is derived from the shell's remote declarations, not hand-written. */
-  protected readonly remotes = REMOTES;
+  remotes = REMOTES;
 }

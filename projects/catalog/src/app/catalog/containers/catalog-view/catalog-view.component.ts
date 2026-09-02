@@ -41,24 +41,24 @@ const SEARCH_DEBOUNCE_MS = 250;
   styleUrl: './catalog-view.component.scss',
 })
 export class CatalogViewComponent {
-  readonly #catalog = inject(CatalogService);
+  #catalog = inject(CatalogService);
 
   /** Raw input value; `debounced` is the experimental v22 signal equivalent of `debounceTime`. */
-  protected readonly searchInput = signal('');
-  readonly #search = debounced(this.searchInput, SEARCH_DEBOUNCE_MS);
+  searchInput = signal('');
+  #search = debounced(this.searchInput, SEARCH_DEBOUNCE_MS);
 
-  protected readonly roast = signal<RoastLevelET | ''>('');
-  protected readonly origin = signal('');
-  protected readonly layout = signal<CatalogLayout>('grid');
-  protected readonly pageSize = signal(DEFAULT_PAGE_SIZE);
-  protected readonly sort = signal<BeanSort | null>(DEFAULT_SORT);
+  roast = signal<RoastLevelET | ''>('');
+  origin = signal('');
+  layout = signal<CatalogLayout>('grid');
+  pageSize = signal(DEFAULT_PAGE_SIZE);
+  sort = signal<BeanSort | null>(DEFAULT_SORT);
 
   /**
    * Paging is derived state: any change to the filters, the page size or the sort
    * has to send the user back to page one, while explicit `page.set()` calls from
    * the pager still win until the next filter change.
    */
-  protected readonly page = linkedSignal<string, number>({
+  page = linkedSignal<string, number>({
     source: () =>
       [
         this.#search.value(),
@@ -71,7 +71,7 @@ export class CatalogViewComponent {
     computation: () => 1,
   });
 
-  readonly #query = computed<CatalogQuery>(() => ({
+  #query = computed<CatalogQuery>(() => ({
     q: this.#search.value().trim() || undefined,
     roast: this.roast() || undefined,
     origin: this.origin() || undefined,
@@ -80,7 +80,7 @@ export class CatalogViewComponent {
     sort: this.sort() ?? undefined,
   }));
 
-  protected readonly pageResource = resource({
+  pageResource = resource({
     params: () => this.#query(),
     loader: ({ params }) => firstValueFrom(this.#catalog.search(params)),
   });
@@ -89,36 +89,34 @@ export class CatalogViewComponent {
    * Keeps the last successfully loaded page on screen while the next one is in
    * flight, so filtering does not blank the layout on every keystroke.
    */
-  protected readonly currentPage = linkedSignal<BeanPage | undefined, BeanPage | undefined>({
+  currentPage = linkedSignal<BeanPage | undefined, BeanPage | undefined>({
     source: () => this.pageResource.value(),
     computation: (next, previous) => next ?? previous?.value,
   });
 
-  protected readonly origins = computed(() => this.currentPage()?.facets.origins ?? []);
+  origins = computed(() => this.currentPage()?.facets.origins ?? []);
 
-  protected readonly isFiltered = computed(
-    () => !!this.#search.value() || !!this.roast() || !!this.origin(),
-  );
+  isFiltered = computed(() => !!this.#search.value() || !!this.roast() || !!this.origin());
 
-  protected onSortChange(sort: BeanSort | null): void {
+  onSortChange(sort: BeanSort | null): void {
     this.sort.set(sort);
   }
 
-  protected onPageChange(page: number): void {
+  onPageChange(page: number): void {
     this.page.set(page);
   }
 
-  protected onPageSizeChange(size: number): void {
+  onPageSizeChange(size: number): void {
     this.pageSize.set(size);
   }
 
-  protected onReset(): void {
+  onReset(): void {
     this.searchInput.set('');
     this.roast.set('');
     this.origin.set('');
   }
 
-  protected onReload(): void {
+  onReload(): void {
     this.pageResource.reload();
   }
 }

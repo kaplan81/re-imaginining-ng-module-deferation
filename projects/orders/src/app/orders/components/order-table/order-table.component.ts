@@ -20,12 +20,12 @@ interface Column {
   styleUrl: './order-table.component.scss',
 })
 export class OrderTableComponent {
-  readonly items = input.required<readonly Order[]>();
-  readonly sort = input<OrderSort | null>(null);
+  items = input.required<readonly Order[]>();
+  sort = input<OrderSort | null>(null);
 
-  readonly sortChange = output<OrderSort | null>();
+  sortChange = output<OrderSort | null>();
 
-  protected readonly columns: readonly Column[] = [
+  columns: readonly Column[] = [
     { field: 'reference', label: 'Order', numeric: false },
     { field: 'customer', label: 'Customer', numeric: false },
     { field: 'status', label: 'Status', numeric: false },
@@ -34,15 +34,15 @@ export class OrderTableComponent {
     { field: 'dueAt', label: 'Due', numeric: false },
   ];
 
-  protected readonly statusLabels = ORDER_STATUS_LABELS;
+  statusLabels = ORDER_STATUS_LABELS;
 
-  protected directionFor(field: OrderSortFieldET): SortDirectionET | null {
+  directionFor(field: OrderSortFieldET): SortDirectionET | null {
     const current = this.sort();
 
     return current?.field === field ? current.direction : null;
   }
 
-  protected ariaSortFor(field: OrderSortFieldET): 'ascending' | 'descending' | 'none' {
+  ariaSortFor(field: OrderSortFieldET): 'ascending' | 'descending' | 'none' {
     switch (this.directionFor(field)) {
       case 'asc':
         return 'ascending';
@@ -53,7 +53,7 @@ export class OrderTableComponent {
     }
   }
 
-  protected onHeaderClick(field: OrderSortFieldET): void {
+  onHeaderClick(field: OrderSortFieldET): void {
     switch (this.directionFor(field)) {
       case null:
         this.sortChange.emit({ field, direction: 'asc' });
@@ -66,7 +66,7 @@ export class OrderTableComponent {
     }
   }
 
-  protected dueLabel(order: Order): string {
+  dueLabel(order: Order): string {
     if (order.daysToDue === 0) {
       return 'due today';
     }
@@ -76,7 +76,7 @@ export class OrderTableComponent {
       : `${Math.abs(order.daysToDue)} days ago`;
   }
 
-  protected isLate(order: Order): boolean {
+  isLate(order: Order): boolean {
     return order.daysToDue < 0 && order.status !== 'delivered' && order.status !== 'shipped';
   }
 }

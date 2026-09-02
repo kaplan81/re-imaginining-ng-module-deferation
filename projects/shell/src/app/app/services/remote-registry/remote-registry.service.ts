@@ -26,9 +26,9 @@ interface RemoteEntry {
  */
 @Service()
 export class RemoteRegistryService {
-  readonly #statuses = signal<readonly RemoteStatus[]>(REMOTES.map((remote) => toChecking(remote)));
+  #statuses = signal<readonly RemoteStatus[]>(REMOTES.map((remote) => toChecking(remote)));
 
-  readonly statuses = this.#statuses.asReadonly();
+  statuses = this.#statuses.asReadonly();
 
   async refresh(): Promise<void> {
     this.#statuses.set(REMOTES.map((remote) => toChecking(remote)));

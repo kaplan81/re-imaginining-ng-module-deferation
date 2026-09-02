@@ -9,7 +9,7 @@ import { RemoteStatusComponent } from '../../../app/components/remote-status/rem
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-  protected readonly steps = [
+  steps = [
     {
       order: '01',
       title: 'Manifest',

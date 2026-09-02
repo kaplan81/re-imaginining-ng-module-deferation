@@ -10,7 +10,7 @@ const ENDPOINT = '/api/orders';
 /** Route-provided, not root-provided - see the note in `catalog/services/catalog/catalog.ts`. */
 @Service({ autoProvided: false })
 export class OrdersService {
-  readonly #http = inject(HttpClient);
+  #http = inject(HttpClient);
 
   search(query: OrdersQuery): Observable<OrderPage> {
     let params = new HttpParams()

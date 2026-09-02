@@ -21,12 +21,12 @@ interface Column {
   styleUrl: './bean-table.component.scss',
 })
 export class BeanTableComponent {
-  readonly items = input.required<readonly Bean[]>();
-  readonly sort = input<BeanSort | null>(null);
+  items = input.required<readonly Bean[]>();
+  sort = input<BeanSort | null>(null);
 
-  readonly sortChange = output<BeanSort | null>();
+  sortChange = output<BeanSort | null>();
 
-  protected readonly columns: readonly Column[] = [
+  columns: readonly Column[] = [
     { field: 'name', label: 'Lot', numeric: false },
     { field: 'origin', label: 'Origin', numeric: false },
     { field: 'roast', label: 'Roast', numeric: false },
@@ -35,16 +35,16 @@ export class BeanTableComponent {
     { field: 'stockKg', label: 'Stock', numeric: true },
   ];
 
-  protected readonly roastLabels = ROAST_LEVEL_LABELS;
-  protected readonly processLabels = COFFEE_PROCESS_LABELS;
+  roastLabels = ROAST_LEVEL_LABELS;
+  processLabels = COFFEE_PROCESS_LABELS;
 
-  protected directionFor(field: BeanSortFieldET): SortDirectionET | null {
+  directionFor(field: BeanSortFieldET): SortDirectionET | null {
     const current = this.sort();
 
     return current?.field === field ? current.direction : null;
   }
 
-  protected ariaSortFor(field: BeanSortFieldET): 'ascending' | 'descending' | 'none' {
+  ariaSortFor(field: BeanSortFieldET): 'ascending' | 'descending' | 'none' {
     switch (this.directionFor(field)) {
       case 'asc':
         return 'ascending';
@@ -56,7 +56,7 @@ export class BeanTableComponent {
   }
 
   /** Click cycles ascending → descending → unsorted, so the backend default is reachable. */
-  protected onHeaderClick(field: BeanSortFieldET): void {
+  onHeaderClick(field: BeanSortFieldET): void {
     switch (this.directionFor(field)) {
       case null:
         this.sortChange.emit({ field, direction: 'asc' });

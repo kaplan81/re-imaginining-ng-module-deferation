@@ -10,15 +10,15 @@ import { RemoteRegistryService } from '../../services/remote-registry/remote-reg
   styleUrl: './remote-status.component.scss',
 })
 export class RemoteStatusComponent {
-  readonly #registry = inject(RemoteRegistryService);
+  #registry = inject(RemoteRegistryService);
 
-  protected readonly statuses = this.#registry.statuses;
+  statuses = this.#registry.statuses;
 
   constructor() {
     void this.#registry.refresh();
   }
 
-  protected onRefresh(): void {
+  onRefresh(): void {
     void this.#registry.refresh();
   }
 }

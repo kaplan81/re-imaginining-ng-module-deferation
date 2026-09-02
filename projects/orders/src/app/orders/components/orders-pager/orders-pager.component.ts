@@ -8,45 +8,39 @@ import { Component, computed, input, output } from '@angular/core';
   styleUrl: './orders-pager.component.scss',
 })
 export class OrdersPagerComponent {
-  static readonly pageSizes: readonly number[] = [10, 25, 50];
+  static pageSizes: readonly number[] = [10, 25, 50];
 
-  readonly page = input.required<number>();
-  readonly pageSize = input.required<number>();
-  readonly total = input.required<number>();
+  page = input.required<number>();
+  pageSize = input.required<number>();
+  total = input.required<number>();
 
-  readonly pageChange = output<number>();
-  readonly pageSizeChange = output<number>();
+  pageChange = output<number>();
+  pageSizeChange = output<number>();
 
-  protected readonly pageSizeOptions = OrdersPagerComponent.pageSizes;
+  pageSizeOptions = OrdersPagerComponent.pageSizes;
 
-  protected readonly totalPages = computed(() =>
-    Math.max(1, Math.ceil(this.total() / this.pageSize())),
-  );
+  totalPages = computed(() => Math.max(1, Math.ceil(this.total() / this.pageSize())));
 
-  protected readonly rangeStart = computed(() =>
-    this.total() === 0 ? 0 : (this.page() - 1) * this.pageSize() + 1,
-  );
+  rangeStart = computed(() => (this.total() === 0 ? 0 : (this.page() - 1) * this.pageSize() + 1));
 
-  protected readonly rangeEnd = computed(() =>
-    Math.min(this.page() * this.pageSize(), this.total()),
-  );
+  rangeEnd = computed(() => Math.min(this.page() * this.pageSize(), this.total()));
 
-  protected readonly canGoPrev = computed(() => this.page() > 1);
-  protected readonly canGoNext = computed(() => this.page() < this.totalPages());
+  canGoPrev = computed(() => this.page() > 1);
+  canGoNext = computed(() => this.page() < this.totalPages());
 
-  protected onPrev(): void {
+  onPrev(): void {
     if (this.canGoPrev()) {
       this.pageChange.emit(this.page() - 1);
     }
   }
 
-  protected onNext(): void {
+  onNext(): void {
     if (this.canGoNext()) {
       this.pageChange.emit(this.page() + 1);
     }
   }
 
-  protected onPageSizeChange(event: Event): void {
+  onPageSizeChange(event: Event): void {
     this.pageSizeChange.emit(Number((event.target as HTMLSelectElement).value));
   }
 }

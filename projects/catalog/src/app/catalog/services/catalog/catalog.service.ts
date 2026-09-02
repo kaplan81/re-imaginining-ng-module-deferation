@@ -15,7 +15,7 @@ const ENDPOINT = '/api/beans';
  */
 @Service({ autoProvided: false })
 export class CatalogService {
-  readonly #http = inject(HttpClient);
+  #http = inject(HttpClient);
 
   search(query: CatalogQuery): Observable<BeanPage> {
     let params = new HttpParams()

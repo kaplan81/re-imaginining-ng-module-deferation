@@ -9,19 +9,19 @@ export type RemoteHealth = 'checking' | 'online' | 'offline';
  * has no build-time knowledge of what a bean or an order looks like.
  */
 export interface RemoteDescriptor {
-  readonly name: RemoteName;
-  readonly label: string;
-  readonly route: string;
-  readonly tagline: string;
-  readonly owner: string;
+  name: RemoteName;
+  label: string;
+  route: string;
+  tagline: string;
+  owner: string;
 }
 
 /** A descriptor joined with what the manifest and the live probe tell us. */
 export interface RemoteStatus extends RemoteDescriptor {
-  readonly remoteEntryUrl: string | null;
-  readonly health: RemoteHealth;
-  readonly exposed: readonly string[];
-  readonly sharedCount: number | null;
+  remoteEntryUrl: string | null;
+  health: RemoteHealth;
+  exposed: readonly string[];
+  sharedCount: number | null;
 }
 
 export const REMOTES: readonly RemoteDescriptor[] = [

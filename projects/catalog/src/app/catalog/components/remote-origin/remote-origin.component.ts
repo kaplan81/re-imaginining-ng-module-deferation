@@ -48,13 +48,13 @@ import { Component, input } from '@angular/core';
   `,
 })
 export class RemoteOriginComponent {
-  readonly remote = input.required<string>();
+  remote = input.required<string>();
 
   /**
    * Read at runtime from the module URL, so the strip shows :4201 when the shell
    * loaded this component and the shell's own origin never appears here.
    */
-  readonly origin = input<string>(remoteOrigin());
+  origin = input<string>(remoteOrigin());
 }
 
 function remoteOrigin(): string {

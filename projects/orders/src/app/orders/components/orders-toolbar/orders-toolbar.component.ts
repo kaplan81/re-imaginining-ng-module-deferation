@@ -12,16 +12,16 @@ import {
   styleUrl: './orders-toolbar.component.scss',
 })
 export class OrdersToolbarComponent {
-  readonly counts = input.required<Readonly<Record<OrderStatusET, number>>>();
-  readonly total = input.required<number>();
+  counts = input.required<Readonly<Record<OrderStatusET, number>>>();
+  total = input.required<number>();
 
-  readonly search = model.required<string>();
-  readonly status = model.required<OrderStatusET | ''>();
+  search = model.required<string>();
+  status = model.required<OrderStatusET | ''>();
 
-  protected readonly statuses = ORDER_STATUSES;
-  protected readonly statusLabels = ORDER_STATUS_LABELS;
+  statuses = ORDER_STATUSES;
+  statusLabels = ORDER_STATUS_LABELS;
 
-  protected onSearchInput(event: Event): void {
+  onSearchInput(event: Event): void {
     this.search.set((event.target as HTMLInputElement).value);
   }
 }

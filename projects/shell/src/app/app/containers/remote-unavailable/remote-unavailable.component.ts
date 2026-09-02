@@ -19,17 +19,17 @@ const PORTS: Record<RemoteName, number> = {
   styleUrl: './remote-unavailable.component.scss',
 })
 export class RemoteUnavailableComponent {
-  readonly #route = inject(ActivatedRoute);
+  #route = inject(ActivatedRoute);
 
-  protected readonly remote = computed<RemoteName>(
+  remote = computed<RemoteName>(
     () => (this.#route.snapshot.data['remote'] as RemoteName | undefined) ?? 'catalog',
   );
 
-  protected readonly label = computed(
+  label = computed(
     () => REMOTES.find((remote) => remote.name === this.remote())?.label ?? this.remote(),
   );
 
-  protected readonly command = computed(() => `npm run start:${this.remote()}`);
+  command = computed(() => `npm run start:${this.remote()}`);
 
-  protected readonly port = computed(() => PORTS[this.remote()]);
+  port = computed(() => PORTS[this.remote()]);
 }

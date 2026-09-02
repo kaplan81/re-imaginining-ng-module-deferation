@@ -10,9 +10,9 @@ import type { OrderSummary } from '../../models/order.model';
   styleUrl: './order-stats.component.scss',
 })
 export class OrderStatsComponent {
-  readonly summary = input.required<OrderSummary>();
+  summary = input.required<OrderSummary>();
 
-  protected readonly lateShare = computed(() => {
+  lateShare = computed(() => {
     const { openOrders, lateOrders } = this.summary();
 
     return openOrders === 0 ? 0 : Math.round((lateOrders / openOrders) * 100);
