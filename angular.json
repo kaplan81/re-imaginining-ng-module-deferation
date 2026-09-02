@@ -94,7 +94,7 @@
             "styles": ["projects/shell/src/styles.scss"],
             "polyfills": ["es-module-shims"],
             "stylePreprocessorOptions": {
-              "includePaths": ["styles"]
+              "includePaths": ["projects/shell/styles"]
             }
           },
           "configurations": {
@@ -196,7 +196,7 @@
             "styles": ["projects/catalog/src/styles.scss"],
             "polyfills": ["es-module-shims"],
             "stylePreprocessorOptions": {
-              "includePaths": ["styles"]
+              "includePaths": ["projects/catalog/styles"]
             }
           },
           "configurations": {
@@ -298,7 +298,7 @@
             "styles": ["projects/orders/src/styles.scss"],
             "polyfills": ["es-module-shims"],
             "stylePreprocessorOptions": {
-              "includePaths": ["styles"]
+              "includePaths": ["projects/orders/styles"]
             }
           },
           "configurations": {

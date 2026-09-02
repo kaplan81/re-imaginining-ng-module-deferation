@@ -84,8 +84,14 @@ Architects Native Federation. See `README.md` and `docs/ARCHITECTURE.md` first.
   route providers. Root-provided singletons land in whichever injector is around —
   the shell's, in federated mode.
 - **Component styles must be self-sufficient.** A remote's `styles.scss` is not
-  loaded by the shell. Use the compile-time SCSS tokens in `styles/_tokens.scss`
-  (`@use 'tokens' as t;`), never a CSS custom property defined in a global sheet.
+  loaded by the shell. Use the compile-time SCSS tokens in
+  `projects/<project>/styles/_tokens.scss` (`@use 'tokens' as t;`), never a CSS
+  custom property defined in a global sheet.
+- **Every project owns its own `styles/` folder**, and the three copies of
+  `_tokens.scss` / `_base.scss` are byte-identical on purpose — no project reads
+  a sibling's stylesheet, not even at build time. Edit one and you must edit all
+  three; `diff` is the drift check. The header comment in `_tokens.scss` records
+  why, and that a published styles library package is the way to scale it.
 - **Do not extract a shared UI library** between the three applications. The
   duplicated `remote-origin` component is intentional.
 - **Mocks stay deterministic.** Seeds are generated from fixed indices, and

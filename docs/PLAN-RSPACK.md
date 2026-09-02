@@ -106,7 +106,7 @@ export default createConfig({
 
 Checkpoints before going further:
 
-- SCSS with `includePaths` for `styles/` resolves (the adapter bundles `sass` and
+- SCSS with `includePaths` for each project's `styles/` resolves (the adapter bundles `sass` and
   `sass-loader`; the option name differs from `stylePreprocessorOptions`).
 - Zoneless bootstrap works. `@nx/angular-rspack` still lists `zone.js` as a peer;
   Angular 22 defaults to zoneless, so confirm no `zone.js` import is injected.

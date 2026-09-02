@@ -1,6 +1,10 @@
 // Global page frame. Loaded by whichever application owns the document: the
 // shell in federated mode, the remote itself when it runs standalone. Remotes
 // must never rely on this file being present — see the note in `_tokens.scss`.
+//
+// Duplicated verbatim in all three projects, exactly like `_tokens.scss`. The
+// note at the top of that file explains why, and what a published styles
+// library package would replace it with.
 @use 'tokens' as t;
 
 *,

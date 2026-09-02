@@ -161,19 +161,27 @@ demo shows the same figures on the second run and specs need no frozen clock.
 ## 6. Styling across the boundary
 
 The remote's global stylesheet is **never loaded by the shell**. Only component
-styles travel with a federated component. That is why `styles/_tokens.scss`
-exposes **SCSS variables and mixins**, not CSS custom properties: compile-time
-values are baked into each component's own styles by that component's own build,
-so they survive the crossing. A `var(--token)` defined only in the remote's
-`styles.scss` would resolve to nothing inside the shell.
+styles travel with a federated component. That is why
+`projects/<project>/styles/_tokens.scss` exposes **SCSS variables and mixins**,
+not CSS custom properties: compile-time values are baked into each component's
+own styles by that component's own build, so they survive the crossing. A
+`var(--token)` defined only in the remote's `styles.scss` would resolve to
+nothing inside the shell.
 
-`styles/` is wired into all three projects through
-`stylePreprocessorOptions.includePaths`, which makes it **the one intentional
-build-time coupling in this workspace**. It carries values, never behaviour, and
-it is a deliberate trade: three independently deployed applications that must look
-like one product need _some_ shared vocabulary. The alternatives are worse — a
-published design-token package (real versioning, real release process, correct at
-scale) or per-project copies (zero coupling, guaranteed drift).
+Each project owns its own `styles/` folder, wired in through that project's
+`stylePreprocessorOptions.includePaths`. The three copies of `_tokens.scss` and
+`_base.scss` are **byte-identical duplicates**, which leaves the workspace with
+**no build-time coupling between the three applications at all** — none of them
+reads a sibling's file for any purpose, in any phase.
+
+The cost is drift: edit one copy and nothing tells you the other two are stale.
+`diff` between any two is the check. The reason to accept that cost here is that
+tokens are inlined into every consuming component anyway (see the duplication
+figures above), so a single shared file was never buying deduplicated output —
+only deduplicated authoring. The way to buy that back properly is a published
+styles library package consumed as a versioned dependency, which is what the
+header comment in `_tokens.scss` points at; it needs its own build, registry and
+release cadence, so it is out of scope for a demo workspace.
 
 The "Rendered by the … remote" strip is duplicated in both remotes on purpose. A
 shared UI library would be exactly the build-time dependency federation exists to

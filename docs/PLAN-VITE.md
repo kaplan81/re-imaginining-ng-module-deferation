@@ -93,8 +93,8 @@ export default defineConfig({
 Checkpoints:
 
 - SCSS resolves `@use 'tokens'`. Vite has no `stylePreprocessorOptions`; use
-  `css.preprocessorOptions.scss.loadPaths` (Vite 5+ naming) pointing at
-  `../../../styles`.
+  `css.preprocessorOptions.scss.loadPaths` (Vite 5+ naming) pointing at that
+  project's own `styles/` folder.
 - Zoneless bootstrap. Both Zephyr Angular examples call
   `provideZonelessChangeDetection()` explicitly, whereas Angular 22 defaults to
   zoneless under the CLI; make it explicit here so the two pipelines cannot drift.

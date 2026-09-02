@@ -1,15 +1,36 @@
 // ---------------------------------------------------------------------------
 // Roast Republic design tokens.
 //
-// Deliberately SCSS variables, not CSS custom properties: component styles of a
+// This file is duplicated, verbatim, in all three projects:
+//
+//   projects/shell/styles/_tokens.scss
+//   projects/catalog/styles/_tokens.scss
+//   projects/orders/styles/_tokens.scss
+//
+// That is the trade this workspace takes. Copies buy zero build-time coupling —
+// each application builds, versions and deploys without a single reference to a
+// sibling, which is the whole point of federating them — and they cost
+// guaranteed drift: edit one and nothing tells you the other two are now wrong.
+// The three are byte-identical, so `diff` is the drift check:
+//
+//   diff projects/shell/styles/_tokens.scss projects/catalog/styles/_tokens.scss
+//
+// The professional way to scale this is a published styles library package —
+// `@roast-republic/styles`, owned by whoever owns the design system, consumed by
+// each application as a versioned dependency. One source of truth, a real
+// release process, and a changelog entry when a value moves. It also survives
+// the thing copies do not: a fourth application, or a team that does not read
+// this comment. What it needs in return is its own build, a registry and a
+// release cadence, which is more machinery than a demo workspace can justify —
+// so these copies stand in for it, and the moment there is a fourth consumer
+// the package is the correct answer.
+//
+// Why SCSS variables and not CSS custom properties: component styles of a
 // federated remote are compiled by the *remote's* build and rendered inside the
 // *shell's* document. The remote's global stylesheet is never loaded by the
 // shell, so anything a remote component needs at runtime has to be baked into
 // the component style itself. Compile-time tokens survive that boundary; a
 // `var(--token)` defined only in the remote's `styles.scss` would not.
-//
-// This file is the one intentional build-time coupling between the three
-// applications. It carries no behaviour, only values.
 // ---------------------------------------------------------------------------
 
 // Surfaces

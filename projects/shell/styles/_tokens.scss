@@ -1,0 +1,222 @@
+// ---------------------------------------------------------------------------
+// Roast Republic design tokens.
+//
+// This file is duplicated, verbatim, in all three projects:
+//
+//   projects/shell/styles/_tokens.scss
+//   projects/catalog/styles/_tokens.scss
+//   projects/orders/styles/_tokens.scss
+//
+// That is the trade this workspace takes. Copies buy zero build-time coupling —
+// each application builds, versions and deploys without a single reference to a
+// sibling, which is the whole point of federating them — and they cost
+// guaranteed drift: edit one and nothing tells you the other two are now wrong.
+// The three are byte-identical, so `diff` is the drift check:
+//
+//   diff projects/shell/styles/_tokens.scss projects/catalog/styles/_tokens.scss
+//
+// The professional way to scale this is a published styles library package —
+// `@roast-republic/styles`, owned by whoever owns the design system, consumed by
+// each application as a versioned dependency. One source of truth, a real
+// release process, and a changelog entry when a value moves. It also survives
+// the thing copies do not: a fourth application, or a team that does not read
+// this comment. What it needs in return is its own build, a registry and a
+// release cadence, which is more machinery than a demo workspace can justify —
+// so these copies stand in for it, and the moment there is a fourth consumer
+// the package is the correct answer.
+//
+// Why SCSS variables and not CSS custom properties: component styles of a
+// federated remote are compiled by the *remote's* build and rendered inside the
+// *shell's* document. The remote's global stylesheet is never loaded by the
+// shell, so anything a remote component needs at runtime has to be baked into
+// the component style itself. Compile-time tokens survive that boundary; a
+// `var(--token)` defined only in the remote's `styles.scss` would not.
+// ---------------------------------------------------------------------------
+
+// Surfaces
+$color-page: #fbf8f4;
+$color-surface: #ffffff;
+$color-surface-sunken: #f4efe8;
+$color-border: #e7ded1;
+$color-border-strong: #d6c8b4;
+
+// Ink
+$color-ink: #241a12;
+$color-ink-muted: #6b5a4a;
+$color-ink-subtle: #948373;
+$color-ink-inverse: #fdfaf6;
+
+// Brand + per-remote accents. Each remote owns one hue so an audience can see
+// at a glance which independently deployed build painted which region.
+$color-brand: #7a3f16;
+$color-brand-dark: #4a2409;
+$color-accent-catalog: #c2600d;
+$color-accent-catalog-soft: #fdf0e2;
+$color-accent-orders: #0f6b62;
+$color-accent-orders-soft: #e3f3f1;
+$color-accent-shell: #6d4c9f;
+
+// Status
+$color-positive: #1f7a45;
+$color-positive-soft: #e6f4ec;
+$color-warning: #a56a00;
+$color-warning-soft: #fdf2dc;
+$color-danger: #a32020;
+$color-danger-soft: #fceaea;
+$color-neutral-soft: #efe9e1;
+
+// Radii, spacing, elevation
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 16px;
+$radius-pill: 999px;
+
+$shadow-sm: 0 1px 2px rgba(36, 26, 18, 0.06);
+$shadow-md: 0 4px 16px rgba(36, 26, 18, 0.08);
+$shadow-lg: 0 18px 48px rgba(36, 26, 18, 0.12);
+
+$font-sans:
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  Roboto,
+  'Helvetica Neue',
+  Arial,
+  sans-serif;
+$font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+$layout-max-width: 1180px;
+
+// ---------------------------------------------------------------------------
+// Mixins
+// ---------------------------------------------------------------------------
+
+@mixin card($padding: 1.25rem) {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $padding;
+}
+
+@mixin chip($fg, $bg) {
+  align-items: center;
+  background: $bg;
+  border-radius: $radius-pill;
+  color: $fg;
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 650;
+  gap: 0.375rem;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 0.3125rem 0.625rem;
+  white-space: nowrap;
+}
+
+@mixin eyebrow {
+  color: $color-ink-subtle;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+@mixin focus-ring($color: $color-accent-shell) {
+  outline: 2px solid $color;
+  outline-offset: 2px;
+}
+
+@mixin button-base {
+  align-items: center;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 600;
+  gap: 0.4rem;
+  justify-content: center;
+  line-height: 1.2;
+  padding: 0.5rem 0.875rem;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+}
+
+@mixin button-quiet {
+  @include button-base;
+
+  background: $color-surface;
+  border: 1px solid $color-border-strong;
+  color: $color-ink;
+
+  &:hover:not(:disabled) {
+    background: $color-surface-sunken;
+  }
+}
+
+@mixin text-field {
+  background: $color-surface;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-sm;
+  color: $color-ink;
+  font: inherit;
+  padding: 0.5rem 0.75rem;
+
+  &::placeholder {
+    color: $color-ink-subtle;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@mixin data-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+  width: 100%;
+
+  th,
+  td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+  }
+
+  thead th {
+    background: $color-surface-sunken;
+    border-bottom: 1px solid $color-border;
+    color: $color-ink-muted;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    position: sticky;
+    text-transform: uppercase;
+    top: 0;
+    white-space: nowrap;
+    z-index: 1;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid $color-border;
+  }
+
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: rgba(194, 96, 13, 0.04);
+  }
+}
