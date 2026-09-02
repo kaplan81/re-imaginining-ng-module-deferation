@@ -1,6 +1,6 @@
 import { Component, input, model, output } from '@angular/core';
 
-import { ROAST_LEVEL_LABELS, ROAST_LEVELS, type RoastLevelET } from '../../enums/roast-level.enum';
+import { roastLevelLabels, roastLevels, type RoastLevelET } from '../../enums/roast-level.enum';
 
 export type CatalogLayout = 'grid' | 'table';
 
@@ -19,8 +19,8 @@ export class CatalogToolbarComponent {
 
   reset = output<void>();
 
-  roastLevels = ROAST_LEVELS;
-  roastLabels = ROAST_LEVEL_LABELS;
+  roastLevels = roastLevels;
+  roastLabels = roastLevelLabels;
 
   onSearchInput(event: Event): void {
     this.search.set((event.target as HTMLInputElement).value);

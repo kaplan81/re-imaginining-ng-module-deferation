@@ -14,7 +14,7 @@ interface OriginSeed {
   lots: readonly string[];
 }
 
-const ORIGINS: readonly OriginSeed[] = [
+const origins: readonly OriginSeed[] = [
   {
     country: 'Ethiopia',
     regions: ['Yirgacheffe', 'Guji', 'Sidama'],
@@ -57,10 +57,10 @@ const ORIGINS: readonly OriginSeed[] = [
   },
 ];
 
-const ROASTS: readonly RoastLevelET[] = ['light', 'medium', 'mediumDark', 'dark'];
-const PROCESSES: readonly CoffeeProcessET[] = ['washed', 'natural', 'honey', 'anaerobic'];
+const roasts: readonly RoastLevelET[] = ['light', 'medium', 'mediumDark', 'dark'];
+const processes: readonly CoffeeProcessET[] = ['washed', 'natural', 'honey', 'anaerobic'];
 
-const NOTES: readonly string[] = [
+const notes: readonly string[] = [
   'jasmine',
   'bergamot',
   'stone fruit',
@@ -79,7 +79,7 @@ const NOTES: readonly string[] = [
   'almond',
 ];
 
-const SEED_COUNT = 96;
+const seedCount = 96;
 
 function pad(value: number, size = 3): string {
   return String(value).padStart(size, '0');
@@ -90,12 +90,12 @@ function pick<T>(values: readonly T[], index: number): T {
 }
 
 function buildSeed(): readonly Bean[] {
-  return Array.from({ length: SEED_COUNT }, (_, i): Bean => {
-    const origin = pick(ORIGINS, i);
+  return Array.from({ length: seedCount }, (_, i): Bean => {
+    const origin = pick(origins, i);
 
     // `slot` walks the region x lot grid of one origin exactly once, so all 96
     // lot names are distinct instead of a handful repeating.
-    const slot = Math.floor(i / ORIGINS.length);
+    const slot = Math.floor(i / origins.length);
     const region = pick(origin.regions, slot);
     const lot = pick(origin.lots, Math.floor(slot / origin.regions.length));
 
@@ -104,9 +104,9 @@ function buildSeed(): readonly Bean[] {
       name: `${region} ${lot}`,
       origin: origin.country,
       region,
-      roast: pick(ROASTS, i * 3),
-      process: pick(PROCESSES, i * 5 + 1),
-      tastingNotes: [pick(NOTES, i * 7), pick(NOTES, i * 7 + 3), pick(NOTES, i * 7 + 9)],
+      roast: pick(roasts, i * 3),
+      process: pick(processes, i * 5 + 1),
+      tastingNotes: [pick(notes, i * 7), pick(notes, i * 7 + 3), pick(notes, i * 7 + 9)],
       score: Number((82 + ((i * 13) % 39) / 4).toFixed(2)),
       pricePerKg: Number((8.4 + ((i * 13) % 74) / 4).toFixed(2)),
       stockKg: 15 + ((i * 37) % 46) * 5,
@@ -115,4 +115,4 @@ function buildSeed(): readonly Bean[] {
   });
 }
 
-export const BEANS_SEED: readonly Bean[] = buildSeed();
+export const beansSeed: readonly Bean[] = buildSeed();

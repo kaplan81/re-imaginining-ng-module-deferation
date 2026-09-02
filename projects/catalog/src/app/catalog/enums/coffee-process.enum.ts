@@ -7,7 +7,7 @@ export enum CoffeeProcess {
 
 export type CoffeeProcessET = keyof typeof CoffeeProcess;
 
-export const COFFEE_PROCESS_LABELS: Readonly<Record<CoffeeProcessET, string>> = {
+export const coffeeProcessLabels: Readonly<Record<CoffeeProcessET, string>> = {
   washed: 'Washed',
   natural: 'Natural',
   honey: 'Honey',

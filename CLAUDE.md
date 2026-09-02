@@ -89,7 +89,7 @@ Architects Native Federation. See `README.md` and `docs/ARCHITECTURE.md` first.
 - **Do not extract a shared UI library** between the three applications. The
   duplicated `remote-origin` component is intentional.
 - **Mocks stay deterministic.** Seeds are generated from fixed indices, and
-  `orders` computes dates against `REFERENCE_TODAY`, not `Date.now()`.
+  `orders` computes dates against `referenceToday`, not `Date.now()`.
 
 ### Layout conventions inside a feature folder
 
@@ -127,6 +127,14 @@ file carries its type in the name, and every class repeats it:
   (`type` + `addTypeToClassName: true`, and `typeSeparator: "."` for the kinds
   that need it), so `ng generate` produces conforming files for every project. Do
   not add per-project `schematics` overrides — they shadow it.
+- **No `SCREAMING_SNAKE_CASE`.** Module-level constants are camelCase like
+  everything else — `beansSeed`, `defaultPageSize`, `referenceToday`. The single
+  exception is an Angular injection token, which stays screaming so a
+  `new InjectionToken(...)` reads as the DI key it is:
+
+  ```ts
+  export const CATALOG_CONFIG = new InjectionToken<CatalogConfig>('catalog.config');
+  ```
 
 ### After changing federation wiring
 

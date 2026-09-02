@@ -1,21 +1,21 @@
-import { ORDER_STATUSES, type OrderStatusET } from '../enums/order-status.enum';
+import { orderStatuses, type OrderStatusET } from '../enums/order-status.enum';
 import type { Order } from '../models/order.model';
 
 /**
  * Deterministic seed for the mocked fulfilment backend.
  *
- * `REFERENCE_TODAY` is a fixed date rather than `Date.now()`: a demo that shows
+ * `referenceToday` is a fixed date rather than `Date.now()`: a demo that shows
  * "3 days late" should show the same thing next month, and tests should not need
  * to freeze the clock.
  */
-export const REFERENCE_TODAY = '2026-09-01';
+export const referenceToday = '2026-09-01';
 
 interface CustomerSeed {
   name: string;
   city: string;
 }
 
-const CUSTOMERS: readonly CustomerSeed[] = [
+const customers: readonly CustomerSeed[] = [
   { name: 'Kaffeehaus Nord', city: 'Hamburg' },
   { name: 'Le Petit Grain', city: 'Lyon' },
   { name: 'Bica & Co.', city: 'Lisbon' },
@@ -30,7 +30,7 @@ const CUSTOMERS: readonly CustomerSeed[] = [
   { name: 'Copenhagen Cupping Lab', city: 'Copenhagen' },
 ];
 
-const BLENDS: readonly string[] = [
+const blends: readonly string[] = [
   'House Espresso',
   'Morning Filter',
   'Decaf Sunset',
@@ -40,8 +40,8 @@ const BLENDS: readonly string[] = [
   'Barista Reserve',
 ];
 
-const SEED_COUNT = 84;
-const MS_PER_DAY = 86_400_000;
+const seedCount = 84;
+const msPerDay = 86_400_000;
 
 function pad(value: number, size = 5): string {
   return String(value).padStart(size, '0');
@@ -52,7 +52,7 @@ function pick<T>(values: readonly T[], index: number): T {
 }
 
 function shiftDays(iso: string, days: number): string {
-  return new Date(Date.parse(iso) + days * MS_PER_DAY).toISOString().slice(0, 10);
+  return new Date(Date.parse(iso) + days * msPerDay).toISOString().slice(0, 10);
 }
 
 /**
@@ -78,9 +78,9 @@ function dueOffsetFor(status: OrderStatusET, index: number): number {
 }
 
 function buildSeed(): readonly Order[] {
-  return Array.from({ length: SEED_COUNT }, (_, i): Order => {
-    const customer = pick(CUSTOMERS, i * 5 + 1);
-    const status = pick(ORDER_STATUSES, i * 7 + 2);
+  return Array.from({ length: seedCount }, (_, i): Order => {
+    const customer = pick(customers, i * 5 + 1);
+    const status = pick(orderStatuses, i * 7 + 2);
     const quantityKg = 12 + ((i * 17) % 24) * 6;
     const daysToDue = dueOffsetFor(status, i);
 
@@ -89,15 +89,15 @@ function buildSeed(): readonly Order[] {
       reference: `RO-${pad(10_200 + i * 3, 5)}`,
       customer: customer.name,
       city: customer.city,
-      blend: pick(BLENDS, i * 3),
+      blend: pick(blends, i * 3),
       status,
       quantityKg,
       totalEur: Number((quantityKg * (14.5 + ((i * 11) % 40) / 4)).toFixed(2)),
-      placedAt: shiftDays(REFERENCE_TODAY, daysToDue - 14 - (i % 7)),
-      dueAt: shiftDays(REFERENCE_TODAY, daysToDue),
+      placedAt: shiftDays(referenceToday, daysToDue - 14 - (i % 7)),
+      dueAt: shiftDays(referenceToday, daysToDue),
       daysToDue,
     };
   });
 }
 
-export const ORDERS_SEED: readonly Order[] = buildSeed();
+export const ordersSeed: readonly Order[] = buildSeed();

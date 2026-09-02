@@ -2,8 +2,8 @@ import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 
 import type { BeanSortFieldET } from '../../enums/bean-sort-field.enum';
-import { COFFEE_PROCESS_LABELS } from '../../enums/coffee-process.enum';
-import { ROAST_LEVEL_LABELS } from '../../enums/roast-level.enum';
+import { coffeeProcessLabels } from '../../enums/coffee-process.enum';
+import { roastLevelLabels } from '../../enums/roast-level.enum';
 import type { SortDirectionET } from '../../enums/sort-direction.enum';
 import type { Bean } from '../../models/bean.model';
 import type { BeanSort } from '../../models/catalog-query.model';
@@ -35,8 +35,8 @@ export class BeanTableComponent {
     { field: 'stockKg', label: 'Stock', numeric: true },
   ];
 
-  roastLabels = ROAST_LEVEL_LABELS;
-  processLabels = COFFEE_PROCESS_LABELS;
+  roastLabels = roastLevelLabels;
+  processLabels = coffeeProcessLabels;
 
   directionFor(field: BeanSortFieldET): SortDirectionET | null {
     const current = this.sort();

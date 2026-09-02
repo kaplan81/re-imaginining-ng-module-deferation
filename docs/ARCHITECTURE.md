@@ -155,7 +155,7 @@ The mocks implement a **server-driven** contract: filtering, sorting, paging and
 aggregation all happen "server side", and the client holds one page at a time.
 Swapping a mock for a real endpoint is a one-line change in the service, with no
 change to any component. Both mocks are deterministic — generated from fixed
-indices, and `orders` computes due dates against a fixed `REFERENCE_TODAY` — so a
+indices, and `orders` computes due dates against a fixed `referenceToday` — so a
 demo shows the same figures on the second run and specs need no frozen clock.
 
 ## 6. Styling across the boundary
@@ -188,10 +188,10 @@ table rendering `RemoteUnavailable` from the shell:
 
 ```ts
 try {
-  const module = await federation().loadRemoteModule(remote, EXPOSED_ROUTES);
+  const module = await federation().loadRemoteModule(remote, exposedRoutes);
   return module.routes;
 } catch (error) {
-  console.error(`[shell] could not load remote "${remote}" (${EXPOSED_ROUTES})`, error);
+  console.error(`[shell] could not load remote "${remote}" (${exposedRoutes})`, error);
   return remoteUnavailableRoutes(remote);
 }
 ```

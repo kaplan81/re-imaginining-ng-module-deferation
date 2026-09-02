@@ -2,7 +2,7 @@ import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 
 import type { OrderSortFieldET } from '../../enums/order-sort-field.enum';
-import { ORDER_STATUS_LABELS } from '../../enums/order-status.enum';
+import { orderStatusLabels } from '../../enums/order-status.enum';
 import type { SortDirectionET } from '../../enums/sort-direction.enum';
 import type { Order } from '../../models/order.model';
 import type { OrderSort } from '../../models/orders-query.model';
@@ -34,7 +34,7 @@ export class OrderTableComponent {
     { field: 'dueAt', label: 'Due', numeric: false },
   ];
 
-  statusLabels = ORDER_STATUS_LABELS;
+  statusLabels = orderStatusLabels;
 
   directionFor(field: OrderSortFieldET): SortDirectionET | null {
     const current = this.sort();

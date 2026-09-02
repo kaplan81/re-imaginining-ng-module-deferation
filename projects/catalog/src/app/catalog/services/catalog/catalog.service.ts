@@ -5,7 +5,7 @@ import type { Observable } from 'rxjs';
 import type { BeanPage } from '../../models/bean.model';
 import type { CatalogQuery } from '../../models/catalog-query.model';
 
-const ENDPOINT = '/api/beans';
+const endpoint = '/api/beans';
 
 /**
  * `autoProvided: false` on purpose. A root-provided singleton would be created
@@ -38,6 +38,6 @@ export class CatalogService {
       params = params.set('sort', `${query.sort.field}:${query.sort.direction}`);
     }
 
-    return this.#http.get<BeanPage>(ENDPOINT, { params });
+    return this.#http.get<BeanPage>(endpoint, { params });
   }
 }

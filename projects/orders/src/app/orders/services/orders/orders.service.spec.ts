@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { ORDER_STATUSES } from '../../enums/order-status.enum';
+import { orderStatuses } from '../../enums/order-status.enum';
 import type { OrderPage } from '../../models/order.model';
 import { OrdersService } from './orders.service';
 
@@ -17,7 +17,7 @@ const emptyPage: OrderPage = {
     lateOrders: 0,
     revenueEur: 0,
     byStatus: Object.fromEntries(
-      ORDER_STATUSES.map((status) => [status, 0]),
+      orderStatuses.map((status) => [status, 0]),
     ) as OrderPage['summary']['byStatus'],
   },
 };

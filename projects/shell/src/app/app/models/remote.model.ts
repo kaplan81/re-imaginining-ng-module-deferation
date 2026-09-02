@@ -24,7 +24,7 @@ export interface RemoteStatus extends RemoteDescriptor {
   sharedCount: number | null;
 }
 
-export const REMOTES: readonly RemoteDescriptor[] = [
+export const remotes: readonly RemoteDescriptor[] = [
   {
     name: 'catalog',
     label: 'Bean catalog',

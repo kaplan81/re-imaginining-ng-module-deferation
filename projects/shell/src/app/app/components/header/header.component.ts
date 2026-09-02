@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
-import { REMOTES } from '../../models/remote.model';
+import { remotes } from '../../models/remote.model';
 
 @Component({
   selector: 'shl-header',
@@ -11,5 +11,5 @@ import { REMOTES } from '../../models/remote.model';
 })
 export class HeaderComponent {
   /** Navigation is derived from the shell's remote declarations, not hand-written. */
-  remotes = REMOTES;
+  remotes = remotes;
 }

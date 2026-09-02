@@ -19,9 +19,9 @@ import type { OrderPage } from '../../models/order.model';
 import type { OrderSort, OrdersQuery } from '../../models/orders-query.model';
 import { OrdersService } from '../../services/orders/orders.service';
 
-const DEFAULT_PAGE_SIZE = 10;
-const DEFAULT_SORT: OrderSort = { field: 'dueAt', direction: 'asc' };
-const SEARCH_DEBOUNCE_MS = 250;
+const defaultPageSize = 10;
+const defaultSort: OrderSort = { field: 'dueAt', direction: 'asc' };
+const searchDebounceMs = 250;
 
 @Component({
   selector: 'ord-orders-board',
@@ -39,11 +39,11 @@ export class OrdersBoardComponent {
   #orders = inject(OrdersService);
 
   searchInput = signal('');
-  #search = debounced(this.searchInput, SEARCH_DEBOUNCE_MS);
+  #search = debounced(this.searchInput, searchDebounceMs);
 
   status = signal<OrderStatusET | ''>('');
-  pageSize = signal(DEFAULT_PAGE_SIZE);
-  sort = signal<OrderSort | null>(DEFAULT_SORT);
+  pageSize = signal(defaultPageSize);
+  sort = signal<OrderSort | null>(defaultSort);
 
   page = linkedSignal<string, number>({
     source: () =>

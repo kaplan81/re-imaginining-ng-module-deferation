@@ -7,9 +7,9 @@ export enum RoastLevel {
 
 export type RoastLevelET = keyof typeof RoastLevel;
 
-export const ROAST_LEVELS: readonly RoastLevelET[] = ['light', 'medium', 'mediumDark', 'dark'];
+export const roastLevels: readonly RoastLevelET[] = ['light', 'medium', 'mediumDark', 'dark'];
 
-export const ROAST_LEVEL_LABELS: Readonly<Record<RoastLevelET, string>> = {
+export const roastLevelLabels: Readonly<Record<RoastLevelET, string>> = {
   light: 'Light',
   medium: 'Medium',
   mediumDark: 'Medium-dark',

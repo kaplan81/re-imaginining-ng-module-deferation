@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 
-import { REMOTES } from '../../models/remote.model';
+import { remotes } from '../../models/remote.model';
 import { RemoteRegistryService } from './remote-registry.service';
 
-const MANIFEST = {
+const manifest = {
   catalog: 'http://localhost:4201/remoteEntry.json',
   orders: 'http://localhost:4202/remoteEntry.json',
 };
@@ -26,7 +26,7 @@ describe('RemoteRegistryService', () => {
 
   it('should start with every declared remote in the checking state', () => {
     expect(registry.statuses().map((status) => status.name)).toEqual(
-      REMOTES.map((remote) => remote.name),
+      remotes.map((remote) => remote.name),
     );
     expect(registry.statuses().every((status) => status.health === 'checking')).toBe(true);
   });
@@ -36,7 +36,7 @@ describe('RemoteRegistryService', () => {
       'fetch',
       vi.fn(async (url: string) =>
         url.includes('federation.manifest.json')
-          ? jsonResponse(MANIFEST)
+          ? jsonResponse(manifest)
           : jsonResponse({
               name: 'whatever',
               exposes: [{ key: './Routes' }],
@@ -51,7 +51,7 @@ describe('RemoteRegistryService', () => {
       expect(status.health).toBe('online');
       expect(status.exposed).toEqual(['./Routes']);
       expect(status.sharedCount).toBe(3);
-      expect(status.remoteEntryUrl).toBe(MANIFEST[status.name]);
+      expect(status.remoteEntryUrl).toBe(manifest[status.name]);
     }
   });
 
@@ -60,7 +60,7 @@ describe('RemoteRegistryService', () => {
       'fetch',
       vi.fn(async (url: string) => {
         if (url.includes('federation.manifest.json')) {
-          return jsonResponse(MANIFEST);
+          return jsonResponse(manifest);
         }
 
         if (url.includes('4201')) {

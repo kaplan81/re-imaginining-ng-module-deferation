@@ -5,7 +5,7 @@ import type { RemoteName } from '../../models/remote.model';
 import { RemoteUnavailableComponent } from '../../containers/remote-unavailable/remote-unavailable.component';
 
 /** Every remote in this workspace exposes its route table under the same key. */
-export const EXPOSED_ROUTES = './Routes';
+export const exposedRoutes = './Routes';
 
 interface RemoteRoutesModule {
   routes: Routes;
@@ -22,11 +22,11 @@ interface RemoteRoutesModule {
  */
 export async function loadRemoteRoutes(remote: RemoteName): Promise<Routes> {
   try {
-    const module = await federation().loadRemoteModule<RemoteRoutesModule>(remote, EXPOSED_ROUTES);
+    const module = await federation().loadRemoteModule<RemoteRoutesModule>(remote, exposedRoutes);
 
     return module.routes;
   } catch (error) {
-    console.error(`[shell] could not load remote "${remote}" (${EXPOSED_ROUTES})`, error);
+    console.error(`[shell] could not load remote "${remote}" (${exposedRoutes})`, error);
 
     return remoteUnavailableRoutes(remote);
   }

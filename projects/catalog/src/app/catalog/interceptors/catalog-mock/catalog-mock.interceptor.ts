@@ -4,7 +4,7 @@ import { delay } from 'rxjs/operators';
 
 import type { BeanSortFieldET } from '../../enums/bean-sort-field.enum';
 import type { RoastLevelET } from '../../enums/roast-level.enum';
-import { BEANS_SEED } from '../../mocks/beans-seed.mock';
+import { beansSeed } from '../../mocks/beans-seed.mock';
 import type { Bean, BeanFacets, BeanPage } from '../../models/bean.model';
 import type { BeanSort } from '../../models/catalog-query.model';
 
@@ -18,25 +18,25 @@ import type { BeanSort } from '../../models/catalog-query.model';
  * only while a catalog route is active and can never leak into the shell.
  */
 
-const ENDPOINT = '/api/beans';
-const MIN_LATENCY_MS = 180;
-const MAX_LATENCY_MS = 320;
-const DEFAULT_PAGE = 1;
-const DEFAULT_PAGE_SIZE = 12;
+const endpoint = '/api/beans';
+const minLatencyMs = 180;
+const maxLatencyMs = 320;
+const defaultPage = 1;
+const defaultPageSize = 12;
 
 export const catalogMockInterceptor: HttpInterceptorFn = (req, next) => {
-  if (req.method !== 'GET' || !req.url.startsWith(ENDPOINT)) {
+  if (req.method !== 'GET' || !req.url.startsWith(endpoint)) {
     return next(req);
   }
 
-  const page = parsePositiveInt(req.params.get('page'), DEFAULT_PAGE);
-  const pageSize = parsePositiveInt(req.params.get('pageSize'), DEFAULT_PAGE_SIZE);
+  const page = parsePositiveInt(req.params.get('page'), defaultPage);
+  const pageSize = parsePositiveInt(req.params.get('pageSize'), defaultPageSize);
   const search = (req.params.get('q') ?? '').trim().toLowerCase();
   const roast = parseRoast(req.params.get('roast'));
   const origin = (req.params.get('origin') ?? '').trim();
   const sort = parseSort(req.params.get('sort'));
 
-  const filtered = BEANS_SEED.filter((bean) => matches(bean, search, roast, origin));
+  const filtered = beansSeed.filter((bean) => matches(bean, search, roast, origin));
   const sorted = sort ? sortBeans(filtered, sort) : filtered;
   const start = (page - 1) * pageSize;
 
@@ -92,7 +92,7 @@ function sortBeans(items: readonly Bean[], sort: BeanSort): readonly Bean[] {
 }
 
 function buildFacets(items: readonly Bean[]): BeanFacets {
-  const origins = [...new Set(BEANS_SEED.map((bean) => bean.origin))].sort();
+  const origins = [...new Set(beansSeed.map((bean) => bean.origin))].sort();
   const totalStockKg = items.reduce((sum, bean) => sum + bean.stockKg, 0);
   const averageScore = items.length
     ? Number((items.reduce((sum, bean) => sum + bean.score, 0) / items.length).toFixed(1))
@@ -152,5 +152,5 @@ function isSortField(value: string): value is BeanSortFieldET {
 }
 
 function randomLatency(): number {
-  return MIN_LATENCY_MS + Math.random() * (MAX_LATENCY_MS - MIN_LATENCY_MS);
+  return minLatencyMs + Math.random() * (maxLatencyMs - minLatencyMs);
 }

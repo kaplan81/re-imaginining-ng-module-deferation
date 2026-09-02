@@ -1,9 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { REMOTES, type RemoteName } from '../../models/remote.model';
+import { remotes, type RemoteName } from '../../models/remote.model';
 
-const PORTS: Record<RemoteName, number> = {
+const ports: Record<RemoteName, number> = {
   catalog: 4201,
   orders: 4202,
 };
@@ -26,10 +26,10 @@ export class RemoteUnavailableComponent {
   );
 
   label = computed(
-    () => REMOTES.find((remote) => remote.name === this.remote())?.label ?? this.remote(),
+    () => remotes.find((remote) => remote.name === this.remote())?.label ?? this.remote(),
   );
 
   command = computed(() => `npm run start:${this.remote()}`);
 
-  port = computed(() => PORTS[this.remote()]);
+  port = computed(() => ports[this.remote()]);
 }

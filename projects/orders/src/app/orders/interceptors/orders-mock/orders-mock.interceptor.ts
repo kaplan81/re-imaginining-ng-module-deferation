@@ -3,8 +3,8 @@ import { of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
 import type { OrderSortFieldET } from '../../enums/order-sort-field.enum';
-import { OPEN_STATUSES, ORDER_STATUSES, type OrderStatusET } from '../../enums/order-status.enum';
-import { ORDERS_SEED } from '../../mocks/orders-seed.mock';
+import { openStatuses, orderStatuses, type OrderStatusET } from '../../enums/order-status.enum';
+import { ordersSeed } from '../../mocks/orders-seed.mock';
 import type { Order, OrderPage, OrderSummary } from '../../models/order.model';
 import type { OrderSort } from '../../models/orders-query.model';
 
@@ -19,24 +19,24 @@ import type { OrderSort } from '../../models/orders-query.model';
  * host must not own `HttpClient`.
  */
 
-const ENDPOINT = '/api/orders';
-const MIN_LATENCY_MS = 200;
-const MAX_LATENCY_MS = 380;
-const DEFAULT_PAGE = 1;
-const DEFAULT_PAGE_SIZE = 10;
+const endpoint = '/api/orders';
+const minLatencyMs = 200;
+const maxLatencyMs = 380;
+const defaultPage = 1;
+const defaultPageSize = 10;
 
 export const ordersMockInterceptor: HttpInterceptorFn = (req, next) => {
-  if (req.method !== 'GET' || !req.url.startsWith(ENDPOINT)) {
+  if (req.method !== 'GET' || !req.url.startsWith(endpoint)) {
     return next(req);
   }
 
-  const page = parsePositiveInt(req.params.get('page'), DEFAULT_PAGE);
-  const pageSize = parsePositiveInt(req.params.get('pageSize'), DEFAULT_PAGE_SIZE);
+  const page = parsePositiveInt(req.params.get('page'), defaultPage);
+  const pageSize = parsePositiveInt(req.params.get('pageSize'), defaultPageSize);
   const search = (req.params.get('q') ?? '').trim().toLowerCase();
   const status = parseStatus(req.params.get('status'));
   const sort = parseSort(req.params.get('sort'));
 
-  const filtered = ORDERS_SEED.filter((order) => matches(order, search, status));
+  const filtered = ordersSeed.filter((order) => matches(order, search, status));
   const sorted = sort ? sortOrders(filtered, sort) : filtered;
   const start = (page - 1) * pageSize;
 
@@ -90,22 +90,21 @@ function sortOrders(items: readonly Order[], sort: OrderSort): readonly Order[] 
 /** Always computed over the full data set, so the tiles do not change while paging. */
 function buildSummary(): OrderSummary {
   const byStatus = Object.fromEntries(
-    ORDER_STATUSES.map((status) => [
+    orderStatuses.map((status) => [
       status,
-      ORDERS_SEED.filter((order) => order.status === status).length,
+      ordersSeed.filter((order) => order.status === status).length,
     ]),
   ) as Record<OrderStatusET, number>;
 
-  const open = ORDERS_SEED.filter((order) => OPEN_STATUSES.includes(order.status));
+  const open = ordersSeed.filter((order) => openStatuses.includes(order.status));
 
   return {
     openOrders: open.length,
-    kgInRoasting: ORDERS_SEED.filter((order) => order.status === 'roasting').reduce(
-      (sum, order) => sum + order.quantityKg,
-      0,
-    ),
+    kgInRoasting: ordersSeed
+      .filter((order) => order.status === 'roasting')
+      .reduce((sum, order) => sum + order.quantityKg, 0),
     lateOrders: open.filter((order) => order.daysToDue < 0).length,
-    revenueEur: Number(ORDERS_SEED.reduce((sum, order) => sum + order.totalEur, 0).toFixed(2)),
+    revenueEur: Number(ordersSeed.reduce((sum, order) => sum + order.totalEur, 0).toFixed(2)),
     byStatus,
   };
 }
@@ -121,7 +120,7 @@ function parsePositiveInt(raw: string | null, fallback: number): number {
 }
 
 function parseStatus(raw: string | null): OrderStatusET | null {
-  return raw && (ORDER_STATUSES as readonly string[]).includes(raw) ? (raw as OrderStatusET) : null;
+  return raw && (orderStatuses as readonly string[]).includes(raw) ? (raw as OrderStatusET) : null;
 }
 
 function parseSort(raw: string | null): OrderSort | null {
@@ -153,5 +152,5 @@ function isSortField(value: string): value is OrderSortFieldET {
 }
 
 function randomLatency(): number {
-  return MIN_LATENCY_MS + Math.random() * (MAX_LATENCY_MS - MIN_LATENCY_MS);
+  return minLatencyMs + Math.random() * (maxLatencyMs - minLatencyMs);
 }

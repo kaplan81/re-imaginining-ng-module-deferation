@@ -23,9 +23,9 @@ import type { BeanPage } from '../../models/bean.model';
 import type { BeanSort, CatalogQuery } from '../../models/catalog-query.model';
 import { CatalogService } from '../../services/catalog/catalog.service';
 
-const DEFAULT_PAGE_SIZE = 12;
-const DEFAULT_SORT: BeanSort = { field: 'score', direction: 'desc' };
-const SEARCH_DEBOUNCE_MS = 250;
+const defaultPageSize = 12;
+const defaultSort: BeanSort = { field: 'score', direction: 'desc' };
+const searchDebounceMs = 250;
 
 @Component({
   selector: 'cat-catalog-view',
@@ -45,13 +45,13 @@ export class CatalogViewComponent {
 
   /** Raw input value; `debounced` is the experimental v22 signal equivalent of `debounceTime`. */
   searchInput = signal('');
-  #search = debounced(this.searchInput, SEARCH_DEBOUNCE_MS);
+  #search = debounced(this.searchInput, searchDebounceMs);
 
   roast = signal<RoastLevelET | ''>('');
   origin = signal('');
   layout = signal<CatalogLayout>('grid');
-  pageSize = signal(DEFAULT_PAGE_SIZE);
-  sort = signal<BeanSort | null>(DEFAULT_SORT);
+  pageSize = signal(defaultPageSize);
+  sort = signal<BeanSort | null>(defaultSort);
 
   /**
    * Paging is derived state: any change to the filters, the page size or the sort

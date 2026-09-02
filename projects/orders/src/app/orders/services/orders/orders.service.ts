@@ -5,7 +5,7 @@ import type { Observable } from 'rxjs';
 import type { OrderPage } from '../../models/order.model';
 import type { OrdersQuery } from '../../models/orders-query.model';
 
-const ENDPOINT = '/api/orders';
+const endpoint = '/api/orders';
 
 /** Route-provided, not root-provided - see the note in `catalog/services/catalog/catalog.ts`. */
 @Service({ autoProvided: false })
@@ -29,6 +29,6 @@ export class OrdersService {
       params = params.set('sort', `${query.sort.field}:${query.sort.direction}`);
     }
 
-    return this.#http.get<OrderPage>(ENDPOINT, { params });
+    return this.#http.get<OrderPage>(endpoint, { params });
   }
 }

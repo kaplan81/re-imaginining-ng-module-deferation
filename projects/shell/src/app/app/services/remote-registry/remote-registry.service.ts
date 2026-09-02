@@ -1,13 +1,13 @@
 import { Service, signal } from '@angular/core';
 
 import {
-  REMOTES,
+  remotes,
   type RemoteDescriptor,
   type RemoteName,
   type RemoteStatus,
 } from '../../models/remote.model';
 
-const MANIFEST_URL = 'federation.manifest.json';
+const manifestUrl = 'federation.manifest.json';
 
 interface RemoteEntry {
   name?: string;
@@ -26,16 +26,16 @@ interface RemoteEntry {
  */
 @Service()
 export class RemoteRegistryService {
-  #statuses = signal<readonly RemoteStatus[]>(REMOTES.map((remote) => toChecking(remote)));
+  #statuses = signal<readonly RemoteStatus[]>(remotes.map((remote) => toChecking(remote)));
 
   statuses = this.#statuses.asReadonly();
 
   async refresh(): Promise<void> {
-    this.#statuses.set(REMOTES.map((remote) => toChecking(remote)));
+    this.#statuses.set(remotes.map((remote) => toChecking(remote)));
 
     const manifest = await this.#readManifest();
     const probed = await Promise.all(
-      REMOTES.map((remote) => this.#probe(remote, manifest[remote.name] ?? null)),
+      remotes.map((remote) => this.#probe(remote, manifest[remote.name] ?? null)),
     );
 
     this.#statuses.set(probed);
@@ -43,7 +43,7 @@ export class RemoteRegistryService {
 
   async #readManifest(): Promise<Partial<Record<RemoteName, string>>> {
     try {
-      const response = await fetch(MANIFEST_URL, { cache: 'no-store' });
+      const response = await fetch(manifestUrl, { cache: 'no-store' });
 
       if (!response.ok) {
         return {};

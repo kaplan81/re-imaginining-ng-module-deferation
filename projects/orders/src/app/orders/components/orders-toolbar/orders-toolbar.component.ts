@@ -1,8 +1,8 @@
 import { Component, input, model } from '@angular/core';
 
 import {
-  ORDER_STATUS_LABELS,
-  ORDER_STATUSES,
+  orderStatusLabels,
+  orderStatuses,
   type OrderStatusET,
 } from '../../enums/order-status.enum';
 
@@ -18,8 +18,8 @@ export class OrdersToolbarComponent {
   search = model.required<string>();
   status = model.required<OrderStatusET | ''>();
 
-  statuses = ORDER_STATUSES;
-  statusLabels = ORDER_STATUS_LABELS;
+  statuses = orderStatuses;
+  statusLabels = orderStatusLabels;
 
   onSearchInput(event: Event): void {
     this.search.set((event.target as HTMLInputElement).value);

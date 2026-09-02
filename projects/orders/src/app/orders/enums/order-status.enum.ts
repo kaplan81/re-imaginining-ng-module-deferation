@@ -9,7 +9,7 @@ export enum OrderStatus {
 
 export type OrderStatusET = keyof typeof OrderStatus;
 
-export const ORDER_STATUSES: readonly OrderStatusET[] = [
+export const orderStatuses: readonly OrderStatusET[] = [
   'intake',
   'roasting',
   'packed',
@@ -18,7 +18,7 @@ export const ORDER_STATUSES: readonly OrderStatusET[] = [
   'onHold',
 ];
 
-export const ORDER_STATUS_LABELS: Readonly<Record<OrderStatusET, string>> = {
+export const orderStatusLabels: Readonly<Record<OrderStatusET, string>> = {
   intake: 'Intake',
   roasting: 'Roasting',
   packed: 'Packed',
@@ -28,4 +28,4 @@ export const ORDER_STATUS_LABELS: Readonly<Record<OrderStatusET, string>> = {
 };
 
 /** Statuses that still need work from the fulfilment team. */
-export const OPEN_STATUSES: readonly OrderStatusET[] = ['intake', 'roasting', 'packed', 'onHold'];
+export const openStatuses: readonly OrderStatusET[] = ['intake', 'roasting', 'packed', 'onHold'];
