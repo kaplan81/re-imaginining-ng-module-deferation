@@ -5,6 +5,7 @@ export default withNativeFederation({
 
   exposes: {
     './Routes': './projects/orders/src/app/orders/orders.routes.ts',
+    './Widgets': './projects/orders/src/app/orders/orders.widgets.ts',
   },
 
   shared: {

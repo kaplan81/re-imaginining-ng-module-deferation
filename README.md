@@ -55,6 +55,13 @@ Then open:
 - <http://localhost:4200/> — the composed console
 - <http://localhost:4201/> — the catalog remote, standalone
 - <http://localhost:4202/> — the orders remote, standalone
+- <http://localhost:4201/widgets> and <http://localhost:4202/widgets> — each
+  remote rendering the widgets it publishes under `./Widgets`, without the shell
+
+> Adding or renaming an exposed key needs the remote's dev server **restarted**.
+> A running `ng serve` keeps serving a `remoteEntry.json` without the new key
+> while serving its chunk, so the shell reports the remote as unreachable for
+> that key with nothing in the log to explain it.
 
 ## Other commands
 
@@ -88,7 +95,10 @@ npm run format
    remote's route table is fetched over the network and grafted onto the shell
    router.
 5. That route table brings its own `provideHttpClient`, its own mock interceptor
-   and its own service. The shell provides no `HttpClient` at all.
+   and its own service. The shell installs no HTTP interceptors at all.
+6. Each remote also exposes `./Widgets` — a list of individually mountable
+   components. `/home` mounts two of them in slots on a page the shell owns, so one
+   document holds components from three independent builds.
 
 Full walkthrough, including the boundaries and the trade-offs: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -104,11 +114,25 @@ Full walkthrough, including the boundaries and the trade-offs: [`docs/ARCHITECTU
 3. **Show a second team's remote.** Navigate to _Roast orders_: teal accent, its
    own KPI contract, its own interceptor — on the same page, in the same Angular
    instance, from a different build.
-4. **Break a remote.** `Ctrl+C` the catalog dev server, then click _Bean catalog_.
+4. **Drop the granularity from page to component.** Back on `/home`, scroll to
+   _Components from three builds, one document_. Two widgets appear — one from
+   catalog, one from orders — inside a page the shell owns. In DevTools → Network,
+   note the ordering: `Widgets.js` from `:4201` and `:4202` only when the slots
+   enter the viewport, and _then_ each widget's own component chunk, fetched by the
+   remote's inner `import()`. Two nested lazy levels, and `Routes.js` never loads
+   at all. Both origin strips still read `localhost:4201` / `localhost:4202` while
+   the document is `:4200`.
+
+   The division of labour is worth naming: `@defer (on viewport)` can only defer
+   dependencies the compiler sees statically, so it defers the shell's own slot
+   component; federation does the cross-origin fetch inside it.
+
+5. **Break a remote.** `Ctrl+C` the catalog dev server, then click _Bean catalog_.
    The shell stays alive, navigation keeps working, and the fallback explains what
    happened. Go back to `/home` and hit **Re-probe**: catalog flips to
-   _Unreachable_ while orders stays green.
-5. **Deploy one side only.** `npm run build:catalog` alone. The shell needs no
+   _Unreachable_ while orders stays green — and the catalog _slot_ degrades on its
+   own while the orders widget beside it keeps rendering.
+6. **Deploy one side only.** `npm run build:catalog` alone. The shell needs no
    rebuild, because it holds no compiled reference to the catalog.
 
 ## Relationship to the other two repositories

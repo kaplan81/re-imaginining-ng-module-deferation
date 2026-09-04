@@ -82,12 +82,21 @@ Architects Native Federation. See `README.md` and `docs/ARCHITECTURE.md` first.
 
 - **Never import across projects.** No file under `projects/shell` may import from
   `projects/catalog` or `projects/orders`, or vice versa — not even a type. The
-  only contract is the exposed `./Routes` key plus the URL in
-  `projects/shell/public/federation.manifest.json`.
+  only contract is the two exposed keys, `./Routes` and `./Widgets`, plus the URL
+  in `projects/shell/public/federation.manifest.json`. Where a shape has to be
+  known on both sides (the widget descriptor), each side declares its own
+  structurally identical interface — see `remote-widget.model.ts` in the shell and
+  `<remote>.widgets.ts` in each remote.
 - **Never add `provideHttpClient` to a shell `ApplicationConfig`.** Remotes provide
-  their own HTTP stack in their route providers so their interceptors cannot leak
-  into each other or into the host. The shell uses `fetch` when it needs the
-  network.
+  their own HTTP stack — in route providers for `./Routes`, in the widget
+  descriptor's `providers` for `./Widgets` — so their interceptors cannot leak into
+  each other or into the host. The shell uses `fetch` when it needs the network.
+  Be precise about the risk: `HttpClient`, `HttpHandler` and `HttpBackend` are all
+  `providedIn: 'root'` in Angular 22, so `inject(HttpClient)` never fails. What is
+  _not_ root-provided is the interceptor chain, which resolves from whichever
+  `EnvironmentInjector` created the handler. A shell-level interceptor would
+  therefore sit above every remote's traffic, silently. `app.config.spec.ts` is the
+  tripwire.
 - **Feature services use `@Service({ autoProvided: false })`** and are listed in
   route providers. Root-provided singletons land in whichever injector is around —
   the shell's, in federated mode.
@@ -103,13 +112,33 @@ Architects Native Federation. See `README.md` and `docs/ARCHITECTURE.md` first.
 - **Do not extract a shared UI library** between the three applications. The
   duplicated `remote-origin` component is intentional.
 - **Mocks stay deterministic.** Seeds are generated from fixed indices, and
-  `orders` computes dates against `referenceToday`, not `Date.now()`.
+  `orders` computes dates against `referenceToday`, not `Date.now()`. Deterministic
+  is not the same as well-distributed: keep an index multiplier coprime with its
+  modulus, or the spread collapses. `(i * 13) % 39` yielded three distinct cupping
+  scores across 96 lots before it was fixed to `% 37`.
+- **A widget must not inject `ActivatedRoute`.** A slot is not a route, so there is
+  no route context to read. `Router` is fine — it is a shared singleton. A widget
+  descriptor's `providers` must be self-sufficient and never rely on a token the
+  host happens to provide.
+- **Two AA-constrained tokens.** `$color-ink-subtle` and `$color-accent-catalog`
+  are used as small text on light surfaces (the `eyebrow` and `chip` mixins), so
+  they are pinned to values that clear 4.5:1 on every surface they touch. Do not
+  lighten them back, and do not reach for `opacity` to subdue accent text — it
+  drops contrast below AA.
 
 ### Layout conventions inside a feature folder
 
-`components/` (presentational) · `containers/` (stateful, route entry) ·
-`services/` · `models/` · `enums/` · `interceptors/` · `mocks/`. Enums follow the
+`components/` (presentational) · `containers/` (stateful) · `services/` ·
+`models/` · `enums/` · `interceptors/` · `mocks/`. Enums follow the
 `enum X {...}` + `type XET = keyof typeof X` pattern.
+
+What makes a container is **holding state and orchestrating** — injecting
+services, owning signals, deciding what gets rendered — not being the thing a URL
+resolves to. Most containers here happen to be route entries, but that is a
+consequence, not the definition: `shell/app/containers/remote-slot/` is a
+container that is only ever placed inside another template, and each remote's
+`app/containers/widget-gallery/` is one too. Presentational components take
+`input()`/`output()`/`model()` and inject nothing.
 
 ### Naming: the 2016 style guide, deliberately
 
@@ -153,6 +182,18 @@ file carries its type in the name, and every class repeats it:
 ### After changing federation wiring
 
 Rebuild the affected project and confirm `dist/<project>/browser/remoteEntry.json`
-still lists the expected `exposes` keys. `tsconfig.federation.json` must name the
+still lists the expected `exposes` keys — `./Routes` and `./Widgets` for both
+remotes, and an empty list for the shell. `tsconfig.federation.json` must name the
 exposed entry points — it is what the federation build compiles, separately from
 `tsconfig.app.json`.
+
+Adding an exposed key is therefore **two** edits, and forgetting the second fails
+at build time rather than obviously:
+
+1. the `exposes` map in `federation.config.mjs` (paths are **workspace-root**-relative)
+2. the `files` array in `tsconfig.federation.json` (paths are **project**-relative)
+
+Then **restart the remote's dev server**. A long-running `ng serve` does not pick
+up a new `exposes` key: it keeps serving a `remoteEntry.json` without it while
+happily serving the new chunk, so the host reports the remote as unreachable for
+that key and nothing in the log explains why.

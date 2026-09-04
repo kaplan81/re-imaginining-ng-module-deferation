@@ -107,7 +107,12 @@ function buildSeed(): readonly Bean[] {
       roast: pick(roasts, i * 3),
       process: pick(processes, i * 5 + 1),
       tastingNotes: [pick(notes, i * 7), pick(notes, i * 7 + 3), pick(notes, i * 7 + 9)],
-      score: Number((82 + ((i * 13) % 39) / 4).toFixed(2)),
+      // The modulus must be coprime with the multiplier or the spread collapses:
+      // gcd(13, 39) = 13, so `(i * 13) % 39` only ever yields 0, 13 or 26 - three
+      // distinct scores across the whole catalog, with a third of the lots tied
+      // at the top. 37 is prime, so this walks all 37 residues (82.00 - 91.00)
+      // and stays as deterministic as before.
+      score: Number((82 + ((i * 13) % 37) / 4).toFixed(2)),
       pricePerKg: Number((8.4 + ((i * 13) % 74) / 4).toFixed(2)),
       stockKg: 15 + ((i * 37) % 46) * 5,
       harvestYear: 2024 + (i % 2),

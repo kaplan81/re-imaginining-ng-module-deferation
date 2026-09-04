@@ -1,0 +1,63 @@
+@use 'tokens' as t;
+
+.shl-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.shl-slot__heading {
+  @include t.eyebrow;
+
+  margin: 0;
+}
+
+.shl-slot__loading {
+  @include t.card(1.125rem);
+
+  color: t.$color-ink-muted;
+  font-size: 0.875rem;
+  margin: 0;
+  // Matches the loaded widget's rough height so resolving a slot does not
+  // shift the rest of the page.
+  min-height: 13rem;
+}
+
+.shl-slot__failed {
+  @include t.card(1.125rem);
+
+  border-style: dashed;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  min-height: 13rem;
+}
+
+.shl-slot__failed-text {
+  color: t.$color-ink-muted;
+  font-size: 0.875rem;
+  margin: 0;
+
+  code {
+    color: t.$color-ink;
+    font-family: t.$font-mono;
+    font-size: 0.8125rem;
+  }
+}
+
+.shl-slot__command {
+  background: t.$color-surface-sunken;
+  border-radius: t.$radius-sm;
+  color: t.$color-ink;
+  font-family: t.$font-mono;
+  font-size: 0.8125rem;
+  padding: 0.4375rem 0.625rem;
+}
+
+.shl-slot__available {
+  color: t.$color-ink-subtle;
+  font-family: t.$font-mono;
+  font-size: 0.75rem;
+  margin: 0;
+}

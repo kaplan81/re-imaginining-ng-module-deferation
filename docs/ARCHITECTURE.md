@@ -55,8 +55,9 @@ initFederation('federation.manifest.json', {
 Both remotes run the same two-phase boot with an empty remote map, so a remote
 served standalone behaves exactly like the federated one.
 
-## 3. The only link between shell and remotes
+## 3. The two links between shell and remotes
 
+The shell composes a remote at two granularities. A whole URL subtree, in
 `projects/shell/src/app/app/app.routes.ts`:
 
 ```ts
@@ -64,16 +65,88 @@ served standalone behaves exactly like the federated one.
 { path: 'orders',  loadChildren: () => loadRemoteRoutes('orders') },
 ```
 
-There is no `import` of anything under `projects/catalog` or `projects/orders`
-anywhere in the shell — no components, no models, no enums, not even a type. The
-contract is three strings: the remote's name, the exposed key `./Routes`, and the
-URL in `federation.manifest.json`.
+…and a single component inside a page the shell owns, in
+`projects/shell/src/app/home/containers/home/home.component.html`:
 
-**Why expose a route table rather than a component?** A component forces the host
-to decide how it is lazily loaded, what providers surround it and what its inputs
-are. A route table lets the remote keep all of that: its own lazy boundaries, its
-own providers, its own internal URLs. Both remotes expose the same key, so the
-shell composes them through one code path with no per-remote special casing.
+```html
+@defer (on viewport) {
+<shl-remote-slot remote="catalog" widget="top-lots" heading="From the bean catalog" />
+<shl-remote-slot remote="orders" widget="roast-queue" heading="From the roast orders board" />
+}
+```
+
+There is still no `import` of anything under `projects/catalog` or
+`projects/orders` anywhere in the shell — no components, no models, no enums, not
+even a type. The contract is four strings per remote: its name, the exposed keys
+`./Routes` and `./Widgets`, and the URL in `federation.manifest.json`.
+
+Both remotes expose the same two keys, so the shell composes them through one code
+path per granularity with no per-remote special casing.
+
+### A route table is a granularity, not a principle
+
+A route table is the right contract when the remote should own a whole URL
+subtree: it keeps its own lazy boundaries, its own providers and its own internal
+URLs, and the host writes one `loadChildren`. What it cannot do is put a remote's
+component inside a page the _host_ owns.
+
+It is tempting to argue that a component contract would force the host to decide
+how the component is lazily loaded, what providers surround it and what its inputs
+are. That is only true if the remote exposes a bare component class. Expose a
+**descriptor** instead and all three stay on the remote side:
+
+```ts
+// projects/catalog/src/app/catalog/catalog.widgets.ts   — exposed as './Widgets'
+{
+  id: 'top-lots',
+  label: 'Top scoring lots',
+  load: () => import('./containers/top-lots-widget/top-lots-widget.component').then((m) => ({
+    component: m.TopLotsWidgetComponent,
+    providers: [provideHttpClient(withInterceptors([catalogMockInterceptor])), CatalogService],
+  })),
+}
+```
+
+The host loads `./Widgets`, finds the id, calls `load()`, and drops the returned
+`providers` into a child `EnvironmentInjector` it never inspects. `providers` is
+the same array `Route.providers` carries, so a widget's HTTP stack and feature
+service are scoped exactly as they are on the routed path.
+
+That yields two nested lazy levels, both owned by the remote:
+
+| Level | Fetches                                          | Triggered by                                 |
+| ----- | ------------------------------------------------ | -------------------------------------------- |
+| 1     | the remote's `Widgets.js` (descriptor list only) | `shl-remote-slot`, on `@defer (on viewport)` |
+| 2     | the widget's own component chunk                 | the descriptor's inner `import()`            |
+
+`@defer` and federation do different jobs here, and it is worth saying out loud:
+`@defer` can only defer dependencies the compiler can see statically, so what it
+defers is the shell's _own_ `RemoteSlotComponent`. The cross-origin fetch happens
+inside that component. `@defer` supplies the trigger ergonomics — `on viewport`,
+`on interaction`, `on idle`, `prefetch` — and federation supplies the module.
+
+### One manifest key, or many flat keys?
+
+Production classic-MF deployments tend to expose many flat keys rather than one
+manifest. `shop.lululemon.com` registers 12 remotes and instantiates 3 on its
+homepage; its `layout` remote alone exposes `./Root`, `./atoms/layout`,
+`./atoms/config` and `./utils/getNavData` — components, shared state and plain
+functions, at a granularity well below the page. Nothing there exposes a route
+table.
+
+This workspace takes the other option, deliberately. One `./Widgets` key means the
+host _discovers_ what a remote offers at runtime instead of hardcoding
+`catalog/TopLots`, and a new widget needs no federation-config change and no shell
+change. The cost is one small extra fetch before anything can render, and a
+descriptor shape that both sides declare independently — see §10.
+
+### Failure has two shapes now
+
+A slot distinguishes them, because the fixes differ: **unreachable** means the
+remote did not answer and someone should start it; **not found** means the remote
+answered but publishes no such id — a typo, or a version skew between a deployed
+shell and an older remote. Collapsing both into one empty state throws away the
+only information that helps.
 
 ### The manifest is data, not code
 
@@ -123,7 +196,7 @@ shareAll(
 
 ## 5. Where the backend lives
 
-Each remote ships its own mocked backend and provides it **at route level**:
+Each remote ships its own mocked backend and provides it **at route level** — and, for a widget, in the descriptor's `providers`, which is the same array shape:
 
 ```ts
 // projects/catalog/src/app/catalog/catalog.routes.ts
@@ -137,15 +210,26 @@ Each remote ships its own mocked backend and provides it **at route level**:
 
 Three consequences worth stating out loud:
 
-1. **The shell has no `HttpClient`.** Look at `app.config.ts`: there is no
-   `provideHttpClient`. A remote therefore cannot inherit a base URL, an
-   interceptor chain or an auth token from the host by accident. When the shell
-   needs to talk to the network itself — the remote-health probe — it uses `fetch`
-   directly, so this property is not quietly undone.
+1. **The shell provides no HTTP of its own.** Look at `app.config.ts`: there is no
+   `provideHttpClient`. When the shell needs the network itself — the remote-health
+   probe — it uses `fetch` directly, so this property is not quietly undone.
+
+   Be precise about what that buys, because it is easy to overstate. In Angular 22
+   `HttpClient`, `HttpHandler` and `HttpBackend` are all `providedIn: 'root'` with
+   a fetch backend, so `inject(HttpClient)` succeeds in any application whether or
+   not anyone called `provideHttpClient`. What is _not_ root-provided is the
+   **interceptor chain**: `HttpInterceptorHandler` resolves interceptors from the
+   `EnvironmentInjector` it was created in. So the real guarantee is that no
+   shell-level interceptor sits above a remote's traffic, and that each remote's
+   own mock backend is reached through the injector the remote described.
+   `app.config.spec.ts` asserts the shell installs none.
+
 2. **Two interceptor chains coexist.** The catalog's mock answers `/api/beans`;
    the orders mock answers `/api/orders`. Neither can see the other's traffic,
-   because each lives in its own route-scoped injector. Root-provided interceptors
-   would have made them fight over the same chain.
+   because each lives in its own scoped injector — route-scoped when routed,
+   slot-scoped when mounted as a widget. Root-provided interceptors would have made
+   them fight over the same chain. The observable proof is on `/home`: both widgets
+   render seeded data from their own mock, in one document, at the same time.
 3. **Feature services use `@Service({ autoProvided: false })`.** A root-provided
    singleton would be created in whichever injector happens to be around — the
    shell's, in federated mode. Listing the service in the route providers ties its
@@ -251,18 +335,21 @@ The `adg-coding-challenge` repo runs Native Federation 21 on Angular 21. Moving 
 Most of these are inherent to _any_ federation runtime, not to Native Federation.
 They are the material for the comparison with the Rspack and Vite builds.
 
-| Topic                        | Position taken here                                                                                                                                                                         |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Builder ownership**        | Stay on `@angular/build:application`. Upgrades follow Angular's release notes; no bundler stack to own. This is the whole point of the baseline.                                            |
-| **Bundler still required**   | The "no bundler" pitch of raw ESM does not apply. Tree-shaking, code splitting, CSS pipelines, TS, source maps and budgets all still live in the bundler.                                   |
-| **Cross-origin posture**     | Chunks are fetched cross-origin (`:4201` → `:4200`). The dev server allows it; production needs explicit CORS headers, cache rules and SBOM coverage of every origin.                       |
-| **Cross-origin DX cost**     | Source maps and stack traces straddle two origins. Fine for a demo; in many-team setups a unified delivery layer (per-team prefixes on one CDN, or a platform like Zephyr) pays off.        |
-| **No unload semantics**      | ESM cannot unload a module. Long-lived multi-remote shells that need memory recovery reach `registerRemotes(..., { force: true })` / `removeRemote()` through classic MF.                   |
-| **Single Angular major**     | Layered singletons — the same specifier as _different_ singletons per layer, e.g. two Angular majors side by side — remain a classic-MF capability. Not needed for one major version.       |
-| **Loader hooks**             | NF covers retries, fallbacks and telemetry. The broader MF hook surface (`beforeLoadRemote`, `errorLoadRemote`, `afterResolve`) is reachable via the documented combination pattern.        |
-| **Shared build-time tokens** | One SCSS file is shared across three builds. Documented above as a deliberate trade rather than an oversight.                                                                               |
-| **No e2e**                   | Shell↔remote wiring is only verified manually. The honest gap in the test story.                                                                                                            |
-| **Experimental API**         | `debounced()` from `@angular/core` is experimental in v22. Used in both containers because it replaces the RxJS `debounceTime` ceremony; swap for a `FormControl` pipeline if that matters. |
+| Topic                         | Position taken here                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Builder ownership**         | Stay on `@angular/build:application`. Upgrades follow Angular's release notes; no bundler stack to own. This is the whole point of the baseline.                                                                                                                                                                                                                                                                                                                   |
+| **Bundler still required**    | The "no bundler" pitch of raw ESM does not apply. Tree-shaking, code splitting, CSS pipelines, TS, source maps and budgets all still live in the bundler.                                                                                                                                                                                                                                                                                                          |
+| **Cross-origin posture**      | Chunks are fetched cross-origin (`:4201` → `:4200`). The dev server allows it; production needs explicit CORS headers, cache rules and SBOM coverage of every origin.                                                                                                                                                                                                                                                                                              |
+| **Cross-origin DX cost**      | Source maps and stack traces straddle two origins. Fine for a demo; in many-team setups a unified delivery layer (per-team prefixes on one CDN, or a platform like Zephyr) pays off.                                                                                                                                                                                                                                                                               |
+| **No unload semantics**       | ESM cannot unload a module. Long-lived multi-remote shells that need memory recovery reach `registerRemotes(..., { force: true })` / `removeRemote()` through classic MF.                                                                                                                                                                                                                                                                                          |
+| **Single Angular major**      | Layered singletons — the same specifier as _different_ singletons per layer, e.g. two Angular majors side by side — remain a classic-MF capability. Not needed for one major version.                                                                                                                                                                                                                                                                              |
+| **Loader hooks**              | NF covers retries, fallbacks and telemetry. The broader MF hook surface (`beforeLoadRemote`, `errorLoadRemote`, `afterResolve`) is reachable via the documented combination pattern.                                                                                                                                                                                                                                                                               |
+| **Shared build-time tokens**  | One SCSS file is shared across three builds. Documented above as a deliberate trade rather than an oversight.                                                                                                                                                                                                                                                                                                                                                      |
+| **No e2e**                    | Shell↔remote wiring is only verified manually. The honest gap in the test story.                                                                                                                                                                                                                                                                                                                                                                                   |
+| **Descriptor asserted twice** | `./Routes` is typed `Routes`, owned by `@angular/router`, so both sides are structurally guaranteed to agree. The widget descriptor is a bespoke shape declared independently in the shell and in each remote, and nothing checks that they still match. Each remote's `/widgets` gallery is the mitigation: it consumes the descriptor list inside the remote's own build, so a broken descriptor fails in that remote's dev server rather than only in the host. |
+| **Manifest vs flat keys**     | One `./Widgets` key buys runtime discoverability and costs an extra round trip before first paint. Flat per-widget keys invert that. Build 2 should measure both rather than assume.                                                                                                                                                                                                                                                                               |
+| **Dev-server staleness**      | A running `ng serve` does not pick up a new `exposes` key — it serves a `remoteEntry.json` without it while serving the chunk, so the host reports "unreachable" with nothing in the log. Restart the remote after touching `federation.config.mjs`.                                                                                                                                                                                                               |
+| **Experimental API**          | `debounced()` from `@angular/core` is experimental in v22. Used in both containers because it replaces the RxJS `debounceTime` ceremony; swap for a `FormControl` pipeline if that matters.                                                                                                                                                                                                                                                                        |
 
 ## Further reading
 

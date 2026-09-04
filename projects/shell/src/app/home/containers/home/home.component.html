@@ -29,6 +29,37 @@
 
   <shl-remote-status />
 
+  <section class="shl-home__slots-section" aria-labelledby="shl-home-slots-title">
+    <h2 class="shl-home__section-title" id="shl-home-slots-title">
+      Components from three builds, one document
+    </h2>
+
+    <p class="shl-home__section-lead">
+      Everything above is the shell's own code. Everything below this line was compiled, versioned
+      and deployed by another team &mdash; and it is mounted here, inside a page the shell owns,
+      rather than behind a route of its own.
+    </p>
+
+    <!--
+      `@defer` can only defer statically analysable dependencies, so what it
+      defers here is the shell's own slot component. The cross-origin fetch
+      happens inside the slot, one level further down. `@defer` supplies the
+      trigger, federation supplies the module.
+    -->
+    @defer (on viewport) {
+      <div class="shl-home__slots">
+        <shl-remote-slot remote="catalog" widget="top-lots" heading="From the bean catalog" />
+        <shl-remote-slot
+          remote="orders"
+          widget="roast-queue"
+          heading="From the roast orders board"
+        />
+      </div>
+    } @placeholder {
+      <div class="shl-home__slots-placeholder" aria-hidden="true"></div>
+    }
+  </section>
+
   <section class="shl-home__how" aria-labelledby="shl-home-how-title">
     <h2 class="shl-home__section-title" id="shl-home-how-title">
       What happens before the first route renders

@@ -8,6 +8,7 @@ export default withNativeFederation({
   // its own providers and its own internal URLs.
   exposes: {
     './Routes': './projects/catalog/src/app/catalog/catalog.routes.ts',
+    './Widgets': './projects/catalog/src/app/catalog/catalog.widgets.ts',
   },
 
   shared: {

@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { RemoteRegistryService } from '../../services/remote-registry/remote-registry.service';
+import { RemoteRegistryService } from '../../../app/services/remote-registry/remote-registry.service';
 
 @Component({
   selector: 'shl-remote-status',

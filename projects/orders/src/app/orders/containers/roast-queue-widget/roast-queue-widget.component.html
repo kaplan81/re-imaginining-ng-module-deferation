@@ -1,0 +1,47 @@
+<div class="ord-roast-queue" [attr.aria-busy]="pageResource.isLoading()">
+  <header class="ord-roast-queue__head">
+    <h3 class="ord-roast-queue__title">Due soonest</h3>
+    <ord-remote-origin remote="orders" />
+  </header>
+
+  @if (pageResource.error()) {
+    <p class="ord-roast-queue__error" role="alert">
+      The orders backend did not answer.
+      <button type="button" class="ord-roast-queue__retry" (click)="onReload()">Try again</button>
+    </p>
+  } @else {
+    <ol class="ord-roast-queue__list">
+      @for (order of orders(); track order.id) {
+        <li class="ord-roast-queue__item">
+          <span class="ord-roast-queue__body">
+            <span class="ord-roast-queue__customer">{{ order.customer }}</span>
+            <span class="ord-roast-queue__meta">
+              {{ order.reference }} · {{ order.quantityKg | number }} kg ·
+              {{ statusLabels[order.status] }}
+            </span>
+          </span>
+
+          <span
+            class="ord-roast-queue__due"
+            [class.ord-roast-queue__due--late]="order.daysToDue < 0"
+          >
+            {{ dueLabel(order.daysToDue) }}
+          </span>
+        </li>
+      } @empty {
+        @if (!pageResource.isLoading()) {
+          <li class="ord-roast-queue__empty">No orders in the queue.</li>
+        }
+      }
+    </ol>
+
+    <p class="ord-roast-queue__foot" role="status" aria-live="polite">
+      @if (pageResource.isLoading()) {
+        Loading orders…
+      } @else if (summary(); as totals) {
+        {{ totals.openOrders | number }} open · {{ totals.lateOrders | number }} late ·
+        {{ totals.kgInRoasting | number }} kg roasting
+      }
+    </p>
+  }
+</div>

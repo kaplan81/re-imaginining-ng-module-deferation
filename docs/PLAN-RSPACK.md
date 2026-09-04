@@ -135,7 +135,10 @@ const shared = {
 new ModuleFederationPlugin({
   name: 'catalog',
   filename: 'remoteEntry.js',
-  exposes: { './Routes': '@rr/catalog/catalog.routes' },
+  exposes: {
+    './Routes': '@rr/catalog/catalog.routes',
+    './Widgets': '@rr/catalog/catalog.widgets',
+  },
   shared,
 });
 ```
@@ -147,7 +150,40 @@ Every Angular package the remotes have in common must be listed on both sides, a
 maintenance cost.
 
 Verify `dist/mf-manifest.json` and `dist/remoteEntry.js` are emitted and that the
-manifest lists `./Routes`.
+manifest lists both `./Routes` and `./Widgets`.
+
+**`./Widgets` must port unchanged, and it needs no adapter.** The descriptor in
+`catalog.widgets.ts` is plain `@angular/core` — `Type`, `Provider |
+EnvironmentProviders`, and a bare dynamic `import()`. No federation API appears in
+it, which is exactly why it can sit inside the aliased feature tree and satisfy
+criterion 3. On the host side `loadRemote('catalog/Widgets')` returns the same
+module object that `federation().loadRemoteModule('catalog', './Widgets')` returns
+in the baseline, so `RemoteSlotComponent` should port with only its loader call
+rewritten.
+
+**Bridges are out of scope, and that is a finding rather than a gap.** MF Bridge
+ships officially for React and Vue 3 only — there is no Angular bridge — and its
+provider contract is DOM-based (`render({ dom })` / `destroy({ dom })`), which
+would mean a second `ApplicationRef` per remote and no injector inheritance from
+the host. It exists to cross _framework_ boundaries. Worth saying on the slide:
+`shop.lululemon.com` runs 12 remotes with zero bridges, because everything there
+is React and `react`/`react-dom`/`next/*`/`jotai` are simply shared singletons —
+the same posture `shareAll` gives the baseline.
+
+**Comparison task: flat keys vs one manifest key.** The baseline exposes a single
+`./Widgets` descriptor list, so the host discovers what a remote offers at runtime.
+Production MF tends the other way — lululemon's `layout` remote exposes `./Root`,
+`./atoms/layout`, `./atoms/config` and `./utils/getNavData` as separate flat keys,
+and its host hardcodes them. Implement one widget both ways here and measure the
+round trips and the config churn per added widget.
+
+**Production details from that survey worth reproducing or avoiding:** remote
+versions pinned in the URL path (`…/layout/11.22.39/static/chunks/remoteEntry.js`)
+with `_app_version_` placeholders substituted at load time; remotes that are
+themselves hosts (`story-app` registers `layout`); and — the cautionary one — those
+nested registrations pointing at `stage.lululemon.com` from production, which is
+what a compiled-in remote URL costs you when the baseline's manifest-as-data would
+have been an edit.
 
 ### Step 3 — the host
 
@@ -234,21 +270,24 @@ bundler choice fixes on its own.
 
 1. `npm run build` and `npm run dev` work for all three apps under `builds/rspack/`.
 2. The shell at `:4210` composes both remotes at runtime with one Angular instance.
-3. Feature code is imported from `projects/*` with **zero** modifications.
+3. Feature code is imported from `projects/*` with **zero** modifications —
+   including `<remote>.widgets.ts` and both widget containers.
 4. The parity checklist in step 4 passes, or every failure is documented.
 5. A filled-in comparison row exists for the matrix below.
 
 ## 7. What the talk gets from this build
 
-| Dimension                         | Baseline (Native Federation) | This build (Rspack + MF)           |
-| --------------------------------- | ---------------------------- | ---------------------------------- |
-| Cold production build, 3 apps     | measure                      | measure                            |
-| Incremental rebuild on file save  | measure                      | measure                            |
-| Initial transferred bytes, shell  | ~36.7 kB gzip                | measure                            |
-| Lines of build/federation config  | count                        | count                              |
-| Shared-dep map: derived or manual | derived (`shareAll`)         | manual                             |
-| Remote URLs: data or compiled     | data (manifest asset)        | compiled, unless `registerRemotes` |
-| `ng update` migration path        | yes                          | no — adapter's own cadence         |
-| `ng test`, budgets, i18n          | first-party                  | re-solve per feature               |
-| Angular version ceiling           | tracks Angular               | set by the adapter                 |
-| Unload / layered singletons       | not available                | available                          |
+| Dimension                          | Baseline (Native Federation) | This build (Rspack + MF)             |
+| ---------------------------------- | ---------------------------- | ------------------------------------ |
+| Cold production build, 3 apps      | measure                      | measure                              |
+| Incremental rebuild on file save   | measure                      | measure                              |
+| Initial transferred bytes, shell   | ~36.7 kB gzip                | measure                              |
+| Lines of build/federation config   | count                        | count                                |
+| Shared-dep map: derived or manual  | derived (`shareAll`)         | manual                               |
+| Remote URLs: data or compiled      | data (manifest asset)        | compiled, unless `registerRemotes`   |
+| `ng update` migration path         | yes                          | no — adapter's own cadence           |
+| `ng test`, budgets, i18n           | first-party                  | re-solve per feature                 |
+| Component-level exposure           | one `./Widgets` descriptor   | measure: flat keys or manifest       |
+| Adapter needed for Angular→Angular | none                         | none (Bridge is for cross-framework) |
+| Angular version ceiling            | tracks Angular               | set by the adapter                   |
+| Unload / layered singletons        | not available                | available                            |

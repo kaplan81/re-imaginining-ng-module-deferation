@@ -43,14 +43,21 @@ $color-border-strong: #d6c8b4;
 // Ink
 $color-ink: #241a12;
 $color-ink-muted: #6b5a4a;
-$color-ink-subtle: #948373;
+// AA-constrained: this is used by the `eyebrow` mixin at 11px bold, so it needs
+// 4.5:1 against every surface it sits on - including $color-surface-sunken and
+// $color-neutral-soft, which are the tightest. #948373 was only 3.03:1 there.
+$color-ink-subtle: #776555;
 $color-ink-inverse: #fdfaf6;
 
 // Brand + per-remote accents. Each remote owns one hue so an audience can see
 // at a glance which independently deployed build painted which region.
 $color-brand: #7a3f16;
 $color-brand-dark: #4a2409;
-$color-accent-catalog: #c2600d;
+// AA-constrained, like $color-ink-subtle: this accent is used as small text on
+// $color-accent-catalog-soft (score chips, the remote-origin strip) and as a
+// solid background under $color-ink-inverse. #c2600d failed both (3.77 and
+// 4.06); this clears 4.94 and 5.32.
+$color-accent-catalog: #a4520b;
 $color-accent-catalog-soft: #fdf0e2;
 $color-accent-orders: #0f6b62;
 $color-accent-orders-soft: #e3f3f1;

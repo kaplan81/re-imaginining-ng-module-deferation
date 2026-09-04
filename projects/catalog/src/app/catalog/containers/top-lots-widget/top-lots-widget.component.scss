@@ -1,0 +1,109 @@
+@use 'tokens' as t;
+
+// A widget renders inside a host document whose global stylesheet this build
+// never loaded - the shell's `_base.scss` reset is not there. Inherited
+// properties therefore cascade in from whatever the host set, so font, colour
+// and line-height are declared here rather than assumed.
+.cat-top-lots {
+  @include t.card(1.125rem);
+
+  color: t.$color-ink;
+  display: flex;
+  flex-direction: column;
+  font-family: t.$font-sans;
+  gap: 0.875rem;
+  line-height: 1.5;
+}
+
+.cat-top-lots__head {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.cat-top-lots__title {
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.cat-top-lots__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cat-top-lots__item {
+  align-items: center;
+  border-bottom: 1px solid t.$color-border;
+  display: flex;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.cat-top-lots__score {
+  @include t.chip(t.$color-accent-catalog, t.$color-accent-catalog-soft);
+
+  font-family: t.$font-mono;
+  min-width: 2.75rem;
+  justify-content: center;
+}
+
+.cat-top-lots__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cat-top-lots__name {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cat-top-lots__meta {
+  color: t.$color-ink-muted;
+  font-size: 0.8125rem;
+}
+
+.cat-top-lots__foot {
+  @include t.eyebrow;
+
+  border-top: 1px solid t.$color-border;
+  margin: auto 0 0;
+  padding-top: 0.75rem;
+}
+
+.cat-top-lots__empty {
+  color: t.$color-ink-muted;
+  font-size: 0.875rem;
+}
+
+.cat-top-lots__error {
+  align-items: center;
+  color: t.$color-danger;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.cat-top-lots__retry {
+  @include t.button-quiet;
+
+  font-size: 0.8125rem;
+  padding: 0.3125rem 0.625rem;
+}

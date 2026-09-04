@@ -42,7 +42,9 @@ import { Component, input } from '@angular/core';
 
     .cat-remote-origin__url {
       font-family: t.$font-mono;
-      opacity: 0.75;
+      // No opacity here: the accent at 0.75 over the soft background lands at
+      // 3.16:1, under AA. The URL is already de-emphasised by the mono face, and
+      // the only opacity that passes (0.95) is indistinguishable from none.
       padding-left: 0.25rem;
     }
   `,

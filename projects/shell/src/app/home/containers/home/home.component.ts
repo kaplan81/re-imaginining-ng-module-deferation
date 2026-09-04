@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 
-import { RemoteStatusComponent } from '../../../app/components/remote-status/remote-status.component';
+import { RemoteSlotComponent } from '../../../app/containers/remote-slot/remote-slot.component';
+import { RemoteStatusComponent } from '../../components/remote-status/remote-status.component';
 
 @Component({
   selector: 'shl-home',
-  imports: [RemoteStatusComponent],
+  imports: [RemoteSlotComponent, RemoteStatusComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })

@@ -1,0 +1,47 @@
+<section
+  class="shl-slot"
+  [attr.aria-labelledby]="heading() ? headingId() : null"
+  [attr.aria-busy]="isLoading()"
+>
+  @if (heading(); as text) {
+    <h2 class="shl-slot__heading" [id]="headingId()">{{ text }}</h2>
+  }
+
+  @if (ready(); as widget) {
+    <!--
+      Both outlet inputs are bound here, on one container created in a single
+      pass. Splitting them across two signals is the NG0201 trap described in
+      the component.
+    -->
+    <ng-container
+      [ngComponentOutlet]="widget.component"
+      [ngComponentOutletEnvironmentInjector]="widget.envInjector"
+    />
+  } @else if (isLoading()) {
+    <p class="shl-slot__loading" role="status" aria-live="polite">
+      Fetching the {{ label() }} widget…
+    </p>
+  } @else if (isUnreachable()) {
+    <div class="shl-slot__failed" role="status" aria-live="polite">
+      <p class="shl-slot__failed-text">
+        The <code>{{ remote() }}</code> remote did not answer, so this panel is empty. The rest of
+        the page is unaffected.
+      </p>
+
+      <code class="shl-slot__command">{{ command() }}</code>
+    </div>
+  } @else if (notFound(); as missing) {
+    <div class="shl-slot__failed" role="status" aria-live="polite">
+      <p class="shl-slot__failed-text">
+        The <code>{{ remote() }}</code> remote is reachable but publishes no widget called
+        <code>{{ widget() }}</code
+        >. This is a version skew or a typo, not an outage.
+      </p>
+
+      <p class="shl-slot__available">
+        It offers:
+        {{ missing.available.length ? missing.available.join(', ') : 'no widgets at all' }}
+      </p>
+    </div>
+  }
+</section>

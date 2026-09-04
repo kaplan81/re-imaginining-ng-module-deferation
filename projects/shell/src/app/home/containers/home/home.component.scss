@@ -107,3 +107,21 @@
   font-size: 0.8125rem;
   margin: 0;
 }
+
+.shl-home__section-lead {
+  color: t.$color-ink-muted;
+  margin: -0.5rem 0 1.25rem;
+  max-width: 62ch;
+}
+
+.shl-home__slots {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+}
+
+// Holds the space the two slots will occupy, so resolving the `@defer` block
+// does not shift the section below it.
+.shl-home__slots-placeholder {
+  min-height: 15rem;
+}
