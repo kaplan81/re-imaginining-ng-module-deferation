@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import { RemoteSlotComponent } from '../../../app/containers/remote-slot/remote-slot.component';
+import { RemoteRegistryService } from '../../../app/services/remote-registry/remote-registry.service';
 import { RemoteStatusComponent } from '../../components/remote-status/remote-status.component';
 
 @Component({
@@ -10,6 +11,16 @@ import { RemoteStatusComponent } from '../../components/remote-status/remote-sta
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
+  #registry = inject(RemoteRegistryService);
+
+  /**
+   * Which widget microfrontends to mount, and where, read from
+   * `widget-slots.json` rather than written into this template. Adding one is a
+   * JSON edit and a deploy - the shell is not rebuilt and this file does not
+   * change.
+   */
+  slots = this.#registry.slots;
+
   steps = [
     {
       order: '01',
@@ -29,7 +40,7 @@ export class HomeComponent {
     {
       order: '04',
       title: 'Compose',
-      body: 'Navigating to a remote route fetches its exposed ./Routes and grafts it onto the shell router.',
+      body: 'A page remote hands over a URL subtree; a widget microfrontend hands over one component, mounted here.',
     },
   ];
 }

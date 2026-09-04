@@ -1,0 +1,21 @@
+@use 'tokens' as t;
+
+.rqu-standalone {
+  margin: 0 auto;
+  max-width: t.$layout-max-width;
+  padding: 1.5rem 1.5rem 3rem;
+}
+
+.rqu-standalone__banner {
+  background: t.$color-accent-orders-soft;
+  border: 1px solid rgba(15, 107, 98, 0.35);
+  border-radius: t.$radius-md;
+  color: #0b4f49;
+  font-size: 0.875rem;
+  margin: 0 0 1.5rem;
+  padding: 0.75rem 1rem;
+
+  code {
+    font-family: t.$font-mono;
+  }
+}

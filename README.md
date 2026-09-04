@@ -2,18 +2,22 @@
 
 Demo workspace for the talk **"Module Federation in Angular: beyond the default toolchain"**.
 
-Three independently built Angular 22 applications are composed in the browser by
+Five independently built Angular 22 applications are composed in the browser by
 [Angular Architects Native Federation](https://github.com/angular-architects/module-federation-plugin/blob/main/libs/native-federation/README.md):
-a **shell** that owns layout, navigation and the federation manifest, plus two
-**remotes** that each own a feature, its data access and its own mocked backend.
+a **shell** that owns layout, navigation and the federation manifest, two **page
+remotes** that each own a whole route subtree, and two **widget microfrontends**
+that own no page at all — they publish a single mountable component apiece, which
+the shell drops into a slot on a page it owns.
 
 The product is _Roast Republic_, a specialty-coffee operations console:
 
-| Project   | Role   | Port | Owns                                                          |
-| --------- | ------ | ---- | ------------------------------------------------------------- |
-| `shell`   | host   | 4200 | Chrome, routing, the manifest, remote health, fallback UI     |
-| `catalog` | remote | 4201 | Green-coffee lots: search, roast/origin filters, sort, paging |
-| `orders`  | remote | 4202 | Roast orders: KPI tiles, status filters, sort, paging         |
+| Project       | Role       | Port | Owns                                                             |
+| ------------- | ---------- | ---- | ---------------------------------------------------------------- |
+| `shell`       | host       | 4200 | Chrome, routing, the manifest, remote health, fallback UI        |
+| `catalog`     | page       | 4201 | Green-coffee lots: search, roast/origin filters, sort, paging    |
+| `orders`      | page       | 4202 | Roast orders: KPI tiles, status filters, sort, paging            |
+| `top-lots`    | widget MFE | 4203 | One component: the highest-scoring lots. No pages, no router.    |
+| `roast-queue` | widget MFE | 4204 | One component: what the roastery owes next. No pages, no router. |
 
 This repository is the **baseline** of the talk. It implements the conservative,
 first-party-toolchain path. Two further builds of the same product — one on
@@ -30,7 +34,7 @@ bootstrap, before Angular is even loaded.
 npm install
 ```
 
-Three terminals:
+One terminal per application, or `start:all` below:
 
 ```bash
 npm run start:catalog
@@ -41,10 +45,18 @@ npm run start:orders
 ```
 
 ```bash
+npm run start:top-lots
+```
+
+```bash
+npm run start:roast-queue
+```
+
+```bash
 npm run start:shell
 ```
 
-Or all three in one (backgrounds the remotes; `Ctrl+C` may leave strays):
+Or all five in one (backgrounds the others; `Ctrl+C` may leave strays):
 
 ```bash
 npm run start:all
@@ -53,10 +65,13 @@ npm run start:all
 Then open:
 
 - <http://localhost:4200/> — the composed console
-- <http://localhost:4201/> — the catalog remote, standalone
-- <http://localhost:4202/> — the orders remote, standalone
-- <http://localhost:4201/widgets> and <http://localhost:4202/widgets> — each
-  remote rendering the widgets it publishes under `./Widgets`, without the shell
+- <http://localhost:4201/> — the `catalog` page remote, standalone
+- <http://localhost:4202/> — the `orders` page remote, standalone
+- <http://localhost:4203/> — the `top-lots` widget microfrontend, standalone
+- <http://localhost:4204/> — the `roast-queue` widget microfrontend, standalone
+
+The last two publish no pages at all. Opening them directly renders the widgets
+they expose under `./Widgets`, which is how they are developed without the shell.
 
 > Adding or renaming an exposed key needs the remote's dev server **restarted**.
 > A running `ng serve` keeps serving a `remoteEntry.json` without the new key
@@ -69,15 +84,17 @@ Then open:
 npm run build
 ```
 
-Builds all three applications (remotes first, so the shell's manifest resolves).
-`npm run build:shell` / `build:catalog` / `build:orders` build one.
+Builds all five applications (the shell last, so its manifest resolves).
+`npm run build:<project>` builds one — and a widget microfrontend can be built and
+deployed entirely on its own, because nothing holds a compiled reference to it.
 
 ```bash
 npm test
 ```
 
-42 specs across the three projects (Vitest through `@angular/build:unit-test`).
-`npm run test:shell` / `test:catalog` / `test:orders` run one.
+63 specs across the five projects (Vitest through `@angular/build:unit-test`).
+`npm run test:<project>` runs one. Every project needs at least one spec: the
+builder fails a target outright when a project has none.
 
 ```bash
 npm run format
@@ -96,9 +113,12 @@ npm run format
    router.
 5. That route table brings its own `provideHttpClient`, its own mock interceptor
    and its own service. The shell installs no HTTP interceptors at all.
-6. Each remote also exposes `./Widgets` — a list of individually mountable
-   components. `/home` mounts two of them in slots on a page the shell owns, so one
-   document holds components from three independent builds.
+6. Two further applications — `top-lots` and `roast-queue` — expose only
+   `./Widgets`: a list of individually mountable components, and no route table at
+   all. `/home` mounts them in slots on a page the shell owns, so one document
+   holds components from five independent builds.
+7. Which widget microfrontends exist, and where they go, is read from
+   `widget-slots.json` at runtime. Adding one never rebuilds the shell.
 
 Full walkthrough, including the boundaries and the trade-offs: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -115,32 +135,40 @@ Full walkthrough, including the boundaries and the trade-offs: [`docs/ARCHITECTU
    own KPI contract, its own interceptor — on the same page, in the same Angular
    instance, from a different build.
 4. **Drop the granularity from page to component.** Back on `/home`, scroll to
-   _Components from three builds, one document_. Two widgets appear — one from
-   catalog, one from orders — inside a page the shell owns. In DevTools → Network,
-   note the ordering: `Widgets.js` from `:4201` and `:4202` only when the slots
-   enter the viewport, and _then_ each widget's own component chunk, fetched by the
-   remote's inner `import()`. Two nested lazy levels, and `Routes.js` never loads
-   at all. Both origin strips still read `localhost:4201` / `localhost:4202` while
+   _Components from five builds, one document_. Two widgets appear, each from an
+   application that publishes no pages at all, inside a page the shell owns. In
+   DevTools → Network, note the ordering: `Widgets.js` from `:4203` and `:4204`
+   only when the slots enter the viewport, and _then_ each widget's own component
+   chunk, fetched by the microfrontend's inner `import()`. Two nested lazy levels —
+   and `Routes.js` never loads at all, because the page remotes were never
+   navigated to. Both origin strips read `localhost:4203` / `localhost:4204` while
    the document is `:4200`.
 
    The division of labour is worth naming: `@defer (on viewport)` can only defer
    dependencies the compiler sees statically, so it defers the shell's own slot
    component; federation does the cross-origin fetch inside it.
 
-5. **Break a remote.** `Ctrl+C` the catalog dev server, then click _Bean catalog_.
-   The shell stays alive, navigation keeps working, and the fallback explains what
-   happened. Go back to `/home` and hit **Re-probe**: catalog flips to
-   _Unreachable_ while orders stays green — and the catalog _slot_ degrades on its
-   own while the orders widget beside it keeps rendering.
-6. **Deploy one side only.** `npm run build:catalog` alone. The shell needs no
-   rebuild, because it holds no compiled reference to the catalog.
+5. **Add a microfrontend without touching the shell.** Edit
+   `projects/shell/public/widget-slots.json` — add a slot, or point one at a widget
+   id that does not exist — and reload. The lineup changes with no rebuild, and a
+   bad id reports _"reachable but publishes no widget called…"_ rather than
+   pretending the application is down. Unreachable and not-found are different
+   failures with different fixes, so the slot distinguishes them.
+6. **Break a remote.** `Ctrl+C` the `top-lots` dev server and reload `/home`. That
+   slot degrades on its own, the `roast-queue` widget beside it keeps rendering, and
+   the page stays interactive. Hit **Re-probe** on the topology panel: `top-lots`
+   flips to _Unreachable_ while everything else stays green.
+7. **Deploy one side only.** `npm run build:top-lots` alone. Nothing else rebuilds —
+   not the shell, not the page remotes — because nobody holds a compiled reference
+   to it.
 
 ## Relationship to the other two repositories
 
 - **`adg-coding-challenge`** — the Angular 21 original: one shell, one
   `prescription` remote, and the written rationale for choosing Native Federation
   over Webpack/Rspack MF, Vite federation and raw ESM. This repo keeps that
-  architecture and moves it to Angular 22, two remotes and a non-medical domain.
+  architecture and moves it to Angular 22, four remotes across two kinds, and a
+  non-medical domain.
   Notable differences introduced by Native Federation 22 are listed in
   [`docs/ARCHITECTURE.md#what-changed-since-native-federation-21`](docs/ARCHITECTURE.md#what-changed-since-native-federation-21).
 - **`ZephyrCloudIO/zephyr-examples`** — reference examples for the Rspack and Vite
@@ -152,23 +180,28 @@ Full walkthrough, including the boundaries and the trade-offs: [`docs/ARCHITECTU
 ## Layout
 
 ```
-angular.json                     3 projects; each has esbuild + native-federation targets
-styles/                          Shared SCSS design tokens - the ONE build-time coupling
+angular.json                     5 projects; each has esbuild + native-federation targets
 projects/
-  shell/
-    federation.config.mjs        host: shares, no exposes
+  shell/                         the host, :4200
+    federation.config.mjs        shares, no exposes
     tsconfig.federation.json     entry points the federation build compiles
     public/
-      federation.manifest.json   where the remotes live - editable without a rebuild
+      federation.manifest.json   where every application lives - edit, no rebuild
+      widget-slots.json          which widget MFEs exist and where they mount
     src/
       federation.ts              holds the runtime handle from initFederation
       main.ts                    initFederation -> bootstrap
-      app/app/                   chrome, routing, remote registry, fallback
-      app/home/                  overview page + live topology panel
-  catalog/
-    federation.config.mjs        remote: exposes ./Routes
+      app/app/                   chrome, routing, registry, fallback, remote-slot
+      app/home/                  overview page, topology panel, widget slots
+  catalog/                       page remote, :4201 - exposes ./Routes
     src/app/catalog/             feature: components, container, mock backend, service
-  orders/
-    federation.config.mjs        remote: exposes ./Routes
+  orders/                        page remote, :4202 - exposes ./Routes
     src/app/orders/              feature: components, container, mock backend, service
+  top-lots/                      widget MFE, :4203 - exposes ./Widgets, no router
+    src/app/top-lots/            its own widget, service, interceptor, seed, models
+  roast-queue/                   widget MFE, :4204 - exposes ./Widgets, no router
+    src/app/roast-queue/         its own widget, service, interceptor, seed, models
+
+Each project also owns projects/<app>/styles/ - five byte-identical copies of
+_tokens.scss and _base.scss, because no project reads a sibling's stylesheet.
 ```

@@ -10,7 +10,8 @@ Status: **planned, not implemented.**
 
 ## 1. Goal
 
-Rebuild _Roast Republic_ — shell + `catalog` + `orders` — so that:
+Rebuild _Roast Republic_ — shell + `catalog` + `orders` + `top-lots` +
+`roast-queue` — so that:
 
 - Angular is compiled by **Rspack**, not by `@angular/build:application`.
 - Composition uses **classic Module Federation** (`mf-manifest.json`,
@@ -151,6 +152,13 @@ maintenance cost.
 
 Verify `dist/mf-manifest.json` and `dist/remoteEntry.js` are emitted and that the
 manifest lists both `./Routes` and `./Widgets`.
+
+**Five applications, not three.** Two of them (`top-lots`, `roast-queue`) are
+widget microfrontends: they expose only `./Widgets`, have no router and no route
+table, and are declared to the shell entirely in `federation.manifest.json` +
+`widget-slots.json`. Porting them is the easier half — no routing to reconcile —
+but the host's slot component and its two config assets are part of the
+`src/app/` composition seam that step 3 rewrites.
 
 **`./Widgets` must port unchanged, and it needs no adapter.** The descriptor in
 `catalog.widgets.ts` is plain `@angular/core` — `Type`, `Provider |

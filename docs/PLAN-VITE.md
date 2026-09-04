@@ -15,6 +15,10 @@ Rebuild _Roast Republic_ — shell + `catalog` + `orders` — so that:
 - Angular is compiled by **Vite** through the AnalogJS plugin.
 - Composition uses **`@module-federation/vite`**, i.e. the classic MF contract
   implemented on top of Rollup/Rolldown output.
+- There are now **five** applications, two of which are widget microfrontends
+  exposing only `./Widgets` (no router, no route table). Their feature code and
+  their `<app>.widgets.ts` descriptors are plain `@angular/core` and must port
+  unchanged; only the `exposes` map and the per-pipeline entry points differ.
 - The **feature code is byte-identical** to the baseline, for the same reason as in
   [`PLAN-RSPACK.md`](PLAN-RSPACK.md#the-one-thing-that-is-shared-and-why).
 

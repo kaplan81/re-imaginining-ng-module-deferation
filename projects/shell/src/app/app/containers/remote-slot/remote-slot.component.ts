@@ -12,7 +12,7 @@ import {
   type Type,
 } from '@angular/core';
 
-import { remotes, type RemoteName } from '../../models/remote.model';
+import type { RemoteName } from '../../models/remote.model';
 import { loadRemoteWidget } from '../../utils/remote/remote.util';
 
 type SlotState =
@@ -80,10 +80,12 @@ export class RemoteSlotComponent {
   isLoading = computed(() => this.#state().status === 'loading');
   isUnreachable = computed(() => this.#state().status === 'unreachable');
 
-  label = computed(
-    () => remotes.find((remote) => remote.name === this.remote())?.label ?? this.remote(),
-  );
-
+  /**
+   * The remote's own name, not a prettier label looked up from a compiled table.
+   * A widget remote is declared in `widget-slots.json` and the shell has no
+   * build-time record of it - and the name is the actionable identifier anyway,
+   * since it is what `npm run start:<name>` takes.
+   */
   command = computed(() => `npm run start:${this.remote()}`);
 
   /** Unique per slot, so two slots on one page do not collide in `aria-labelledby`. */

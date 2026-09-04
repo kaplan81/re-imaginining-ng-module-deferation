@@ -4,9 +4,11 @@
   <h1 class="shl-unavailable__title">{{ label() }} could not be loaded</h1>
 
   <p class="shl-unavailable__body">
-    The shell is running, but the <code>{{ remote() }}</code> remote did not answer on
-    <code>localhost:{{ port() }}</code
-    >. Because composition happens at runtime, this is a deployment condition rather than a build
+    The shell is running, but the <code>{{ remote() }}</code> remote did not answer
+    @if (port(); as port) {
+      on <code>localhost:{{ port }}</code>
+    }
+    . Because composition happens at runtime, this is a deployment condition rather than a build
     error &mdash; the rest of the shell keeps working.
   </p>
 

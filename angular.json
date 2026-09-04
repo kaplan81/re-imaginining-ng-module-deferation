@@ -341,6 +341,210 @@
           }
         }
       }
+    },
+    "top-lots": {
+      "projectType": "application",
+      "root": "projects/top-lots",
+      "sourceRoot": "projects/top-lots/src",
+      "prefix": "tlo",
+      "architect": {
+        "build": {
+          "builder": "@angular-architects/native-federation:build",
+          "options": {
+            "cacheExternalArtifacts": true,
+            "tsConfig": "projects/top-lots/tsconfig.federation.json"
+          },
+          "configurations": {
+            "production": {
+              "target": "top-lots:esbuild:production"
+            },
+            "development": {
+              "target": "top-lots:esbuild:development",
+              "dev": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-architects/native-federation:build",
+          "options": {
+            "target": "top-lots:serve-original:development",
+            "tsConfig": "projects/top-lots/tsconfig.federation.json",
+            "rebuildDelay": 500,
+            "cacheExternalArtifacts": true,
+            "dev": true,
+            "devServer": true,
+            "port": 0
+          }
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "buildTarget": "top-lots:esbuild:development",
+            "tsConfig": "projects/top-lots/tsconfig.spec.json",
+            "watch": false
+          }
+        },
+        "esbuild": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/top-lots/src/main.ts",
+            "tsConfig": "projects/top-lots/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/top-lots/public"
+              }
+            ],
+            "styles": ["projects/top-lots/src/styles.scss"],
+            "polyfills": ["es-module-shims"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/top-lots/styles"]
+            }
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-original": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "top-lots:esbuild:production"
+            },
+            "development": {
+              "buildTarget": "top-lots:esbuild:development"
+            }
+          },
+          "defaultConfiguration": "development",
+          "options": {
+            "port": 4203
+          }
+        }
+      }
+    },
+    "roast-queue": {
+      "projectType": "application",
+      "root": "projects/roast-queue",
+      "sourceRoot": "projects/roast-queue/src",
+      "prefix": "rqu",
+      "architect": {
+        "build": {
+          "builder": "@angular-architects/native-federation:build",
+          "options": {
+            "cacheExternalArtifacts": true,
+            "tsConfig": "projects/roast-queue/tsconfig.federation.json"
+          },
+          "configurations": {
+            "production": {
+              "target": "roast-queue:esbuild:production"
+            },
+            "development": {
+              "target": "roast-queue:esbuild:development",
+              "dev": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-architects/native-federation:build",
+          "options": {
+            "target": "roast-queue:serve-original:development",
+            "tsConfig": "projects/roast-queue/tsconfig.federation.json",
+            "rebuildDelay": 500,
+            "cacheExternalArtifacts": true,
+            "dev": true,
+            "devServer": true,
+            "port": 0
+          }
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "buildTarget": "roast-queue:esbuild:development",
+            "tsConfig": "projects/roast-queue/tsconfig.spec.json",
+            "watch": false
+          }
+        },
+        "esbuild": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/roast-queue/src/main.ts",
+            "tsConfig": "projects/roast-queue/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/roast-queue/public"
+              }
+            ],
+            "styles": ["projects/roast-queue/src/styles.scss"],
+            "polyfills": ["es-module-shims"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/roast-queue/styles"]
+            }
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-original": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "roast-queue:esbuild:production"
+            },
+            "development": {
+              "buildTarget": "roast-queue:esbuild:development"
+            }
+          },
+          "defaultConfiguration": "development",
+          "options": {
+            "port": 4204
+          }
+        }
+      }
     }
   }
 }

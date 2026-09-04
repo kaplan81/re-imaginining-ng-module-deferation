@@ -19,7 +19,7 @@
     />
   } @else if (isLoading()) {
     <p class="shl-slot__loading" role="status" aria-live="polite">
-      Fetching the {{ label() }} widget…
+      Fetching the {{ remote() }} widget…
     </p>
   } @else if (isUnreachable()) {
     <div class="shl-slot__failed" role="status" aria-live="polite">

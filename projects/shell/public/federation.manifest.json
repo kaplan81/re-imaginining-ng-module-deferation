@@ -1,4 +1,6 @@
 {
   "catalog": "http://localhost:4201/remoteEntry.json",
-  "orders": "http://localhost:4202/remoteEntry.json"
+  "orders": "http://localhost:4202/remoteEntry.json",
+  "top-lots": "http://localhost:4203/remoteEntry.json",
+  "roast-queue": "http://localhost:4204/remoteEntry.json"
 }

@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.app.json",
+  "files": ["src/app/roast-queue/roast-queue.widgets.ts"],
+  "include": ["src/**/*.d.ts"]
+}

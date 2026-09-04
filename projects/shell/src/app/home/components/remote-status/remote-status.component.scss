@@ -126,3 +126,10 @@
     text-decoration: underline;
   }
 }
+
+.shl-remote-status__mounted {
+  color: t.$color-ink-subtle;
+  font-size: 0.8125rem;
+  font-style: italic;
+  margin: 0.75rem 0 0;
+}

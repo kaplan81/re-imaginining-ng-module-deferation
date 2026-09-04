@@ -69,14 +69,28 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## This workspace
 
-Three independently built Angular applications composed at runtime by Angular
+**Five** independently built Angular applications composed at runtime by Angular
 Architects Native Federation. See `README.md` and `docs/ARCHITECTURE.md` first.
 
-| Project   | Role   | Port | Prefix | Feature folder                      |
-| --------- | ------ | ---- | ------ | ----------------------------------- |
-| `shell`   | host   | 4200 | `shl`  | `projects/shell/src/app/{app,home}` |
-| `catalog` | remote | 4201 | `cat`  | `projects/catalog/src/app/catalog`  |
-| `orders`  | remote | 4202 | `ord`  | `projects/orders/src/app/orders`    |
+| Project       | Role        | Exposes     | Port | Prefix | Feature folder                             |
+| ------------- | ----------- | ----------- | ---- | ------ | ------------------------------------------ |
+| `shell`       | host        | —           | 4200 | `shl`  | `projects/shell/src/app/{app,home}`        |
+| `catalog`     | page remote | `./Routes`  | 4201 | `cat`  | `projects/catalog/src/app/catalog`         |
+| `orders`      | page remote | `./Routes`  | 4202 | `ord`  | `projects/orders/src/app/orders`           |
+| `top-lots`    | widget MFE  | `./Widgets` | 4203 | `tlo`  | `projects/top-lots/src/app/top-lots`       |
+| `roast-queue` | widget MFE  | `./Widgets` | 4204 | `rqu`  | `projects/roast-queue/src/app/roast-queue` |
+
+Two kinds of remote, and the difference is load-bearing:
+
+- A **page remote** owns a URL subtree. It exposes `./Routes`, the shell gives it
+  a `loadChildren` entry, and adding one is a shell code change because the router
+  table is compiled.
+- A **widget microfrontend** owns no URL at all. It exposes only `./Widgets` — a
+  list of mountable component descriptors — and the shell mounts it into a slot on
+  a page the shell owns. It has no router, no `./Routes`, and no route table
+  anywhere in it. Adding one is **two JSON edits and a deploy**, with no shell
+  rebuild: an entry in `projects/shell/public/federation.manifest.json` and one in
+  `projects/shell/public/widget-slots.json`.
 
 ### Rules that federation makes non-negotiable
 
@@ -104,22 +118,36 @@ Architects Native Federation. See `README.md` and `docs/ARCHITECTURE.md` first.
   loaded by the shell. Use the compile-time SCSS tokens in
   `projects/<project>/styles/_tokens.scss` (`@use 'tokens' as t;`), never a CSS
   custom property defined in a global sheet.
-- **Every project owns its own `styles/` folder**, and the three copies of
+- **Every project owns its own `styles/` folder**, and the **five** copies of
   `_tokens.scss` / `_base.scss` are byte-identical on purpose — no project reads
   a sibling's stylesheet, not even at build time. Edit one and you must edit all
-  three; `diff` is the drift check. The header comment in `_tokens.scss` records
-  why, and that a published styles library package is the way to scale it.
-- **Do not extract a shared UI library** between the three applications. The
-  duplicated `remote-origin` component is intentional.
+  five; `diff` is the drift check. The header comment in `_tokens.scss` records
+  why, and that a published styles library package is the way to scale it — at
+  five copies that comment's "fourth consumer" threshold has already passed, so
+  treat the package as overdue rather than hypothetical.
+- **Do not extract a shared UI library** between the five applications. The five
+  copies of the `remote-origin` component are intentional, and so is each widget
+  microfrontend owning its own service, interceptor, seed, models and enums rather
+  than importing the page remote's. A widget MFE's numbers therefore do not match
+  the corresponding page remote's — different application, different backend. That
+  is the honest consequence, not a bug to reconcile.
 - **Mocks stay deterministic.** Seeds are generated from fixed indices, and
   `orders` computes dates against `referenceToday`, not `Date.now()`. Deterministic
   is not the same as well-distributed: keep an index multiplier coprime with its
   modulus, or the spread collapses. `(i * 13) % 39` yielded three distinct cupping
   scores across 96 lots before it was fixed to `% 37`.
 - **A widget must not inject `ActivatedRoute`.** A slot is not a route, so there is
-  no route context to read. `Router` is fine — it is a shared singleton. A widget
-  descriptor's `providers` must be self-sufficient and never rely on a token the
-  host happens to provide.
+  no route context to read. A widget descriptor's `providers` must be
+  self-sufficient and never rely on a token the host happens to provide. A widget
+  microfrontend has no router at all, so `Router` is unavailable there too — and
+  `provideRouter` must not be added back, because the federation share map is
+  derived from what the _exposed_ entry point uses, so a router would be bundled
+  as a local copy rather than shared.
+- **A widget must not render an `<h1>`.** The heading level belongs to the host
+  page; the slot supplies a heading and the widget starts at `<h3>`.
+- **A widget microfrontend's component styles must set `font-family`, `color` and
+  `line-height` explicitly.** It renders inside a host document whose `_base.scss`
+  reset was never loaded, so inherited properties cascade in from the host.
 - **Two AA-constrained tokens.** `$color-ink-subtle` and `$color-accent-catalog`
   are used as small text on light surfaces (the `eyebrow` and `chip` mixins), so
   they are pinned to values that clear 4.5:1 on every surface they touch. Do not
@@ -197,3 +225,21 @@ Then **restart the remote's dev server**. A long-running `ng serve` does not pic
 up a new `exposes` key: it keeps serving a `remoteEntry.json` without it while
 happily serving the new chunk, so the host reports the remote as unreachable for
 that key and nothing in the log explains why.
+
+### Adding a whole application
+
+A new **widget microfrontend** needs no shell rebuild, but it does need a project:
+
+1. `projects/<app>/` — `federation.config.mjs` (exposing only `./Widgets`), the
+   three tsconfigs, `src/{main.ts,bootstrap.ts,index.html,styles.scss}`, a
+   `styles/` folder with the byte-identical token copies, an `app/` wrapper with
+   **no router**, and the feature folder with its own service, interceptor, seed,
+   models and enums.
+2. A project block in `angular.json` — clone an existing widget MFE's, then change
+   the paths, the `prefix` and `serve-original`'s `port`.
+3. `start:<app>` / `build:<app>` / `test:<app>` scripts, and add it to `start:all`,
+   `build` and `test`.
+4. **At least one spec.** `@angular/build:unit-test` fails the target outright when
+   a project has no `*.spec.ts`, which breaks `npm test` for the whole workspace.
+5. Its manifest entry and its `widget-slots.json` entry — the only two edits the
+   shell needs, and neither is code.

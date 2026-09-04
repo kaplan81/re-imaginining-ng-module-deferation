@@ -1,0 +1,38 @@
+<div class="tlo-widget" [attr.aria-busy]="pageResource.isLoading()">
+  <header class="tlo-widget__head">
+    <h3 class="tlo-widget__title">Highest cupping scores</h3>
+    <tlo-remote-origin remote="top-lots" />
+  </header>
+
+  @if (pageResource.error()) {
+    <p class="tlo-widget__error" role="alert">
+      The top-lots backend did not answer.
+      <button type="button" class="tlo-widget__retry" (click)="onReload()">Try again</button>
+    </p>
+  } @else {
+    <ol class="tlo-widget__list">
+      @for (lot of lots(); track lot.id) {
+        <li class="tlo-widget__item">
+          <span class="tlo-widget__score">{{ lot.score }}</span>
+
+          <span class="tlo-widget__body">
+            <span class="tlo-widget__name">{{ lot.name }}</span>
+            <span class="tlo-widget__meta">{{ lot.origin }} · {{ roastLabels[lot.roast] }}</span>
+          </span>
+        </li>
+      } @empty {
+        @if (!pageResource.isLoading()) {
+          <li class="tlo-widget__empty">No lots ranked.</li>
+        }
+      }
+    </ol>
+
+    <p class="tlo-widget__foot" role="status" aria-live="polite">
+      @if (pageResource.isLoading()) {
+        Loading lots…
+      } @else {
+        Top {{ lots().length }} of {{ total() | number }} lots
+      }
+    </p>
+  }
+</div>

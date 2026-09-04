@@ -1,0 +1,44 @@
+<div class="rqu-widget" [attr.aria-busy]="pageResource.isLoading()">
+  <header class="rqu-widget__head">
+    <h3 class="rqu-widget__title">Due soonest</h3>
+    <rqu-remote-origin remote="roast-queue" />
+  </header>
+
+  @if (pageResource.error()) {
+    <p class="rqu-widget__error" role="alert">
+      The roast-queue backend did not answer.
+      <button type="button" class="rqu-widget__retry" (click)="onReload()">Try again</button>
+    </p>
+  } @else {
+    <ol class="rqu-widget__list">
+      @for (order of orders(); track order.id) {
+        <li class="rqu-widget__item">
+          <span class="rqu-widget__body">
+            <span class="rqu-widget__customer">{{ order.customer }}</span>
+            <span class="rqu-widget__meta">
+              {{ order.reference }} · {{ order.quantityKg | number }} kg ·
+              {{ statusLabels[order.status] }}
+            </span>
+          </span>
+
+          <span class="rqu-widget__due" [class.rqu-widget__due--late]="order.daysToDue < 0">
+            {{ dueLabel(order.daysToDue) }}
+          </span>
+        </li>
+      } @empty {
+        @if (!pageResource.isLoading()) {
+          <li class="rqu-widget__empty">Nothing in the queue.</li>
+        }
+      }
+    </ol>
+
+    <p class="rqu-widget__foot" role="status" aria-live="polite">
+      @if (pageResource.isLoading()) {
+        Loading queue…
+      } @else if (totals(); as queue) {
+        {{ queue.openOrders | number }} open · {{ queue.lateOrders | number }} late ·
+        {{ queue.kgQueued | number }} kg queued
+      }
+    </p>
+  }
+</div>

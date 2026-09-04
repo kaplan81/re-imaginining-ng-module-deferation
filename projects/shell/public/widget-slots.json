@@ -1,0 +1,22 @@
+{
+  "remotes": [
+    {
+      "name": "top-lots",
+      "kind": "widget",
+      "label": "Top scoring lots",
+      "tagline": "A ranked shortlist of green-coffee lots. No pages, one widget.",
+      "owner": "Sourcing team"
+    },
+    {
+      "name": "roast-queue",
+      "kind": "widget",
+      "label": "Roast queue",
+      "tagline": "What the roastery has to get through next. No pages, one widget.",
+      "owner": "Fulfilment team"
+    }
+  ],
+  "slots": [
+    { "remote": "top-lots", "widget": "top-lots", "heading": "From the sourcing team" },
+    { "remote": "roast-queue", "widget": "roast-queue", "heading": "From the fulfilment team" }
+  ]
+}

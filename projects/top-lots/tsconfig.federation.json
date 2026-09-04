@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.app.json",
+  "files": ["src/app/top-lots/top-lots.widgets.ts"],
+  "include": ["src/**/*.d.ts"]
+}

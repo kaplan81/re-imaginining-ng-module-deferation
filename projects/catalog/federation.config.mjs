@@ -3,12 +3,12 @@ import { withNativeFederation, shareAll } from '@angular-architects/native-feder
 export default withNativeFederation({
   name: 'catalog',
 
-  // The one and only public surface of this remote. Exposing the route table
-  // rather than a component keeps the remote in charge of its own lazy loading,
-  // its own providers and its own internal URLs.
+  // The public surface of this remote: a route table, so it owns a whole URL
+  // subtree along with its own lazy loading, providers and internal URLs.
+  // Component-level composition lives in the widget microfrontends instead -
+  // see projects/top-lots and projects/roast-queue.
   exposes: {
     './Routes': './projects/catalog/src/app/catalog/catalog.routes.ts',
-    './Widgets': './projects/catalog/src/app/catalog/catalog.widgets.ts',
   },
 
   shared: {

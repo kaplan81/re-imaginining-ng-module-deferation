@@ -44,6 +44,10 @@
             <dd class="shl-remote-status__mono">{{ status.name }}</dd>
           </div>
           <div>
+            <dt>Kind</dt>
+            <dd>{{ status.kind === 'page' ? 'Page (./Routes)' : 'Widget (./Widgets)' }}</dd>
+          </div>
+          <div>
             <dt>Entry</dt>
             <dd class="shl-remote-status__mono">
               {{ status.remoteEntryUrl ?? 'not in manifest' }}
@@ -65,9 +69,16 @@
           </div>
         </dl>
 
-        <a class="shl-remote-status__cta" [routerLink]="status.route">
-          Open {{ status.label }} →
-        </a>
+        <!--
+          Only a page remote has somewhere to go. A widget microfrontend exposes
+          no ./Routes at all, so it gets a note about where it is mounted instead
+          of a dead link.
+        -->
+        @if (status.route; as route) {
+          <a class="shl-remote-status__cta" [routerLink]="route">Open {{ status.label }} →</a>
+        } @else {
+          <p class="shl-remote-status__mounted">Mounted in a slot on this page</p>
+        }
       </li>
     }
   </ul>

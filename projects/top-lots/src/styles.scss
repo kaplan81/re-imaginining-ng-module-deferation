@@ -1,0 +1,4 @@
+// Only applied when this application owns the document (`ng serve top-lots`). Mounted
+// into a host it is never loaded, which is why the widget's component styles
+// carry their own tokens - see `styles/_tokens.scss`.
+@use 'base';

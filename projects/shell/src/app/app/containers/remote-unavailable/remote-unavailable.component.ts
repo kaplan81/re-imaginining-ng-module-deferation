@@ -3,7 +3,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { remotes, type RemoteName } from '../../models/remote.model';
 
-const ports: Record<RemoteName, number> = {
+/**
+ * Only page remotes can land here - this is a *route* fallback, and only a page
+ * remote has a route. So the map covers exactly the entries in `remotes`, and an
+ * unknown name degrades to omitting the port rather than guessing.
+ */
+const ports: Readonly<Record<string, number>> = {
   catalog: 4201,
   orders: 4202,
 };
@@ -31,5 +36,5 @@ export class RemoteUnavailableComponent {
 
   command = computed(() => `npm run start:${this.remote()}`);
 
-  port = computed(() => ports[this.remote()]);
+  port = computed<number | undefined>(() => ports[this.remote()]);
 }

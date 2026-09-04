@@ -2,13 +2,14 @@
   <div class="shl-home__hero">
     <p class="shl-home__eyebrow">Angular 22 · Native Federation</p>
 
-    <h1 class="shl-home__title">One console, three <span>independently deployed</span> builds</h1>
+    <h1 class="shl-home__title">One console, five <span>independently deployed</span> builds</h1>
 
     <p class="shl-home__lead">
       Roast Republic is a shell that owns nothing but layout, navigation and the federation
-      manifest. The bean catalog and the roast-orders board are separate Angular applications with
-      their own build, their own dev server and their own mocked backend. They meet for the first
-      time in the browser.
+      manifest. The bean catalog and the roast-orders board are separate Angular applications that
+      own a whole page each. The top-lots and roast-queue microfrontends own no page at all &mdash;
+      they publish one mountable component apiece. Five builds, five dev servers, five mocked
+      backends. They meet for the first time in the browser.
     </p>
 
     <ul class="shl-home__facts">
@@ -17,7 +18,7 @@
         <span>build-time imports between shell and remotes</span>
       </li>
       <li>
-        <strong>3</strong>
+        <strong>5</strong>
         <span>independent <code>ng build</code> targets</span>
       </li>
       <li>
@@ -31,13 +32,14 @@
 
   <section class="shl-home__slots-section" aria-labelledby="shl-home-slots-title">
     <h2 class="shl-home__section-title" id="shl-home-slots-title">
-      Components from three builds, one document
+      Components from five builds, one document
     </h2>
 
     <p class="shl-home__section-lead">
-      Everything above is the shell's own code. Everything below this line was compiled, versioned
-      and deployed by another team &mdash; and it is mounted here, inside a page the shell owns,
-      rather than behind a route of its own.
+      Everything above is the shell's own code. Each panel below is a separate Angular application
+      with its own build, its own dev server and its own mocked backend &mdash; applications that
+      publish no pages at all, only mountable components. They are declared in
+      <code>widget-slots.json</code>, so adding one never rebuilds the shell.
     </p>
 
     <!--
@@ -48,12 +50,13 @@
     -->
     @defer (on viewport) {
       <div class="shl-home__slots">
-        <shl-remote-slot remote="catalog" widget="top-lots" heading="From the bean catalog" />
-        <shl-remote-slot
-          remote="orders"
-          widget="roast-queue"
-          heading="From the roast orders board"
-        />
+        @for (slot of slots(); track slot.remote + '/' + slot.widget) {
+          <shl-remote-slot [remote]="slot.remote" [widget]="slot.widget" [heading]="slot.heading" />
+        } @empty {
+          <p class="shl-home__slots-empty">
+            No widget microfrontends are declared in <code>widget-slots.json</code>.
+          </p>
+        }
       </div>
     } @placeholder {
       <div class="shl-home__slots-placeholder" aria-hidden="true"></div>

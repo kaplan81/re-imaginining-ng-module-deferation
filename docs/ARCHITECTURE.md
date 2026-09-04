@@ -7,7 +7,8 @@ deliberate, and what each choice costs.
 
 ## 1. Three builds, one page
 
-`angular.json` holds three application projects. Each has **two** build targets:
+`angular.json` holds **five** application projects — a host, two page remotes and
+two widget microfrontends. Each has **two** build targets:
 
 | Target            | Builder                                       | Purpose                                                    |
 | ----------------- | --------------------------------------------- | ---------------------------------------------------------- |
@@ -55,40 +56,52 @@ initFederation('federation.manifest.json', {
 Both remotes run the same two-phase boot with an empty remote map, so a remote
 served standalone behaves exactly like the federated one.
 
-## 3. The two links between shell and remotes
+## 3. Two kinds of application, two contracts
 
-The shell composes a remote at two granularities. A whole URL subtree, in
-`projects/shell/src/app/app/app.routes.ts`:
+The shell composes at two granularities, and each is a different _kind_ of
+application rather than two flavours of the same one.
+
+| Kind                 | Owns          | Exposes     | Has a router | Adding one costs                 |
+| -------------------- | ------------- | ----------- | ------------ | -------------------------------- |
+| Page remote          | a URL subtree | `./Routes`  | yes          | a shell code change (a route)    |
+| Widget microfrontend | one component | `./Widgets` | **no**       | two JSON edits, no shell rebuild |
+
+A whole URL subtree, in `projects/shell/src/app/app/app.routes.ts`:
 
 ```ts
 { path: 'catalog', loadChildren: () => loadRemoteRoutes('catalog') },
 { path: 'orders',  loadChildren: () => loadRemoteRoutes('orders') },
 ```
 
-…and a single component inside a page the shell owns, in
+…and single components inside a page the shell owns, in
 `projects/shell/src/app/home/containers/home/home.component.html`:
 
 ```html
-@defer (on viewport) {
-<shl-remote-slot remote="catalog" widget="top-lots" heading="From the bean catalog" />
-<shl-remote-slot remote="orders" widget="roast-queue" heading="From the roast orders board" />
-}
+@defer (on viewport) { @for (slot of slots(); track slot.remote + '/' + slot.widget) {
+<shl-remote-slot [remote]="slot.remote" [widget]="slot.widget" [heading]="slot.heading" />
+} }
 ```
 
-There is still no `import` of anything under `projects/catalog` or
-`projects/orders` anywhere in the shell — no components, no models, no enums, not
-even a type. The contract is four strings per remote: its name, the exposed keys
-`./Routes` and `./Widgets`, and the URL in `federation.manifest.json`.
+Note what is _not_ in that template: any application's name. `slots()` comes from
+`projects/shell/public/widget-slots.json`, so which widget microfrontends exist and
+where they go is data. Adding one is an entry there plus an entry in the federation
+manifest — the shell is not recompiled and this file does not change.
 
-Both remotes expose the same two keys, so the shell composes them through one code
-path per granularity with no per-remote special casing.
+That is also why `RemoteName` is `string` and not `'catalog' | 'orders'`. The union
+meant the _set_ of remotes was compiled into the host, however much the manifest
+looked like data — a precision the earlier version of this document got wrong.
 
-### A route table is a granularity, not a principle
+There is no `import` of anything under another project anywhere in the shell — no
+components, no models, no enums, not even a type. The contract is a name, an
+exposed key, and a URL.
 
-A route table is the right contract when the remote should own a whole URL
+### Why a widget microfrontend exposes a descriptor, not a component
+
+A route table is the right contract when an application should own a whole URL
 subtree: it keeps its own lazy boundaries, its own providers and its own internal
 URLs, and the host writes one `loadChildren`. What it cannot do is put a remote's
-component inside a page the _host_ owns.
+component inside a page the _host_ owns — which is the entire job of a widget
+microfrontend.
 
 It is tempting to argue that a component contract would force the host to decide
 how the component is lazily loaded, what providers surround it and what its inputs
@@ -96,13 +109,13 @@ are. That is only true if the remote exposes a bare component class. Expose a
 **descriptor** instead and all three stay on the remote side:
 
 ```ts
-// projects/catalog/src/app/catalog/catalog.widgets.ts   — exposed as './Widgets'
+// projects/top-lots/src/app/top-lots/top-lots.widgets.ts   — exposed as './Widgets'
 {
   id: 'top-lots',
   label: 'Top scoring lots',
   load: () => import('./containers/top-lots-widget/top-lots-widget.component').then((m) => ({
     component: m.TopLotsWidgetComponent,
-    providers: [provideHttpClient(withInterceptors([catalogMockInterceptor])), CatalogService],
+    providers: [provideHttpClient(withInterceptors([topLotsMockInterceptor])), TopLotsService],
   })),
 }
 ```
@@ -344,8 +357,10 @@ They are the material for the comparison with the Rspack and Vite builds.
 | **No unload semantics**       | ESM cannot unload a module. Long-lived multi-remote shells that need memory recovery reach `registerRemotes(..., { force: true })` / `removeRemote()` through classic MF.                                                                                                                                                                                                                                                                                          |
 | **Single Angular major**      | Layered singletons — the same specifier as _different_ singletons per layer, e.g. two Angular majors side by side — remain a classic-MF capability. Not needed for one major version.                                                                                                                                                                                                                                                                              |
 | **Loader hooks**              | NF covers retries, fallbacks and telemetry. The broader MF hook surface (`beforeLoadRemote`, `errorLoadRemote`, `afterResolve`) is reachable via the documented combination pattern.                                                                                                                                                                                                                                                                               |
-| **Shared build-time tokens**  | One SCSS file is shared across three builds. Documented above as a deliberate trade rather than an oversight.                                                                                                                                                                                                                                                                                                                                                      |
-| **No e2e**                    | Shell↔remote wiring is only verified manually. The honest gap in the test story.                                                                                                                                                                                                                                                                                                                                                                                   |
+| **Duplicated feature layers** | A widget microfrontend may not import from a page remote, so `top-lots` ships its own service, interceptor, seed, models and enums rather than reusing `catalog`'s. Consequence to state out loud: its numbers do not match `/catalog`'s, because it is a different application with a different backend. At five projects a published contracts package is the correct answer, not a hypothetical one.                                                            |
+| **Registration is not free**  | All five entries sit in `federation.manifest.json`, so every `remoteEntry.json` is fetched and negotiated during bootstrap — before Angular starts — whether or not anything mounts. Loading is lazy; registration is not. A deployment with a dozen widget MFEs should register them lazily via `initRemoteEntry` instead.                                                                                                                                        |
+| **Duplicated style tokens**   | `_tokens.scss` and `_base.scss` exist as five byte-identical copies, not one shared file. Documented above as a deliberate trade rather than an oversight — and past the point where the header comment says a published package becomes correct.                                                                                                                                                                                                                  |
+| **No e2e**                    | Shell↔remote wiring is only verified manually. The honest gap in the test story. Every project does now carry at least one spec, because `@angular/build:unit-test` fails a target outright when a project has none — which silently breaks `npm test` for the whole workspace.                                                                                                                                                                                    |
 | **Descriptor asserted twice** | `./Routes` is typed `Routes`, owned by `@angular/router`, so both sides are structurally guaranteed to agree. The widget descriptor is a bespoke shape declared independently in the shell and in each remote, and nothing checks that they still match. Each remote's `/widgets` gallery is the mitigation: it consumes the descriptor list inside the remote's own build, so a broken descriptor fails in that remote's dev server rather than only in the host. |
 | **Manifest vs flat keys**     | One `./Widgets` key buys runtime discoverability and costs an extra round trip before first paint. Flat per-widget keys invert that. Build 2 should measure both rather than assume.                                                                                                                                                                                                                                                                               |
 | **Dev-server staleness**      | A running `ng serve` does not pick up a new `exposes` key — it serves a `remoteEntry.json` without it while serving the chunk, so the host reports "unreachable" with nothing in the log. Restart the remote after touching `federation.config.mjs`.                                                                                                                                                                                                               |
