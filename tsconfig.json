@@ -40,6 +40,18 @@
     },
     {
       "path": "./projects/orders/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/top-lots/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/top-lots/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/roast-queue/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/roast-queue/tsconfig.spec.json"
     }
   ]
 }

@@ -3,10 +3,21 @@ import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack';
 import { join } from 'node:path';
 
 import { remoteOriginPlugin } from '../tools/remote-origin';
-import { seamPlugins } from '../tools/seam';
+import { seamFileReplacements, seamPlugins } from '../tools/seam';
 import { sharedDependencies } from '../tools/shared-deps';
 
 const workspaceRoot = join(__dirname, '..', '..', '..');
+
+const seams = [
+  {
+    original: 'projects/shell/src/app/app/utils/remote/remote.util.ts',
+    replacement: 'builds/rspack/shell/src/seam/remote.util.ts',
+  },
+  {
+    original: 'projects/shell/src/app/app/services/remote-registry/remote-registry.service.ts',
+    replacement: 'builds/rspack/shell/src/seam/remote-registry.service.ts',
+  },
+] as const;
 
 export default createConfig({
   options: {
@@ -23,6 +34,10 @@ export default createConfig({
     outputPath: { base: './dist' },
     outputHashing: 'none',
     devServer: { port: 4210 },
+    // Angular compiles these two files in place of build 1's Native Federation
+    // seam. The bundler plugin below is the same swap for anything that still
+    // arrives as a webpack resolve - the compiler no longer always does.
+    fileReplacements: seamFileReplacements(workspaceRoot, seams),
   },
 
   rspackConfigOverrides: {
@@ -47,17 +62,7 @@ export default createConfig({
        * fallback component - compiles byte for byte from build 1's tree. The
        * build fails if either path stops matching; see `tools/seam.ts`.
        */
-      ...seamPlugins(workspaceRoot, [
-        {
-          original: 'projects/shell/src/app/app/utils/remote/remote.util.ts',
-          replacement: 'builds/rspack/shell/src/seam/remote.util.ts',
-        },
-        {
-          original:
-            'projects/shell/src/app/app/services/remote-registry/remote-registry.service.ts',
-          replacement: 'builds/rspack/shell/src/seam/remote-registry.service.ts',
-        },
-      ]),
+      ...seamPlugins(workspaceRoot, seams),
 
       new ModuleFederationPlugin({
         name: 'shell',
