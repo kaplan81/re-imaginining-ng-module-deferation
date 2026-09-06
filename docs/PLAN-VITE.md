@@ -24,9 +24,9 @@ compiled by Vite and composed at runtime by Module Federation.
 All three pipelines can run at once, which is a demo in itself.
 
 ```bash
-npm run build:vite        # all five, production
+npm run build:vite:all        # all five, production
 npm run start:vite:all    # all five dev servers
-npm run preview:vite      # serve the built output
+npm run preview:vite:all      # serve the built output
 ```
 
 ## 2. Why this needs a third-party plugin at all

@@ -20,8 +20,8 @@ Then open <http://localhost:5173>. Build 3 uses ports **5173–5177**, so all th
 pipelines can run at once (4200–4204, 4210–4214, 5173–5177).
 
 ```bash
-npm run build:vite
-npm run preview:vite
+npm run build:vite:all
+npm run preview:vite:all
 ```
 
 `vite preview` is the real checkpoint, not `vite dev` — Vite's dev and build paths

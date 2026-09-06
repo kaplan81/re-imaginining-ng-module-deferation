@@ -289,7 +289,7 @@ false }` on every remote. Build 3: `tsconfig` and `inlineStylesExtension` on
   `build.target: 'es2022'`. Both: lazy per-remote `registerRemotes`. Removing any
   one breaks composition — usually with an error that names something else
   entirely.
-- **Check `start:rspack:all` in a browser, not just `build:rspack`.** Build 2's
+- **Check `start:rspack:all` in a browser, not just `build:rspack:all`.** Build 2's
   last two defaults above are dev-server-only: without them the production build
   is perfectly green while the shell either reload-loops forever or renders an
   empty outlet that never resolves. A remote's dev client and Rspack's lazy

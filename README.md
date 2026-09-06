@@ -115,7 +115,7 @@ npm run format
 
 ```bash
 npm run start:rspack:all
-npm run build:rspack
+npm run build:rspack:all
 ```
 
 Build 2: Rspack + Module Federation, ports 4210–4214. See
@@ -123,16 +123,22 @@ Build 2: Rspack + Module Federation, ports 4210–4214. See
 
 ```bash
 npm run start:vite:all
-npm run build:vite
-npm run preview:vite
+npm run build:vite:all
+npm run preview:vite:all
 ```
 
 Build 3: Vite + Module Federation, ports 5173–5177. `vite preview` is the real
 checkpoint there, since Vite's dev and build paths differ. See
 [`builds/vite/README.md`](builds/vite/README.md).
 
-`start:<pipeline>:<project>` and `build:<pipeline>:<project>` target one
-application. Both builds reuse the feature code in `projects/*` unmodified.
+Every script for builds 2 and 3 is `<verb>:<pipeline>:<target>`, where the target
+is always named — `all` or one of `shell`, `catalog`, `orders`, `top-lots`,
+`roast-queue`. There is no bare `build:rspack` or `start:vite`: in a workspace
+with five applications per pipeline, a script that does not say what it runs is a
+script you have to look up. (Build 1 keeps plain `npm start`, `npm run build` and
+`npm test`, because those are npm's own conventions rather than this repo's.)
+
+Both builds reuse the feature code in `projects/*` unmodified.
 
 ## The 60-second version of how it works
 

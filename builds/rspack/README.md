@@ -20,7 +20,7 @@ Then open <http://localhost:4210>. Build 2 uses ports **4210–4214** so it can 
 side by side with build 1 on 4200–4204.
 
 ```bash
-npm run build:rspack
+npm run build:rspack:all
 ```
 
 ## Why the feature code is not here
@@ -88,7 +88,7 @@ Points 2 and 4 interact: the lazy entry must state `type: 'module'` explicitly,
 because dropping the manifest also drops the field that told the runtime the
 container was an ES module.
 
-`rspack serve` only — and `npm run build:rspack` stays green without them, which
+`rspack serve` only — and `npm run build:rspack:all` stays green without them, which
 is what made these expensive to find:
 
 5. **`lazyCompilation: false`** in every config. `@rspack/cli` turns it on by

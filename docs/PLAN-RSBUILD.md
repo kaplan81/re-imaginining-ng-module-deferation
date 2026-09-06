@@ -33,7 +33,7 @@ compiled by Rspack and composed at runtime by Module Federation.
 | `roast-queue` | widget MFE  | `./Widgets` | 4204         | 4214         |
 
 ```bash
-npm run build:rspack        # all five, production
+npm run build:rspack:all        # all five, production
 npm run start:rspack:all    # all five dev servers
 ```
 
@@ -145,7 +145,7 @@ Everything above was found against production builds. Running the workspace the
 way the README tells you to — `npm run start:rspack:all`, five dev servers, open
 the shell — failed in two further ways that **production never exhibits**. Both
 were introduced by defaults nobody set, both were silent, and together they made
-the shell unusable in dev while `npm run build:rspack` stayed perfectly green.
+the shell unusable in dev while `npm run build:rspack:all` stayed perfectly green.
 
 This is the most transferable finding in the build: `rspack serve` is not
 `rspack build` with a watcher on it.
@@ -405,7 +405,7 @@ it costs is in rows four through eleven.
 
 ### Caveats on the numbers
 
-- Cold-build times are wall clock for `npm run build` / `npm run build:rspack`,
+- Cold-build times are wall clock for `npm run build` / `npm run build:rspack:all`,
   which run the five applications sequentially. Both pipelines parallelise
   internally; the CPU figures were 211% and 268% respectively.
 - The transferred-byte figures are gzip of the JS and CSS referenced by each
