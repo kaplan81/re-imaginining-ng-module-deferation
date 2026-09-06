@@ -298,7 +298,9 @@ cross-origin on `:4210`–`:4214`.
 
 ## 6. What the talk gets from this build
 
-Measured on this machine, five applications, production mode, cold cache.
+Measured on this machine, five applications, production mode, cold cache. The
+**three-way** version of this table, with build 3 alongside, is in
+[`PLAN-VITE.md` §8](PLAN-VITE.md) - prefer that one for the slide.
 
 | Dimension                          | Build 1 (Native Federation) | Build 2 (Rspack + MF)                         |
 | ---------------------------------- | --------------------------- | --------------------------------------------- |

@@ -1,0 +1,5 @@
+{
+  "name": "@rr/vite-build",
+  "private": true,
+  "type": "module"
+}

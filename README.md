@@ -22,15 +22,19 @@ The product is _Roast Republic_, a specialty-coffee operations console:
 This repository is the **baseline** of the talk. It implements the conservative,
 first-party-toolchain path.
 
-A second build of the same product is **implemented** alongside it in
-[`builds/rspack/`](builds/rspack): the identical feature code compiled by
-**Rspack** and composed by **classic Module Federation**, on ports 4210–4214 so
-both run side by side. Its write-up — findings, parity checklist and the measured
-comparison — is [`docs/PLAN-RSBUILD.md`](docs/PLAN-RSBUILD.md). A third build on
-Vite is still planned in [`docs/PLAN-VITE.md`](docs/PLAN-VITE.md).
+Two further builds of the same product are **implemented** alongside it, and all
+three run at once:
 
-The three builds share one source tree on purpose, so the pipeline is the only
-variable between them.
+| Build | Pipeline                           | Ports     | Code                              | Write-up                                                  |
+| ----- | ---------------------------------- | --------- | --------------------------------- | --------------------------------------------------------- |
+| 1     | Angular CLI + Native Federation    | 4200–4204 | `projects/`                       | this file, [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| 2     | Rspack + classic Module Federation | 4210–4214 | [`builds/rspack/`](builds/rspack) | [`docs/PLAN-RSBUILD.md`](docs/PLAN-RSBUILD.md)            |
+| 3     | Vite + classic Module Federation   | 5173–5177 | [`builds/vite/`](builds/vite)     | [`docs/PLAN-VITE.md`](docs/PLAN-VITE.md)                  |
+
+The three share one source tree on purpose, so the pipeline is the only variable
+between them: builds 2 and 3 contain no feature code at all, only entry points
+and build configuration. The three-way comparison table is in
+[`docs/PLAN-VITE.md` §8](docs/PLAN-VITE.md).
 
 ## Quick start
 
@@ -107,17 +111,28 @@ builder fails a target outright when a project has none.
 npm run format
 ```
 
-### The second build
+### The other two builds
 
 ```bash
 npm run start:rspack:all
 npm run build:rspack
 ```
 
-The Rspack + Module Federation build of the same five applications, on ports
-4210–4214. `start:rspack:<project>` and `build:rspack:<project>` target one.
-It reuses the feature code in `projects/*` unmodified — see
+Build 2: Rspack + Module Federation, ports 4210–4214. See
 [`builds/rspack/README.md`](builds/rspack/README.md).
+
+```bash
+npm run start:vite:all
+npm run build:vite
+npm run preview:vite
+```
+
+Build 3: Vite + Module Federation, ports 5173–5177. `vite preview` is the real
+checkpoint there, since Vite's dev and build paths differ. See
+[`builds/vite/README.md`](builds/vite/README.md).
+
+`start:<pipeline>:<project>` and `build:<pipeline>:<project>` target one
+application. Both builds reuse the feature code in `projects/*` unmodified.
 
 ## The 60-second version of how it works
 
@@ -233,7 +248,12 @@ builds/rspack/                   build 2: same feature code, Rspack + Module Fed
     src/seam/                    the only two shell modules this pipeline replaces
   catalog/ orders/               page remotes, :4211 / :4212
   top-lots/ roast-queue/         widget MFEs, :4213 / :4214
+builds/vite/                     build 3: same feature code, Vite + Module Federation
+  tools/                         share map, alias derivation, the shell seam swap
+  shell/                         the host, :5173
+  catalog/ orders/               page remotes, :5174 / :5175
+  top-lots/ roast-queue/         widget MFEs, :5176 / :5177
 
-No builds/rspack project contains feature code - only entry points and build
+No project under builds/ contains feature code - only entry points and build
 configuration. That is what makes the pipeline the only variable.
 ```

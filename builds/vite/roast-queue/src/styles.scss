@@ -1,0 +1,3 @@
+// Only applied when this application owns the document. Mounted into a host
+// it is never loaded, which is why component styles carry their own tokens.
+@use 'base';

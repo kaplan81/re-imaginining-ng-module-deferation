@@ -6,9 +6,10 @@
 /out-tsc
 /bazel-out
 
-# Build 2 (Rspack + Module Federation) - one dist per application
+# Builds 2 and 3 (Rspack / Vite) - one dist per application
 /builds/*/*/dist
 /builds/*/*/out-tsc
+/builds/*/*/node_modules
 
 # Nx cache, pulled in by @nx/devkit via the Rspack adapter
 /.nx

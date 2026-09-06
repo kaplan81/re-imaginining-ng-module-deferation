@@ -1,5 +1,6 @@
 import { rspack, type RspackPluginInstance } from '@rspack/core';
-import { resolve } from 'node:path';
+import { existsSync } from 'node:fs';
+import { relative, resolve } from 'node:path';
 
 const pluginName = 'FederationSeam';
 
@@ -47,73 +48,89 @@ export function seamPlugins(
   workspaceRoot: string,
   replacements: readonly SeamReplacement[],
 ): RspackPluginInstance[] {
-  // Keyed without the extension, because that is the shape a TypeScript
-  // relative import resolves to: `./utils/remote/remote.util`, no `.ts`.
-  const bySpecifier = new Map(
-    replacements.map((seam) => [
-      stripExtension(resolve(workspaceRoot, seam.original)),
-      resolve(workspaceRoot, seam.replacement),
-    ]),
-  );
+  const fired = new Set<string>();
 
-  const replace: RspackPluginInstance = {
-    apply(compiler) {
-      compiler.hooks.normalModuleFactory.tap(pluginName, (factory) => {
-        factory.hooks.beforeResolve.tap(pluginName, (data) => {
-          if (!data.request.startsWith('.')) {
-            return;
-          }
+  const plugins: RspackPluginInstance[] = replacements.map((seam) => {
+    const original = resolve(workspaceRoot, seam.original);
+    const replacement = resolve(workspaceRoot, seam.replacement);
 
-          const target = bySpecifier.get(stripExtension(resolve(data.context, data.request)));
+    // Checked here, not assumed - see `assertEverySeamFired` for why a wrong
+    // path is the failure this whole guard exists to catch.
+    for (const [label, path] of [
+      ['original', original],
+      ['replacement', replacement],
+    ] as const) {
+      if (!existsSync(path)) {
+        throw new Error(
+          `[seam] the ${label} "${relative(workspaceRoot, path)}" does not exist. ` +
+            `Fix the path in the shell's rspack.config.ts.`,
+        );
+      }
+    }
 
-          if (target) {
-            data.request = target;
-          }
+    return {
+      apply(compiler) {
+        compiler.hooks.normalModuleFactory.tap(pluginName, (factory) => {
+          factory.hooks.beforeResolve.tap(pluginName, (data) => {
+            if (!data.request.startsWith('.')) {
+              return;
+            }
+
+            if (stripExtension(resolve(data.context, data.request)) === stripExtension(original)) {
+              fired.add(seam.original);
+              data.request = replacement;
+            }
+          });
         });
-      });
-    },
-  };
+      },
+    };
+  });
 
-  return [replace, assertNoUnreplacedSeam(workspaceRoot, replacements)];
+  return [...plugins, assertEverySeamFired(replacements, fired)];
 }
 
 /**
- * Turns a mistyped seam path from a silent runtime failure into a build failure
- * that names the file.
+ * Fails the build unless every seam was actually substituted.
  *
- * The check is deliberately *not* "did every replacement fire". The adapter's
- * dev server compiles lazily, so a first compilation legitimately contains none
- * of these modules, and asserting on the callback fails every `rspack serve` on
- * startup - which is what the first version of this did. What is actually wrong
- * is an *unreplaced original* surviving into the module graph, so that is what
- * is asserted: if the substitution fired, the module's resource is the
- * replacement and the original is absent; if it did not, the original is sitting
- * right there in `compilation.modules`.
+ * This is the second version of this check, and the first one was wrong in a way
+ * worth putting on a slide.
+ *
+ * Version one asked "did an *unreplaced original* reach `compilation.modules`?"
+ * That caught the bug it was written for - a substitution that silently did
+ * nothing - but the reasoning is circular, and it misses the more likely
+ * failure. When the configured path is wrong there is nothing left to compare
+ * against: the redirect never matches, the real file compiles normally under its
+ * real name, the search for the *misspelled* name finds nothing, and the build
+ * goes green with build 1's Native Federation calls inside build 2. Confirmed by
+ * misspelling the path in build 3, which had the identical hole -
+ * `Federation runtime is not ready: initFederation() has not resolved yet` was
+ * sitting in the output bundle of a build that reported no errors.
+ *
+ * Version two asserts the positive: every configured seam must have fired.
+ * Paired with the `existsSync` check above, a mistyped path now fails twice
+ * before it can reach a bundle.
+ *
+ * `afterEmit` rather than `afterCompile`, because the dev server compiles lazily
+ * and an early compilation legitimately contains neither seam; by emit time the
+ * entry graph has been walked.
  */
-function assertNoUnreplacedSeam(
-  workspaceRoot: string,
+function assertEverySeamFired(
   replacements: readonly SeamReplacement[],
+  fired: ReadonlySet<string>,
 ): RspackPluginInstance {
-  const originals = new Map(
-    replacements.map((seam) => [resolve(workspaceRoot, seam.original), seam.original]),
-  );
-
   return {
     apply(compiler) {
-      compiler.hooks.afterCompile.tap(`${pluginName}Assert`, (compilation) => {
-        for (const module of compilation.modules) {
-          const resource = (module as { resource?: string }).resource;
-          const seam = resource ? originals.get(resource) : undefined;
+      compiler.hooks.afterEmit.tap(`${pluginName}Assert`, (compilation) => {
+        const missed = replacements.filter((seam) => !fired.has(seam.original));
 
-          if (seam) {
-            compilation.errors.push(
-              new rspack.WebpackError(
-                `[seam] "${seam}" reached the bundle unreplaced.\n` +
-                  `Build 1's federation runtime calls would ship inside build 2. ` +
-                  `The path in the shell's rspack.config.ts no longer matches the file.`,
-              ),
-            );
-          }
+        if (missed.length > 0) {
+          compilation.errors.push(
+            new rspack.WebpackError(
+              `[seam] ${missed.length} of ${replacements.length} seam modules were never substituted:\n` +
+                missed.map((seam) => `  - ${seam.original}`).join('\n') +
+                `\nBuild 1's federation runtime calls would ship inside build 2.`,
+            ),
+          );
         }
       });
     },

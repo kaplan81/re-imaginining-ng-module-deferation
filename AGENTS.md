@@ -245,37 +245,51 @@ A new **widget microfrontend** needs no shell rebuild, but it does need a projec
 5. Its manifest entry and its `widget-slots.json` entry — the only two edits the
    shell needs, and neither is code.
 
-### `builds/` — the second pipeline
+### `builds/` — the other two pipelines
 
-`builds/rspack/` is a **second build of the same product**: the identical feature
-code compiled by Rspack and composed by classic Module Federation instead of the
-Angular CLI and Native Federation. It runs on ports 4210–4214, alongside build 1
-on 4200–4204. Read [`builds/rspack/README.md`](builds/rspack/README.md) and
-[`docs/PLAN-RSBUILD.md`](docs/PLAN-RSBUILD.md) before touching it.
+`builds/rspack/` and `builds/vite/` are **two further builds of the same
+product**: the identical feature code compiled by Rspack and by Vite, each
+composed by classic Module Federation instead of Native Federation. They run on
+4210–4214 and 5173–5177, alongside build 1 on 4200–4204, and all three can run at
+once. Read the `README.md` in the build you are touching, plus
+[`docs/PLAN-RSBUILD.md`](docs/PLAN-RSBUILD.md) or
+[`docs/PLAN-VITE.md`](docs/PLAN-VITE.md), before changing anything.
 
-Rules specific to it, all of which follow from what it is for:
+Rules specific to them, all of which follow from what they are for:
 
-- **It contains no feature code, and must not grow any.** Every project under
-  `builds/rspack/` is entry points and build configuration only. Components,
-  services, interceptors, mocks and models are imported out of `projects/*`
-  through the `@rr/*` aliases in `builds/rspack/tsconfig.base.json`.
+- **They contain no feature code, and must not grow any.** Every project under
+  `builds/` is entry points and build configuration only. Components, services,
+  interceptors, mocks and models are imported out of `projects/*` through the
+  `@rr/*` aliases in each build's `tsconfig.base.json`.
 - **Those aliases are the one sanctioned exception to "never import across
   projects."** The rule above forbids coupling _between applications_, because
   they are deployed independently. These aliases couple a _pipeline_ to the
   source it compiles, which is the opposite direction and is the entire point:
   if the feature code is byte-identical, the pipeline is the only variable the
   talk is comparing. Do not use them to reach from one application into another.
-- **Never edit `projects/*` to make build 2 work.** If something does not port,
-  that is a finding for `docs/PLAN-RSBUILD.md`, not a change to build 1. The one
-  legitimate lever is `builds/rspack/tools/seam.ts`, which substitutes the two
-  shell modules that call a federation runtime — and it fails the build if an
-  unreplaced original reaches the bundle.
-- **A change to a remote's exposed surface is now two pipelines.** Adding an
+- **Never edit `projects/*` to make build 2 or 3 work.** If something does not
+  port, that is a finding for the build's plan document, not a change to build 1.
+  The one legitimate lever is that build's `tools/seam.ts`, which substitutes the
+  two shell modules that call a federation runtime — and which fails the build
+  both when a configured path does not exist and when a replacement never fired.
+  Keep both guards: the first version of each checked the wrong thing and shipped
+  build 1's Native Federation calls inside a green build.
+- **A change to a remote's exposed surface is now three pipelines.** Adding an
   exposed key means `federation.config.mjs` + `tsconfig.federation.json` in build
-  1 _and_ the `exposes` map in that project's `rspack.config.ts` in build 2.
-  Likewise a new application needs a `builds/rspack/<app>/` to stay comparable.
-- **Four Rspack/MF defaults are load-bearing and each has a comment where it is
-  set**: `optimization.runtimeChunk: false`, `library: { type: 'module' }` on
-  remotes with `remoteType: 'module'` on the host, `output.publicPath: 'auto'`,
-  and lazy per-remote `registerRemotes`. Removing any one breaks composition with
-  an error that names something else entirely.
+  1, the `exposes` map in `rspack.config.ts` in build 2, _and_ the one in
+  `vite.config.ts` in build 3. Likewise a new application needs a
+  `builds/rspack/<app>/` and a `builds/vite/<app>/` to stay comparable.
+- **Several bundler defaults are load-bearing, and each has a comment where it is
+  set.** Build 2: `optimization.runtimeChunk: false`, `library: { type: 'module' }`
+  on remotes with `remoteType: 'module'` on the host, `output.publicPath: 'auto'`.
+  Build 3: `tsconfig` and `inlineStylesExtension` on `angular()`, `resolve.alias`,
+  a pruned share map, `hostInitInjectLocation: 'entry'`, `optimizeDeps.include`,
+  `server.origin` / `base`, and `build.target: 'es2022'`. Both: lazy per-remote
+  `registerRemotes`. Removing any one breaks composition — usually with an error
+  that names something else entirely.
+- **The share map must stay pruned in build 3.** `@module-federation/vite` emits a
+  fallback chunk per _declared_ share, not per _used_ one, so an unused entry is
+  dead weight in all five bundles — `@angular/compiler` alone was 607 kB per app.
+  Builds 1 and 2 prune automatically; build 3 does not, so adding a package to the
+  root `dependencies` that the product actually uses means checking
+  `builds/vite/tools/shared-deps.ts`.
