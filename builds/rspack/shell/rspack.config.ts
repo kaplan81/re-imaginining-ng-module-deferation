@@ -43,6 +43,21 @@ export default createConfig({
   rspackConfigOverrides: {
     output: { publicPath: 'auto' },
 
+    // Rspack's CLI turns on `lazyCompilation: { imports: true, entries: false }`
+    // by default for `rspack serve`, and it is silently fatal across a federation
+    // boundary. Every dynamic `import()` becomes a stub that first POSTs to
+    // `/_rspack/lazy/trigger…` to have the real chunk compiled - resolved against
+    // *the origin of the page it runs in*. A remote's second lazy level (a
+    // route's `loadComponent`, a widget descriptor's `load()`) executes inside
+    // the **host's** page, so the trigger goes to the host's dev server, which
+    // knows nothing about this compilation. The chunk is never built, the
+    // `import()` promise never settles, and the router renders an empty outlet -
+    // no error, no fallback, nothing to search for.
+    //
+    // Worth a slide: it only misbehaves in dev, only when federated, and it
+    // fails by hanging rather than by throwing.
+    lazyCompilation: false,
+
     // The adapter defaults browser builds to `optimization.runtimeChunk: 'single'`,
     // which hoists the Rspack runtime out into `runtime.js`. That is fine for a
     // plain application and fatal for a federation container: `remoteEntry.js`

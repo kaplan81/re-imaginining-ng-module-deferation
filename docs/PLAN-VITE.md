@@ -72,7 +72,9 @@ Two things the Rspack build paid for and this one did not:
 
 ### 4.1 What Vite gets right that Rspack did not
 
-Three of build 2's four "silently incompatible defaults" simply do not exist here.
+Build 2 hit six defaults that were silently incompatible with federation — four
+in the build, two more that only appear under `rspack serve`. **None of the six
+exists here.**
 
 | Build 2 problem                                                    | Build 3                                                                                                                                            |
 | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -80,6 +82,8 @@ Three of build 2's four "silently incompatible defaults" simply do not exist her
 | `Cannot use 'import.meta' outside a module` — MF's `var` container | **Not an issue.** `mf-manifest.json` records `remoteEntry.type: "module"` on its own; no `library: { type: 'module' }` needed.                     |
 | `Library name base (top-lots) must be a valid identifier`          | **Not an issue.** No global to name, so kebab-case project names are fine.                                                                         |
 | `runtimeChunk: 'single'` guts the container                        | **Not an issue.** No equivalent default.                                                                                                           |
+| Lazy compilation hangs a remote's second lazy level (dev)          | **Not an issue.** Vite has no compile-on-request stubs.                                                                                            |
+| A remote's dev client reload-loops the host page (dev)             | **Not an issue.** Vite's HMR client is a per-origin websocket with no compilation hash to go stale.                                                |
 
 The seam module makes the same point from the other side.
 `builds/vite/shell/src/seam/remote.util.ts` is a character-for-character copy of

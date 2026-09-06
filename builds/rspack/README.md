@@ -69,8 +69,10 @@ nothing and shipped build 1's Native Federation calls inside a green build.
 
 ## Gotchas worth knowing before you touch a config
 
-Each has a comment at the site that needs it, and all four are in
-[`docs/PLAN-RSBUILD.md` §3.1](../../docs/PLAN-RSBUILD.md).
+Each has a comment at the site that needs it, and all of them are in
+[`docs/PLAN-RSBUILD.md` §3.1 and §3.2](../../docs/PLAN-RSBUILD.md).
+
+Build and dev alike:
 
 1. **`optimization.runtimeChunk: false`** — the adapter defaults to `'single'`,
    which leaves `remoteEntry.js` with no Rspack runtime.
@@ -85,3 +87,22 @@ Each has a comment at the site that needs it, and all four are in
 Points 2 and 4 interact: the lazy entry must state `type: 'module'` explicitly,
 because dropping the manifest also drops the field that told the runtime the
 container was an ES module.
+
+`rspack serve` only — and `npm run build:rspack` stays green without them, which
+is what made these expensive to find:
+
+5. **`lazyCompilation: false`** in every config. `@rspack/cli` turns it on by
+   default for `rspack serve`, so a remote's `loadComponent()` or widget `load()`
+   POSTs its compile-trigger to the _host's_ dev server, which knows nothing about
+   that compilation. The import never settles, so the route renders an empty
+   outlet — no error, no fallback, and `loadRemoteRoutes`' `try/catch` never runs,
+   because a promise that never settles is not a rejection.
+6. **`devServer: { hmr: false, liveReload: false }` on every remote.** Otherwise
+   the remote's dev client rides inside the container into the host's page and
+   full-reloads it forever on a stale compilation hash. Both flags, not one — HMR
+   and live reload each compare hashes, and the adapter only omits the client
+   entirely when both are off.
+
+**Editing a remote therefore does not refresh the shell.** That is the cost of
+point 6; reload the browser by hand. The shell keeps its own dev client, so
+editing the shell still hot-updates.

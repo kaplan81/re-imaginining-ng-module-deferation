@@ -139,7 +139,73 @@ reintroduces the `import.meta` error from the host side — so the lazy entry ha
 say `type: 'module'` explicitly. **Two one-line fixes that undo each other if you
 only apply one, and neither error message mentions the other.**
 
-### 3.2 A dead remote took down the whole host
+### 3.2 The dev server is a second pipeline, and it broke composition twice
+
+Everything above was found against production builds. Running the workspace the
+way the README tells you to — `npm run start:rspack:all`, five dev servers, open
+the shell — failed in two further ways that **production never exhibits**. Both
+were introduced by defaults nobody set, both were silent, and together they made
+the shell unusable in dev while `npm run build:rspack` stayed perfectly green.
+
+This is the most transferable finding in the build: `rspack serve` is not
+`rspack build` with a watcher on it.
+
+**A remote's dev client hijacks the host's page.** In dev, Rspack injects its
+HMR + live-reload client into each remote's own bundle, and therefore into the
+container the host loads. Mounted into the shell, that client keeps polling
+**the remote's** origin for `<name>.<hash>.hot-update.json` using the compilation
+hash it was built with. The dev server prunes update files for older hashes, so
+after the remote's first rebuild the fetch 404s, the client decides it cannot
+patch, and it calls for a full page reload — of the **shell**, which it knows
+nothing about. The shell reloads, re-fetches the container, gets the same stale
+hash, and the loop never ends:
+
+```
+GET http://localhost:4211/catalog.de4e2548e279956b.hot-update.json.mjs → 404
+[HMR] Cannot find update. Need to do a full reload!
+```
+
+Turning off `hmr` alone is not enough — the live-reload client compares hashes
+too and reports `App updated. Reloading...` on the same stale value. Both have to
+go: `devServer: { hmr: false, liveReload: false }` on every remote. That pair is
+also the adapter's own switch for it — `getWebSocketSettings` returns
+`{ client: undefined, webSocketServer: false }` when both are false, so no client
+is emitted at all. It is the same root cause behind the
+`ws://localhost:4210/ng-cli-ws` failures that accompanied the loop: the client's
+`webSocketURL` is `auto://0.0.0.0:0/ng-cli-ws`, and "auto" means _the origin of
+the page it happens to be running in_.
+
+The shell keeps its own client. It is the page you are looking at, it is
+same-origin, and a hash mismatch there costs one self-correcting reload.
+
+**Lazy compilation hangs a remote's second lazy level.** With the loop fixed the
+shell booted, and `/catalog` rendered an empty router outlet — no error, no
+fallback, nothing. `loadRemote('catalog/Routes')` resolved fine; the route's own
+`loadComponent()` never settled.
+
+`@rspack/cli` turns on `lazyCompilation: { imports: true, entries: false }` by
+default for `rspack serve` unless the config sets it. Every dynamic `import()`
+becomes a stub that first POSTs to `/_rspack/lazy/trigger…` to have the real
+chunk compiled — resolved, again, against the origin of the page it runs in. A
+remote's second lazy level executes inside the **host's** page, so the trigger
+goes to the host's dev server, which knows nothing about that compilation. The
+chunk is never built and the promise never resolves.
+
+That hits every component-level boundary in this workspace: a page remote's
+`loadComponent`, and a widget descriptor's `load()`. `lazyCompilation: false` in
+all five configs.
+
+Note the failure _mode_, because it is what makes this expensive: it hangs rather
+than throwing. `loadRemoteRoutes` has a `try/catch` that renders
+`RemoteUnavailableComponent`, and it never ran — a promise that never settles is
+not a rejection. The shell's careful error handling is invisible to it.
+
+**Neither build 1 nor build 3 has either problem.** The baseline runs five
+`ng serve`s and composes fine. Vite has no lazy-compilation stubs, and its HMR
+client is a per-origin websocket with no hash comparison to go stale. Verified by
+running all three.
+
+### 3.3 A dead remote took down the whole host
 
 Worth separating out, because it is a regression against the baseline rather than
 a configuration wrinkle. Stopping the `catalog` dev server left the shell as a
@@ -152,7 +218,7 @@ rejects wholesale on the first that does not answer. After the fix
 (`builds/rspack/shell/src/main.ts`) the shell boots, the header renders, and
 `/catalog` degrades to `RemoteUnavailableComponent` — build 1's behaviour.
 
-### 3.3 `import.meta.url` did not survive, and leaked the build machine
+### 3.4 `import.meta.url` did not survive, and leaked the build machine
 
 The plan predicted this risk. The reality was worse than "it does not work":
 Rspack's parser substituted `import.meta.url` at build time with the **absolute
@@ -168,7 +234,7 @@ Verified: the strip reads `localhost:4211` under `ng serve`-equivalent and still
 The baseline needs no equivalent, because native ES modules keep their own
 identity all the way to the browser.
 
-### 3.4 The share map is hand-maintained — so it was generated
+### 3.5 The share map is hand-maintained — so it was generated
 
 Native Federation's `shareAll(...)` derives the share map from `package.json` and
 cannot drift. Module Federation has no equivalent, and every published example
@@ -188,7 +254,7 @@ behaviours that are free in the baseline:
 The cost of the manual map is not that it is hard to write once. It is that
 nothing tells you when it is wrong.
 
-### 3.5 The shell was the only application that needed changing
+### 3.6 The shell was the only application that needed changing
 
 Criterion 3 held, and more cleanly than expected. The two page remotes and both
 widget microfrontends compile **completely unmodified** from `projects/*` — their
@@ -221,7 +287,7 @@ pair itself, and asserts that no unreplaced original reaches
 `compilation.modules` — a build error naming the file, instead of a runtime
 failure on first navigation.
 
-### 3.6 Answers to the plan's two open questions
+### 3.7 Answers to the plan's two open questions
 
 - **`import '@angular/compiler'` is not needed.** Both Zephyr Angular examples
   import the JIT compiler in `bootstrap.ts`. It is a leftover: everything here is
@@ -233,7 +299,7 @@ failure on first navigation.
   widget microfrontend stays two JSON edits and a deploy with no shell rebuild —
   parity with the baseline, bought with ~30 lines and the fix in §3.2.
 
-### 3.7 Still out of scope
+### 3.8 Still out of scope
 
 - **Bridges**, and that is a finding rather than a gap. MF Bridge ships for React
   and Vue 3 only; there is no Angular bridge, and its provider contract is
@@ -256,7 +322,8 @@ failure on first navigation.
 ## 4. Parity checklist
 
 Verified against the production builds of all five applications, served
-cross-origin on `:4210`–`:4214`.
+cross-origin on `:4210`–`:4214`, **and** re-verified against
+`npm run start:rspack:all` after the dev-server fixes in §3.2.
 
 - [x] **Both page remotes render inside the shell with correct styling.**
       `/catalog` renders 96 lots, `/orders` renders 56 orders. Component styles
@@ -282,6 +349,11 @@ cross-origin on `:4210`–`:4214`.
 - [x] **Both widget microfrontends mount into shell slots**, each rendering its
       own data behind its own `@defer (on viewport)` boundary, with origin strips
       reading `localhost:4213` and `localhost:4214`.
+- [x] **`npm run start:rspack:all` composes.** The shell boots and stays booted,
+      both routes render from their remotes, both widget slots mount, all four
+      remotes probe reachable, and a clean load makes zero failed requests. This
+      is the item §3.2 exists for — it failed for a long time while every
+      production check above passed.
 
 ## 5. Known gaps
 
@@ -295,6 +367,12 @@ cross-origin on `:4210`–`:4214`.
   a regression — but neither build recovers a remote live.
 - **`@angular/ssr` and `@angular/platform-server` are installed for nothing.**
   Hard peers of an adapter used only for browser builds.
+- **No hot reload for remotes.** §3.2 turns the dev client off in all four, so
+  editing a remote while the shell is open needs a manual refresh. A remote
+  served on its own port has no live reload either. Making it conditional (live
+  reload when a remote is started alone, off under `start:rspack:all`) is a small
+  env-var change that has not been made — the unconditional version is one
+  behaviour to explain instead of two.
 
 ## 6. What the talk gets from this build
 

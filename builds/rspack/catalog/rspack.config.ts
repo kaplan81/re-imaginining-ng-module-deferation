@@ -35,7 +35,23 @@ export default createConfig({
 
     outputPath: { base: './dist' },
     outputHashing: 'none',
-    devServer: { port: 4211 },
+    // `hmr: false` is load-bearing, and the reason is federation-specific.
+    //
+    // In dev, Rspack injects its HMR client into this remote's own bundle - and
+    // therefore into the container the *host* loads. Mounted into the shell, that
+    // client keeps polling **this** origin for `<name>.<hash>.hot-update.json`,
+    // using the compilation hash it was built with. The dev server prunes update
+    // files for older hashes, so as soon as this remote rebuilds once the fetch
+    // 404s, the client decides it cannot patch and calls for a full reload - of
+    // the *shell's* page, not this one. The shell reloads, re-fetches this
+    // container, gets the same stale hash, and the whole thing repeats forever.
+    //
+    // Live reload stays on: it has no hash to go stale, and it is what makes
+    // editing a remote refresh the host page, which is the DX you actually want
+    // across a federation boundary. Only hot-module *patching* is disabled, and
+    // it could never have worked across the boundary anyway - the host holds
+    // module instances the remote's HMR runtime cannot reach.
+    devServer: { port: 4211, hmr: false, liveReload: false },
   },
 
   rspackConfigOverrides: {
@@ -44,6 +60,21 @@ export default createConfig({
     // lazy chunks are fetched from the *host's* origin and 404 - and it is also
     // what gives `remoteOriginPlugin` something true to substitute.
     output: { publicPath: 'auto' },
+
+    // Rspack's CLI turns on `lazyCompilation: { imports: true, entries: false }`
+    // by default for `rspack serve`, and it is silently fatal across a federation
+    // boundary. Every dynamic `import()` becomes a stub that first POSTs to
+    // `/_rspack/lazy/trigger…` to have the real chunk compiled - resolved against
+    // *the origin of the page it runs in*. A remote's second lazy level (a
+    // route's `loadComponent`, a widget descriptor's `load()`) executes inside
+    // the **host's** page, so the trigger goes to the host's dev server, which
+    // knows nothing about this compilation. The chunk is never built, the
+    // `import()` promise never settles, and the router renders an empty outlet -
+    // no error, no fallback, nothing to search for.
+    //
+    // Worth a slide: it only misbehaves in dev, only when federated, and it
+    // fails by hanging rather than by throwing.
+    lazyCompilation: false,
 
     // The adapter defaults browser builds to `optimization.runtimeChunk: 'single'`,
     // which hoists the Rspack runtime out into `runtime.js`. That is fine for a

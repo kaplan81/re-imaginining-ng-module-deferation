@@ -281,12 +281,22 @@ Rules specific to them, all of which follow from what they are for:
   `builds/rspack/<app>/` and a `builds/vite/<app>/` to stay comparable.
 - **Several bundler defaults are load-bearing, and each has a comment where it is
   set.** Build 2: `optimization.runtimeChunk: false`, `library: { type: 'module' }`
-  on remotes with `remoteType: 'module'` on the host, `output.publicPath: 'auto'`.
-  Build 3: `tsconfig` and `inlineStylesExtension` on `angular()`, `resolve.alias`,
-  a pruned share map, `hostInitInjectLocation: 'entry'`, `optimizeDeps.include`,
-  `server.origin` / `base`, and `build.target: 'es2022'`. Both: lazy per-remote
-  `registerRemotes`. Removing any one breaks composition — usually with an error
-  that names something else entirely.
+  on remotes with `remoteType: 'module'` on the host, `output.publicPath: 'auto'`,
+  `lazyCompilation: false` everywhere, and `devServer: { hmr: false, liveReload:
+false }` on every remote. Build 3: `tsconfig` and `inlineStylesExtension` on
+  `angular()`, `resolve.alias`, a pruned share map, `hostInitInjectLocation:
+'entry'`, `optimizeDeps.include`, `server.origin` / `base`, and
+  `build.target: 'es2022'`. Both: lazy per-remote `registerRemotes`. Removing any
+  one breaks composition — usually with an error that names something else
+  entirely.
+- **Check `start:rspack:all` in a browser, not just `build:rspack`.** Build 2's
+  last two defaults above are dev-server-only: without them the production build
+  is perfectly green while the shell either reload-loops forever or renders an
+  empty outlet that never resolves. A remote's dev client and Rspack's lazy
+  compilation both resolve "my origin" as _the page they run in_, which inside a
+  host is the wrong dev server. Any change to `devServer`, `lazyCompilation` or
+  chunk splitting in `builds/rspack` has to be re-checked with all five servers
+  running and the shell open.
 - **The share map must stay pruned in build 3.** `@module-federation/vite` emits a
   fallback chunk per _declared_ share, not per _used_ one, so an unused entry is
   dead weight in all five bundles — `@angular/compiler` alone was 607 kB per app.
