@@ -46,7 +46,8 @@
           "builder": "@angular-architects/native-federation:build",
           "options": {
             "cacheExternalArtifacts": true,
-            "tsConfig": "projects/shell/tsconfig.federation.json"
+            "tsConfig": "projects/shell/tsconfig.federation.json",
+            "esmsInitOptions": { "shimMode": false }
           },
           "configurations": {
             "production": {
@@ -68,7 +69,8 @@
             "cacheExternalArtifacts": true,
             "dev": true,
             "devServer": true,
-            "port": 0
+            "port": 0,
+            "esmsInitOptions": { "shimMode": false }
           }
         },
         "test": {
@@ -148,7 +150,8 @@
           "builder": "@angular-architects/native-federation:build",
           "options": {
             "cacheExternalArtifacts": true,
-            "tsConfig": "projects/catalog/tsconfig.federation.json"
+            "tsConfig": "projects/catalog/tsconfig.federation.json",
+            "esmsInitOptions": { "shimMode": false }
           },
           "configurations": {
             "production": {
@@ -170,7 +173,8 @@
             "cacheExternalArtifacts": true,
             "dev": true,
             "devServer": true,
-            "port": 0
+            "port": 0,
+            "esmsInitOptions": { "shimMode": false }
           }
         },
         "test": {
@@ -250,7 +254,8 @@
           "builder": "@angular-architects/native-federation:build",
           "options": {
             "cacheExternalArtifacts": true,
-            "tsConfig": "projects/orders/tsconfig.federation.json"
+            "tsConfig": "projects/orders/tsconfig.federation.json",
+            "esmsInitOptions": { "shimMode": false }
           },
           "configurations": {
             "production": {
@@ -272,7 +277,8 @@
             "cacheExternalArtifacts": true,
             "dev": true,
             "devServer": true,
-            "port": 0
+            "port": 0,
+            "esmsInitOptions": { "shimMode": false }
           }
         },
         "test": {
@@ -352,7 +358,8 @@
           "builder": "@angular-architects/native-federation:build",
           "options": {
             "cacheExternalArtifacts": true,
-            "tsConfig": "projects/top-lots/tsconfig.federation.json"
+            "tsConfig": "projects/top-lots/tsconfig.federation.json",
+            "esmsInitOptions": { "shimMode": false }
           },
           "configurations": {
             "production": {
@@ -374,7 +381,8 @@
             "cacheExternalArtifacts": true,
             "dev": true,
             "devServer": true,
-            "port": 0
+            "port": 0,
+            "esmsInitOptions": { "shimMode": false }
           }
         },
         "test": {
@@ -454,7 +462,8 @@
           "builder": "@angular-architects/native-federation:build",
           "options": {
             "cacheExternalArtifacts": true,
-            "tsConfig": "projects/roast-queue/tsconfig.federation.json"
+            "tsConfig": "projects/roast-queue/tsconfig.federation.json",
+            "esmsInitOptions": { "shimMode": false }
           },
           "configurations": {
             "production": {
@@ -476,7 +485,8 @@
             "cacheExternalArtifacts": true,
             "dev": true,
             "devServer": true,
-            "port": 0
+            "port": 0,
+            "esmsInitOptions": { "shimMode": false }
           }
         },
         "test": {

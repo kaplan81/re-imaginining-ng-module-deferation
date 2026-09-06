@@ -6,11 +6,6 @@ import { initFederation } from '@angular-architects/native-federation';
  * own `remoteEntry.json` so its shared-dependency metadata is identical whether it
  * is mounted by a host or opened directly.
  */
-initFederation(
-  {},
-  {
-    hostRemoteEntry: { url: './remoteEntry.json' },
-  },
-)
+initFederation({}, { shimMode: false })
   .then(() => import('./bootstrap'))
   .catch((err) => console.error(err));

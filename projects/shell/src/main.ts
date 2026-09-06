@@ -11,13 +11,16 @@ import { setFederation } from './federation';
  * 2. Only then is the Angular application imported, so shell and remotes resolve
  *    the very same `@angular/core` instance rather than two copies of it.
  *
- * `hostRemoteEntry` makes the shell publish its own `remoteEntry.json` as well,
- * so its shared dependencies participate in the same negotiation instead of
- * being a special case.
+ * The Angular adapter already publishes `./remoteEntry.json` as the host entry,
+ * so the shell's shared dependencies participate in the same negotiation
+ * instead of being a special case.
+ *
+ * `shimMode: false` installs that map with the browser's native import maps
+ * instead of es-module-shims. The federation builder's `esmsInitOptions` must
+ * match, or the entry stays `type="module-shim"` while the runtime expects
+ * native resolution. Needs Chrome/Edge 133+, Safari 18.4+ or Firefox 150+.
  */
-initFederation('federation.manifest.json', {
-  hostRemoteEntry: { url: './remoteEntry.json' },
-})
+initFederation('federation.manifest.json', { shimMode: false })
   .then((runtime) => {
     setFederation(runtime);
     return import('./bootstrap');

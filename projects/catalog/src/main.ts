@@ -6,11 +6,6 @@ import { initFederation } from '@angular-architects/native-federation';
  * so the shared-dependency metadata is identical in both modes - the remote is
  * not a second-class citizen of the federation graph.
  */
-initFederation(
-  {},
-  {
-    hostRemoteEntry: { url: './remoteEntry.json' },
-  },
-)
+initFederation({}, { shimMode: false })
   .then(() => import('./bootstrap'))
   .catch((err) => console.error(err));
