@@ -289,6 +289,10 @@ false }` on every remote. Build 3: `tsconfig` and `inlineStylesExtension` on
   `build.target: 'es2022'`. Both: lazy per-remote `registerRemotes`. Removing any
   one breaks composition — usually with an error that names something else
   entirely.
+- **`npm run start:everything` runs all fifteen dev servers** — all three
+  pipelines at once, prefixed output, one `Ctrl-C` stops everything. Every
+  multi-application script goes through `concurrently`; do not go back to bare
+  `&`, which orphans the children on `Ctrl-C`.
 - **Check `start:rspack:all` in a browser, not just `build:rspack:all`.** Build 2's
   last two defaults above are dev-server-only: without them the production build
   is perfectly green while the shell either reload-loops forever or renders an

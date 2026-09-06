@@ -136,9 +136,45 @@ is always named — `all` or one of `shell`, `catalog`, `orders`, `top-lots`,
 `roast-queue`. There is no bare `build:rspack` or `start:vite`: in a workspace
 with five applications per pipeline, a script that does not say what it runs is a
 script you have to look up. (Build 1 keeps plain `npm start`, `npm run build` and
-`npm test`, because those are npm's own conventions rather than this repo's.)
+`npm test`, because those are npm's own conventions rather than this repo's, and
+`start:everything` sits outside the pattern on purpose — it is the one script
+that crosses all three pipelines.)
 
 Both builds reuse the feature code in `projects/*` unmodified.
+
+### Running all three at once
+
+```bash
+npm run start:everything
+```
+
+Fifteen dev servers — all five applications of all three pipelines — and three
+shells composing side by side at <http://localhost:4200>,
+<http://localhost:4210> and <http://localhost:5173>. That is the three-way demo,
+and it works because the ports never overlap (4200–4204, 4210–4214, 5173–5177)
+and each pipeline has its own output root (`dist/`, `builds/rspack/*/dist`,
+`builds/vite/*/dist`).
+
+Output is prefixed by pipeline and application — `[rspack] [ord]`, `[vite] [cat]`
+— and one `Ctrl-C` stops all fifteen. Give it about 80 seconds; build 1's five
+`ng serve`s are the slow part.
+
+What does collide is a dev server and a **production build of the same
+pipeline**, because the three treat `dist/` differently:
+
+| Pipeline           | What its dev server does to that pipeline's `dist/`                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 — `ng serve`     | **Writes into it.** Native Federation serves real ES modules through an import map, so `dist/<project>/browser` fills with dev-mode artifacts (`…-dev.js`, `remoteEntry.json`). |
+| 2 — `rspack serve` | **Empties it** on startup and serves from memory.                                                                                                                               |
+| 3 — `vite`         | **Ignores it.** Vite serves from memory; anything in `dist/` is a leftover.                                                                                                     |
+
+So after running `npm run start:all` or `npm run start:rspack:all`, that
+pipeline's `dist/` is either dev-mode output or gone. Re-run the build before
+measuring bundle sizes or serving the built output — a stale or emptied `dist/`
+is the one way to get numbers that look real and are not.
+
+Build 3 has a second, simpler constraint: `start:vite:all` and `preview:vite:all`
+both bind 5173–5177, so they are mutually exclusive.
 
 ## The 60-second version of how it works
 
