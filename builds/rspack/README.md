@@ -16,8 +16,11 @@ From the workspace root:
 npm run start:rspack:all
 ```
 
-Then open <http://localhost:4210>. Build 2 uses ports **4210–4214** so it can run
-side by side with build 1 on 4200–4204.
+Then open <http://localhost:4210>. Build 2's five applications are 4210 (`shell`),
+4211 (`catalog`), 4212 (`orders`), 4213 (`top-lots`), 4214 (`roast-queue`) —
+declared in each `rspack.config.ts` as `devServer.port`. The full three-pipeline
+map is in the [root README](../../README.md#every-port); `npm run start:everything`
+runs all fifteen.
 
 ```bash
 npm run build:rspack:all

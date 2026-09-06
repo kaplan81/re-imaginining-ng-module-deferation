@@ -159,6 +159,33 @@ Output is prefixed by pipeline and application — `[rspack] [ord]`, `[vite] [ca
 — and one `Ctrl-C` stops all fifteen. Give it about 80 seconds; build 1's five
 `ng serve`s are the slow part.
 
+### Every port
+
+The full map, and the reason all three pipelines can run at once. Build 3's
+`vite preview` reuses build 3's dev ports, so `start:vite:all` and
+`preview:vite:all` are mutually exclusive.
+
+| Application   | Role        | Exposes     | 1 — Angular CLI                   | 2 — Rspack                        | 3 — Vite                          |
+| ------------- | ----------- | ----------- | --------------------------------- | --------------------------------- | --------------------------------- |
+| `shell`       | host        | —           | **[4200](http://localhost:4200)** | **[4210](http://localhost:4210)** | **[5173](http://localhost:5173)** |
+| `catalog`     | page remote | `./Routes`  | [4201](http://localhost:4201)     | [4211](http://localhost:4211)     | [5174](http://localhost:5174)     |
+| `orders`      | page remote | `./Routes`  | [4202](http://localhost:4202)     | [4212](http://localhost:4212)     | [5175](http://localhost:5175)     |
+| `top-lots`    | widget MFE  | `./Widgets` | [4203](http://localhost:4203)     | [4213](http://localhost:4213)     | [5176](http://localhost:5176)     |
+| `roast-queue` | widget MFE  | `./Widgets` | [4204](http://localhost:4204)     | [4214](http://localhost:4214)     | [5177](http://localhost:5177)     |
+
+The three shells in bold are the pages to open. Where each port is declared, if
+you ever need to change one:
+
+| Pipeline | Declared in                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------- |
+| 1        | `angular.json` → `<project>.architect.serve-original.options.port`                          |
+| 2        | `builds/rspack/<app>/rspack.config.ts` → `devServer.port`                                   |
+| 3        | `builds/vite/<app>/vite.config.ts` → `server.port`, `preview.port`, and the absolute `base` |
+
+Build 3 needs the port in three places because a remote's chunks must be fetched
+from the remote's own origin, not from whoever mounted it — see
+[`builds/vite/README.md`](builds/vite/README.md).
+
 What does collide is a dev server and a **production build of the same
 pipeline**, because the three treat `dist/` differently:
 

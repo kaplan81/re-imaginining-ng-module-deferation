@@ -72,13 +72,22 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 **Five** independently built Angular applications composed at runtime by Angular
 Architects Native Federation. See `README.md` and `docs/ARCHITECTURE.md` first.
 
-| Project       | Role        | Exposes     | Port | Prefix | Feature folder                             |
-| ------------- | ----------- | ----------- | ---- | ------ | ------------------------------------------ |
-| `shell`       | host        | —           | 4200 | `shl`  | `projects/shell/src/app/{app,home}`        |
-| `catalog`     | page remote | `./Routes`  | 4201 | `cat`  | `projects/catalog/src/app/catalog`         |
-| `orders`      | page remote | `./Routes`  | 4202 | `ord`  | `projects/orders/src/app/orders`           |
-| `top-lots`    | widget MFE  | `./Widgets` | 4203 | `tlo`  | `projects/top-lots/src/app/top-lots`       |
-| `roast-queue` | widget MFE  | `./Widgets` | 4204 | `rqu`  | `projects/roast-queue/src/app/roast-queue` |
+The `Port` columns are per pipeline: build 1 is this workspace, builds 2 and 3
+are the same five applications rebuilt under `builds/` — see `builds/` below.
+
+| Project       | Role        | Exposes     | :1   | :2   | :3   | Prefix | Feature folder                             |
+| ------------- | ----------- | ----------- | ---- | ---- | ---- | ------ | ------------------------------------------ |
+| `shell`       | host        | —           | 4200 | 4210 | 5173 | `shl`  | `projects/shell/src/app/{app,home}`        |
+| `catalog`     | page remote | `./Routes`  | 4201 | 4211 | 5174 | `cat`  | `projects/catalog/src/app/catalog`         |
+| `orders`      | page remote | `./Routes`  | 4202 | 4212 | 5175 | `ord`  | `projects/orders/src/app/orders`           |
+| `top-lots`    | widget MFE  | `./Widgets` | 4203 | 4213 | 5176 | `tlo`  | `projects/top-lots/src/app/top-lots`       |
+| `roast-queue` | widget MFE  | `./Widgets` | 4204 | 4214 | 5177 | `rqu`  | `projects/roast-queue/src/app/roast-queue` |
+
+Ports are declared in `angular.json` (`serve-original.options.port`),
+`builds/rspack/<app>/rspack.config.ts` (`devServer.port`) and
+`builds/vite/<app>/vite.config.ts` (`server.port`, `preview.port` **and** the
+absolute `base`). Change one and you must change every doc that lists it —
+`README.md` holds the canonical table.
 
 Two kinds of remote, and the difference is load-bearing:
 

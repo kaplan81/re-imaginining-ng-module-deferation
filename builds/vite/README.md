@@ -16,8 +16,16 @@ From the workspace root:
 npm run start:vite:all
 ```
 
-Then open <http://localhost:5173>. Build 3 uses ports **5173–5177**, so all three
-pipelines can run at once (4200–4204, 4210–4214, 5173–5177).
+Then open <http://localhost:5173>. Build 3's five applications are 5173 (`shell`),
+5174 (`catalog`), 5175 (`orders`), 5176 (`top-lots`), 5177 (`roast-queue`). Each
+port is declared **three times** in that application's `vite.config.ts` —
+`server.port`, `preview.port` and the absolute `base` — because a remote's chunks
+have to be fetched from the remote's own origin, not from whoever mounted it.
+
+`preview` reuses the dev ports, so `start:vite:all` and `preview:vite:all` cannot
+run together. The full three-pipeline map is in the
+[root README](../../README.md#every-port); `npm run start:everything` runs all
+fifteen.
 
 ```bash
 npm run build:vite:all

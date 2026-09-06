@@ -34,8 +34,11 @@ compiled by Rspack and composed at runtime by Module Federation.
 
 ```bash
 npm run build:rspack:all        # all five, production
-npm run start:rspack:all    # all five dev servers
+npm run start:rspack:all        # all five dev servers
 ```
+
+The canonical port map for all three pipelines lives in the
+[root README](../README.md#every-port).
 
 > **Correction to the original plan.** It assumed each page remote exposed both
 > `./Routes` and `./Widgets`, and its step-2 snippet exposed

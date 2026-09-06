@@ -21,7 +21,9 @@ compiled by Vite and composed at runtime by Module Federation.
 | `top-lots`    | widget MFE  | `./Widgets` | 4203    | 4213    | 5176    |
 | `roast-queue` | widget MFE  | `./Widgets` | 4204    | 4214    | 5177    |
 
-All three pipelines can run at once, which is a demo in itself.
+All three pipelines can run at once — `npm run start:everything` — which is a
+demo in itself. The canonical port map lives in the
+[root README](../README.md#every-port).
 
 ```bash
 npm run build:vite:all        # all five, production
