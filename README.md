@@ -21,7 +21,7 @@ The product is _Roast Republic_, a specialty-coffee operations console:
 
 This repository is the **baseline** of the talk. It implements the conservative,
 first-party-toolchain path. Two further builds of the same product — one on
-Rspack, one on Vite — are planned in [`docs/PLAN-RSPACK.md`](docs/PLAN-RSPACK.md)
+Rsbuild, one on Vite — are planned in [`docs/PLAN-RSBUILD.md`](docs/PLAN-RSBUILD.md)
 and [`docs/PLAN-VITE.md`](docs/PLAN-VITE.md), so the talk can compare all three
 against a fixed application.
 
@@ -171,8 +171,10 @@ Full walkthrough, including the boundaries and the trade-offs: [`docs/ARCHITECTU
   non-medical domain.
   Notable differences introduced by Native Federation 22 are listed in
   [`docs/ARCHITECTURE.md#what-changed-since-native-federation-21`](docs/ARCHITECTURE.md#what-changed-since-native-federation-21).
-- **`ZephyrCloudIO/zephyr-examples`** — reference examples for the Rspack and Vite
-  paths (`module-federation/angular-rsbuild`, `module-federation/angular-vite`).
+- **`ZephyrCloudIO/zephyr-examples`** — reference examples for the Rsbuild and Vite
+  paths
+  ([`module-federation/angular-rsbuild`](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-rsbuild),
+  [`module-federation/angular-vite`](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-vite)).
   They are the starting point for the two plans in `docs/`, not a template to
   copy: their Angular and adapter versions are already behind, which is itself
   part of the talk's argument.

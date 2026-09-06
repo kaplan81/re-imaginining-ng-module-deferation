@@ -20,7 +20,7 @@ Rebuild _Roast Republic_ — shell + `catalog` + `orders` — so that:
   their `<app>.widgets.ts` descriptors are plain `@angular/core` and must port
   unchanged; only the `exposes` map and the per-pipeline entry points differ.
 - The **feature code is byte-identical** to the baseline, for the same reason as in
-  [`PLAN-RSPACK.md`](PLAN-RSPACK.md#the-one-thing-that-is-shared-and-why).
+  [`PLAN-RSBUILD.md`](PLAN-RSBUILD.md#the-one-thing-that-is-shared-and-why).
 
 ## 2. Why this needs a third-party plugin at all
 
@@ -40,7 +40,7 @@ This build is the second one.
 
 ## 3. Verified version constraints
 
-Checked against npm at the time of writing. Unlike the Rspack path, nothing here
+Checked against npm at the time of writing. Unlike the Rsbuild path, nothing here
 blocks Angular 22.
 
 | Package                         | Latest   | Peer range                                          | Verdict for Angular 22 |
@@ -50,9 +50,11 @@ blocks Angular 22.
 | `vite`                          | 8.x      | —                                                   | matches both plugins   |
 | `vite-plugin-zephyr`            | —        | —                                                   | optional stage 5       |
 
-The Zephyr reference example (`zephyr-examples/module-federation/angular-vite`)
+The Zephyr reference example
+([zephyr-examples/module-federation/angular-vite](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-vite))
 already runs Angular 21 + Vite 8, so it is a much closer starting point than the
-Rsbuild example. Re-verify the table before starting anyway.
+[Rsbuild example](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-rsbuild).
+Re-verify the table before starting anyway.
 
 ## 4. Where the code lives
 
@@ -99,9 +101,12 @@ Checkpoints:
 - SCSS resolves `@use 'tokens'`. Vite has no `stylePreprocessorOptions`; use
   `css.preprocessorOptions.scss.loadPaths` (Vite 5+ naming) pointing at that
   project's own `styles/` folder.
-- Zoneless bootstrap. Both Zephyr Angular examples call
-  `provideZonelessChangeDetection()` explicitly, whereas Angular 22 defaults to
-  zoneless under the CLI; make it explicit here so the two pipelines cannot drift.
+- Zoneless bootstrap. Both Zephyr Angular examples
+  ([Vite](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-vite),
+  [Rsbuild](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-rsbuild))
+  call `provideZonelessChangeDetection()` explicitly, whereas Angular 22 defaults
+  to zoneless under the CLI; make it explicit here so the two pipelines cannot
+  drift.
 - `import '@angular/compiler'` — the Zephyr examples import it in `main.ts`.
   Determine whether AOT is actually in effect: if the JIT compiler is genuinely
   required, that is a bundle-size and startup difference worth measuring against
@@ -129,8 +134,8 @@ federation({
 });
 ```
 
-Same divergence as the Rspack build: the share map is hand-maintained, not derived
-from `package.json` the way `shareAll()` does it.
+Same divergence as the Rsbuild build: the share map is hand-maintained, not
+derived from `package.json` the way `shareAll()` does it.
 
 ### Step 3 — the host
 
@@ -189,7 +194,7 @@ that is a legitimate criticism of runtime composition in general.
 
 ### Step 4 — parity checklist
 
-Identical to the Rspack plan — re-run the same list, because each item is a claim
+Identical to the Rsbuild plan — re-run the same list, because each item is a claim
 the baseline makes:
 
 - [ ] Both remotes render in the shell with correct styling.
@@ -209,8 +214,9 @@ Plus one Vite-specific item:
 ### Step 5 — optional: Zephyr Cloud
 
 `vite-plugin-zephyr` alongside `federation()`, plus `zephyr:dependencies` in
-`package.json`, exactly as the Zephyr example does. Same rationale as in the Rspack
-plan.
+`package.json`, exactly as the
+[Zephyr Angular Vite example](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-vite)
+does. Same rationale as in the Rsbuild plan.
 
 ## 6. Risk register
 
@@ -222,7 +228,7 @@ plan.
 | Hand-written remote `.d.ts` drifts from the remote's real exports | Medium     | Generate it, or accept and state the gap                              |
 | `build.target` too low for top-level await                        | Low        | Pin `chrome89`/`es2022`                                               |
 | AnalogJS plugin lags an Angular minor                             | Low        | Currently supports `@angular/build ^22`; re-check before starting     |
-| Angular CLI features lost (budgets, i18n, `ng test`, `ng update`) | Certain    | Same slide as the Rspack build                                        |
+| Angular CLI features lost (budgets, i18n, `ng test`, `ng update`) | Certain    | Same slide as the Rsbuild build                                       |
 
 ## 7. Acceptance criteria
 
@@ -232,7 +238,7 @@ plan.
 3. Feature code is imported from `projects/*` with **zero** modifications.
 4. The parity checklist passes, or every failure is documented.
 5. A filled-in comparison row exists for the matrix in
-   [`PLAN-RSPACK.md`](PLAN-RSPACK.md#7-what-the-talk-gets-from-this-build).
+   [`PLAN-RSBUILD.md`](PLAN-RSBUILD.md#7-what-the-talk-gets-from-this-build).
 
 ## 8. What the talk gets from this build
 
@@ -243,10 +249,10 @@ payload of the talk:
   Angular already builds with Vite; the moment you need a plugin inside it, you
   leave the first-party pipeline and take ownership of the config, the upgrade
   cadence and everything the CLI was doing for you.
-- **Against the Rspack build** it shows that "custom pipeline" is not one decision.
-  The Vite path currently tracks Angular closely; the Nx Rsbuild adapter the public
-  examples use is capped below Angular 21 while its Rspack successor is not. Same
-  category of choice, materially different maintenance exposure — and the exposure
-  moved between the two adapters, which is the point.
+- **Against the Rsbuild build** it shows that "custom pipeline" is not one
+  decision. The Vite path currently tracks Angular closely; the Nx Rsbuild adapter
+  the public examples use is capped below Angular 21 while its Rspack successor is
+  not. Same category of choice, materially different maintenance exposure — and
+  the exposure moved between the two adapters, which is the point.
 - **Against both**, the baseline is the control: it is the only one of the three
   where Angular's release notes are also your migration guide.

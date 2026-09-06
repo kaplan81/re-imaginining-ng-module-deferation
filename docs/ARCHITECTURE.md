@@ -346,7 +346,7 @@ The `adg-coding-challenge` repo runs Native Federation 21 on Angular 21. Moving 
 ## 10. Trade-offs this baseline accepts
 
 Most of these are inherent to _any_ federation runtime, not to Native Federation.
-They are the material for the comparison with the Rspack and Vite builds.
+They are the material for the comparison with the Rsbuild and Vite builds.
 
 | Topic                         | Position taken here                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

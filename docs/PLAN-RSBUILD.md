@@ -1,8 +1,10 @@
-# Plan — build 2: Rspack + Module Federation
+# Plan — build 2: Rsbuild + Module Federation
 
 Second of the three builds in the talk. Same product, same application code, a
-**different build pipeline and a different federation runtime**: Rspack instead of
-esbuild, classic Module Federation instead of Native Federation.
+**different build pipeline and a different federation runtime**: Rsbuild instead of
+the Angular CLI application builder, classic Module Federation instead of Native
+Federation. Rsbuild is the build tool; Rspack is the bundler it runs — the same
+relationship Vite has to Rolldown.
 
 Status: **planned, not implemented.**
 
@@ -13,7 +15,8 @@ Status: **planned, not implemented.**
 Rebuild _Roast Republic_ — shell + `catalog` + `orders` + `top-lots` +
 `roast-queue` — so that:
 
-- Angular is compiled by **Rspack**, not by `@angular/build:application`.
+- Angular is compiled by **Rsbuild** (Rspack underneath), not by
+  `@angular/build:application`.
 - Composition uses **classic Module Federation** (`mf-manifest.json`,
   `ModuleFederationPlugin`, the MF runtime), not import maps.
 - The **feature code is byte-identical** to the baseline. If the pipeline is the
@@ -22,8 +25,9 @@ Rebuild _Roast Republic_ — shell + `catalog` + `orders` + `top-lots` +
 ## 2. Verified version constraints
 
 Checked against npm at the time of writing. This matters: the reference example in
-`zephyr-examples/module-federation/angular-rsbuild` pins **Angular 20** and says
-so explicitly, so it cannot be copied onto this Angular 22 workspace.
+[zephyr-examples/module-federation/angular-rsbuild](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-rsbuild)
+pins **Angular 20** and says so explicitly, so it cannot be copied onto this
+Angular 22 workspace.
 
 | Package                       | Latest   | Peer range                                                     | Verdict for Angular 22                              |
 | ----------------------------- | -------- | -------------------------------------------------------------- | --------------------------------------------------- |
@@ -230,10 +234,12 @@ should port unchanged. **If it does not, that is a finding, not a bug to hide.**
 
 Two host details to work out:
 
-- **`import '@angular/compiler'`** — both Zephyr Angular examples import it in
-  `bootstrap.ts`. Determine whether the JIT compiler is genuinely required or
-  whether it is a leftover; a shipped compiler is a real bundle-size difference
-  worth measuring.
+- **`import '@angular/compiler'`** — both Zephyr Angular examples
+  ([Rsbuild](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-rsbuild),
+  [Vite](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-vite))
+  import it in `bootstrap.ts`. Determine whether the JIT compiler is genuinely
+  required or whether it is a leftover; a shipped compiler is a real bundle-size
+  difference worth measuring.
 - **Dynamic remotes.** The MF equivalent of the baseline's editable
   `federation.manifest.json` is `registerRemotes()` at runtime plus a fetched
   config. Either implement it (keeps parity with the baseline's "edit a file, no
@@ -257,7 +263,9 @@ baseline that must be re-tested on this pipeline.
 
 ### Step 5 — optional: Zephyr Cloud
 
-Add `zephyr-rspack-plugin` and `zephyr:dependencies` as the Zephyr example does.
+Add `zephyr-rspack-plugin` and `zephyr:dependencies` as the
+[Zephyr Angular Rsbuild example](https://github.com/ZephyrCloudIO/zephyr-examples/tree/main/module-federation/angular-rsbuild)
+does.
 This is the deployment-and-resolution layer rather than the bundler layer — worth
 a slide because it addresses the cross-origin DX cost listed in
 [`ARCHITECTURE.md`](ARCHITECTURE.md#10-trade-offs-this-baseline-accepts), which no
@@ -285,7 +293,7 @@ bundler choice fixes on its own.
 
 ## 7. What the talk gets from this build
 
-| Dimension                          | Baseline (Native Federation) | This build (Rspack + MF)             |
+| Dimension                          | Baseline (Native Federation) | This build (Rsbuild + MF)            |
 | ---------------------------------- | ---------------------------- | ------------------------------------ |
 | Cold production build, 3 apps      | measure                      | measure                              |
 | Incremental rebuild on file save   | measure                      | measure                              |
