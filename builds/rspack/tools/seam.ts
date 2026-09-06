@@ -133,14 +133,17 @@ export function seamPlugins(
  * `Federation runtime is not ready: initFederation() has not resolved yet` was
  * sitting in the output bundle of a build that reported no errors.
  *
- * Version two asserts the positive: every configured seam must have fired, or
- * the replacement file must be in the graph (Angular `fileReplacements` /
- * `resolve.alias` can land it there without going through `beforeResolve`).
- * Paired with the `existsSync` check above, a mistyped path now fails twice
- * before it can reach a bundle.
+ * Version two asserts the positive: a seam that reached the graph must have
+ * fired, or the replacement file must be among the modules (Angular
+ * `fileReplacements` / `resolve.alias` can land it there without going through
+ * `beforeResolve`). Paired with the `existsSync` check above, a mistyped path
+ * now fails twice before it can reach a bundle.
  *
- * Compilations that never saw the shell app (the global `styles` entry) are
- * skipped - they legitimately contain neither seam.
+ * Assertion is per seam, not all-or-nothing. `remote.util.ts` is a static
+ * import from `app.routes.ts` and is in the first emit; the registry is only
+ * reached from the lazy `home` route. Treating "one seam present" as "both
+ * must have fired" fails `rspack serve` on the initial compile, which is
+ * exactly when the home chunk has not been asked for yet.
  */
 function assertEverySeamFired(
   workspaceRoot: string,
@@ -156,25 +159,20 @@ function assertEverySeamFired(
           return resource === undefined ? [] : [normalizePath(resource)];
         });
 
-        const graphSawSeam = replacements.some((seam) => {
-          const originalId = normalizePath(resolve(workspaceRoot, seam.original));
-          const replacementId = normalizePath(resolve(workspaceRoot, seam.replacement));
-
-          return resources.includes(originalId) || resources.includes(replacementId);
-        });
-
-        if (!graphSawSeam) {
-          return;
-        }
-
         const missed = replacements.filter((seam) => {
           if (fired.has(seam.original)) {
             return false;
           }
 
+          const originalId = normalizePath(resolve(workspaceRoot, seam.original));
           const replacementId = normalizePath(resolve(workspaceRoot, seam.replacement));
 
-          return !resources.includes(replacementId);
+          if (resources.includes(replacementId)) {
+            return false;
+          }
+
+          // Not in this compilation - the lazy home route has not been walked.
+          return resources.includes(originalId);
         });
 
         if (missed.length > 0) {
