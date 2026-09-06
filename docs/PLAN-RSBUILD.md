@@ -208,6 +208,36 @@ not a rejection. The shell's careful error handling is invisible to it.
 client is a per-origin websocket with no hash comparison to go stale. Verified by
 running all three.
 
+**A third, cosmetic one, same shape.** Loading any build-2 application _standalone_
+in dev threw `styles.js: Uncaught SyntaxError: Cannot use 'import.meta' outside a
+module`. `library: { type: 'module' }` makes the whole compilation ESM, so
+`publicPath: 'auto'` emits a runtime that reads `import.meta.url` — but the
+adapter decides per entry point whether a script tag is a module, and
+`getEntryPoints` hardcodes the global-styles entry as _not_ one:
+
+```js
+...globalStyles.filter((s) => s.initial).map((s) => [s.name, false]),
+```
+
+so ESM shipped inside a classic `<script>`. Nothing broke visually — the CSS
+arrives through an inlined critical block and a `<link>`, and `main.js` is tagged
+correctly — which is exactly why it survived every functional check in §4 and was
+only noticed by opening a remote on its own port. Production never shows it: the
+adapter strips the JS shim for CSS-only chunks, so no styles tag is emitted at
+all.
+
+`tools/module-script-tags.ts` rewrites the emitted tag rather than working around
+it. The two alternatives were both worse, and the reason is worth a sentence:
+pinning an explicit `publicPath` per application removes the `import.meta.url`,
+but then the "Rendered by …" strip reports a compiled-in constant instead of a
+runtime-derived value — it would have stopped proving the thing it exists to
+prove. Moving global styles into `bootstrap.ts` would have changed how CSS is
+delivered, and with it the byte measurements in §6.
+
+All three of these are the same failure shape: a default that is correct for a
+single Angular application and wrong for one that is either federated or ESM, with
+an error message that names neither.
+
 ### 3.3 A dead remote took down the whole host
 
 Worth separating out, because it is a regression against the baseline rather than

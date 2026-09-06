@@ -159,6 +159,25 @@ Output is prefixed by pipeline and application — `[rspack] [ord]`, `[vite] [ca
 — and one `Ctrl-C` stops all fifteen. Give it about 80 seconds; build 1's five
 `ng serve`s are the slow part.
 
+**Only one stack at a time.** Every `…:all` script is gated on
+`tools/check-ports.mjs`, which refuses to start when a port it needs is already
+taken and names the port, the application and the process holding it:
+
+```
+  1 of the ports this needs is already in use:
+
+    4211   build 2 (Rspack) · catalog  — held by node (pid 59877)
+
+  Most likely another dev stack is still running in a different terminal.
+  Stop it there with Ctrl-C (it was started by `npm run start:rspack:all`), then run this again.
+```
+
+The guard exists because the failure it replaces was so misleading: the fan-out
+scripts use `concurrently -k`, so a single occupied port produced a wall of
+`EADDRINUSE` from the applications that lost the race and then killed the other
+fourteen — which reads as "the script is broken" rather than "something else is
+already running".
+
 ### Every port
 
 The full map, and the reason all three pipelines can run at once. Build 3's

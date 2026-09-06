@@ -291,13 +291,19 @@ Rules specific to them, all of which follow from what they are for:
 - **Several bundler defaults are load-bearing, and each has a comment where it is
   set.** Build 2: `optimization.runtimeChunk: false`, `library: { type: 'module' }`
   on remotes with `remoteType: 'module'` on the host, `output.publicPath: 'auto'`,
-  `lazyCompilation: false` everywhere, and `devServer: { hmr: false, liveReload:
-false }` on every remote. Build 3: `tsconfig` and `inlineStylesExtension` on
+  `lazyCompilation: false` everywhere, `devServer: { hmr: false, liveReload:
+false }` on every remote, and `moduleScriptTagsPlugin()` so the global-styles
+  entry is not injected as a classic script. Build 3: `tsconfig` and `inlineStylesExtension` on
   `angular()`, `resolve.alias`, a pruned share map, `hostInitInjectLocation:
 'entry'`, `optimizeDeps.include`, `server.origin` / `base`, and
   `build.target: 'es2022'`. Both: lazy per-remote `registerRemotes`. Removing any
   one breaks composition — usually with an error that names something else
   entirely.
+- **Only one dev stack can run at a time**, and every `…:all` script is gated on
+  `tools/check-ports.mjs` for that reason. Leaving servers running and then
+  starting another stack is the single easiest way to make the workspace look
+  broken: `concurrently -k` turns one occupied port into fifteen dead servers.
+  Stop what is running before starting something else.
 - **`npm run start:everything` runs all fifteen dev servers** — all three
   pipelines at once, prefixed output, one `Ctrl-C` stops everything. Every
   multi-application script goes through `concurrently`; do not go back to bare

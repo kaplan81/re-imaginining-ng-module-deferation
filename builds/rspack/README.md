@@ -91,8 +91,8 @@ Points 2 and 4 interact: the lazy entry must state `type: 'module'` explicitly,
 because dropping the manifest also drops the field that told the runtime the
 container was an ES module.
 
-`rspack serve` only — and `npm run build:rspack:all` stays green without them, which
-is what made these expensive to find:
+`rspack serve` only — and `npm run build:rspack:all` stays green without every
+one of them, which is what made these expensive to find:
 
 5. **`lazyCompilation: false`** in every config. `@rspack/cli` turns it on by
    default for `rspack serve`, so a remote's `loadComponent()` or widget `load()`
@@ -105,6 +105,12 @@ is what made these expensive to find:
    full-reloads it forever on a stale compilation hash. Both flags, not one — HMR
    and live reload each compare hashes, and the adapter only omits the client
    entirely when both are off.
+7. **`moduleScriptTagsPlugin()`** in every config. The adapter hardcodes the
+   global-styles entry as "not a module", so `styles.js` ships ESM inside a
+   classic `<script>` and every standalone dev page load throws
+   `Cannot use 'import.meta' outside a module`. Cosmetic — the CSS still arrives
+   through an inlined critical block and a `<link>` — but it is a console error on
+   every page, and it only shows up if you open a remote on its own port.
 
 **Editing a remote therefore does not refresh the shell.** That is the cost of
 point 6; reload the browser by hand. The shell keeps its own dev client, so

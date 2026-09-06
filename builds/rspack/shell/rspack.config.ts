@@ -2,6 +2,7 @@ import { createConfig } from '@nx/angular-rspack';
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack';
 import { join } from 'node:path';
 
+import { moduleScriptTagsPlugin } from '../tools/module-script-tags';
 import { remoteOriginPlugin } from '../tools/remote-origin';
 import { seamFileReplacements, seamPlugins } from '../tools/seam';
 import { sharedDependencies } from '../tools/shared-deps';
@@ -41,6 +42,11 @@ export default createConfig({
   },
 
   rspackConfigOverrides: {
+    // `'auto'` makes the runtime derive the base URL from the script that
+    // loaded the chunk. Required once federation is in play - without it a
+    // remote's lazy chunks are fetched from the *host's* origin and 404 - and
+    // it is also what keeps the "Rendered by" strip honest, since it reports a
+    // value derived at runtime rather than one compiled in.
     output: { publicPath: 'auto' },
 
     // Rspack's CLI turns on `lazyCompilation: { imports: true, entries: false }`
@@ -70,6 +76,7 @@ export default createConfig({
 
     plugins: [
       remoteOriginPlugin(),
+      moduleScriptTagsPlugin(),
 
       /**
        * The only two shell files this pipeline replaces. Everything else under
