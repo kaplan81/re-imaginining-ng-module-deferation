@@ -1,0 +1,6 @@
+{
+  "catalog": "http://localhost:4211/mf-manifest.json",
+  "orders": "http://localhost:4212/mf-manifest.json",
+  "top-lots": "http://localhost:4213/mf-manifest.json",
+  "roast-queue": "http://localhost:4214/mf-manifest.json"
+}

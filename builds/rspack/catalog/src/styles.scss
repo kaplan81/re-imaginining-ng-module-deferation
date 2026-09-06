@@ -1,0 +1,4 @@
+// Byte-identical in intent to `projects/catalog/src/styles.scss`: only applied
+// when the remote owns the document. Under the shell it is never loaded, which
+// is why component styles carry their own tokens.
+@use 'base';

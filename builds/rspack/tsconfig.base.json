@@ -1,0 +1,52 @@
+/*
+ * Type-checking baseline for build 2.
+ *
+ * The `paths` below are the whole trick: they map the *unmodified* feature code
+ * out of the Angular CLI workspace and into this pipeline, so the bundler is the
+ * only independent variable between build 1 and build 2. Sharing a source tree
+ * across pipelines is exactly the build-time coupling the baseline forbids
+ * *between applications*; here it runs in the opposite direction and is
+ * deliberate. Say it out loud in the talk - it is the difference between a fair
+ * comparison and three unrelated demos.
+ *
+ * `@rr/shell/*` is the same idea for the host, but note that it is *not* how the
+ * shell's federation seam is swapped. An alias can only redirect an import that
+ * names it, and the shell reaches `remote.util.ts` by a relative path from
+ * `app.routes.ts`. The seam is replaced below the import graph instead - see
+ * `tools/seam.ts`.
+ */
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@rr/catalog/*": ["../../projects/catalog/src/app/catalog/*"],
+      "@rr/orders/*": ["../../projects/orders/src/app/orders/*"],
+      "@rr/top-lots/*": ["../../projects/top-lots/src/app/top-lots/*"],
+      "@rr/roast-queue/*": ["../../projects/roast-queue/src/app/roast-queue/*"],
+
+      "@rr/catalog-app/*": ["../../projects/catalog/src/app/app/*"],
+      "@rr/orders-app/*": ["../../projects/orders/src/app/app/*"],
+      "@rr/top-lots-app/*": ["../../projects/top-lots/src/app/app/*"],
+      "@rr/roast-queue-app/*": ["../../projects/roast-queue/src/app/app/*"],
+
+      "@rr/shell/*": ["../../projects/shell/src/app/app/*"]
+    }
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  }
+}

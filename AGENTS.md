@@ -210,8 +210,9 @@ file carries its type in the name, and every class repeats it:
 ### After changing federation wiring
 
 Rebuild the affected project and confirm `dist/<project>/browser/remoteEntry.json`
-still lists the expected `exposes` keys — `./Routes` and `./Widgets` for both
-remotes, and an empty list for the shell. `tsconfig.federation.json` must name the
+still lists the expected `exposes` keys — `./Routes` for each page remote,
+`./Widgets` for each widget microfrontend, and an empty list for the shell. No
+project exposes both: that is the distinction the table above is drawing. `tsconfig.federation.json` must name the
 exposed entry points — it is what the federation build compiles, separately from
 `tsconfig.app.json`.
 
@@ -243,3 +244,38 @@ A new **widget microfrontend** needs no shell rebuild, but it does need a projec
    a project has no `*.spec.ts`, which breaks `npm test` for the whole workspace.
 5. Its manifest entry and its `widget-slots.json` entry — the only two edits the
    shell needs, and neither is code.
+
+### `builds/` — the second pipeline
+
+`builds/rspack/` is a **second build of the same product**: the identical feature
+code compiled by Rspack and composed by classic Module Federation instead of the
+Angular CLI and Native Federation. It runs on ports 4210–4214, alongside build 1
+on 4200–4204. Read [`builds/rspack/README.md`](builds/rspack/README.md) and
+[`docs/PLAN-RSBUILD.md`](docs/PLAN-RSBUILD.md) before touching it.
+
+Rules specific to it, all of which follow from what it is for:
+
+- **It contains no feature code, and must not grow any.** Every project under
+  `builds/rspack/` is entry points and build configuration only. Components,
+  services, interceptors, mocks and models are imported out of `projects/*`
+  through the `@rr/*` aliases in `builds/rspack/tsconfig.base.json`.
+- **Those aliases are the one sanctioned exception to "never import across
+  projects."** The rule above forbids coupling _between applications_, because
+  they are deployed independently. These aliases couple a _pipeline_ to the
+  source it compiles, which is the opposite direction and is the entire point:
+  if the feature code is byte-identical, the pipeline is the only variable the
+  talk is comparing. Do not use them to reach from one application into another.
+- **Never edit `projects/*` to make build 2 work.** If something does not port,
+  that is a finding for `docs/PLAN-RSBUILD.md`, not a change to build 1. The one
+  legitimate lever is `builds/rspack/tools/seam.ts`, which substitutes the two
+  shell modules that call a federation runtime — and it fails the build if an
+  unreplaced original reaches the bundle.
+- **A change to a remote's exposed surface is now two pipelines.** Adding an
+  exposed key means `federation.config.mjs` + `tsconfig.federation.json` in build
+  1 _and_ the `exposes` map in that project's `rspack.config.ts` in build 2.
+  Likewise a new application needs a `builds/rspack/<app>/` to stay comparable.
+- **Four Rspack/MF defaults are load-bearing and each has a comment where it is
+  set**: `optimization.runtimeChunk: false`, `library: { type: 'module' }` on
+  remotes with `remoteType: 'module'` on the host, `output.publicPath: 'auto'`,
+  and lazy per-remote `registerRemotes`. Removing any one breaks composition with
+  an error that names something else entirely.

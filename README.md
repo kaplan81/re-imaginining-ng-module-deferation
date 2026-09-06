@@ -20,10 +20,17 @@ The product is _Roast Republic_, a specialty-coffee operations console:
 | `roast-queue` | widget MFE | 4204 | One component: what the roastery owes next. No pages, no router. |
 
 This repository is the **baseline** of the talk. It implements the conservative,
-first-party-toolchain path. Two further builds of the same product — one on
-Rsbuild, one on Vite — are planned in [`docs/PLAN-RSBUILD.md`](docs/PLAN-RSBUILD.md)
-and [`docs/PLAN-VITE.md`](docs/PLAN-VITE.md), so the talk can compare all three
-against a fixed application.
+first-party-toolchain path.
+
+A second build of the same product is **implemented** alongside it in
+[`builds/rspack/`](builds/rspack): the identical feature code compiled by
+**Rspack** and composed by **classic Module Federation**, on ports 4210–4214 so
+both run side by side. Its write-up — findings, parity checklist and the measured
+comparison — is [`docs/PLAN-RSBUILD.md`](docs/PLAN-RSBUILD.md). A third build on
+Vite is still planned in [`docs/PLAN-VITE.md`](docs/PLAN-VITE.md).
+
+The three builds share one source tree on purpose, so the pipeline is the only
+variable between them.
 
 ## Quick start
 
@@ -99,6 +106,18 @@ builder fails a target outright when a project has none.
 ```bash
 npm run format
 ```
+
+### The second build
+
+```bash
+npm run start:rspack:all
+npm run build:rspack
+```
+
+The Rspack + Module Federation build of the same five applications, on ports
+4210–4214. `start:rspack:<project>` and `build:rspack:<project>` target one.
+It reuses the feature code in `projects/*` unmodified — see
+[`builds/rspack/README.md`](builds/rspack/README.md).
 
 ## The 60-second version of how it works
 
@@ -206,4 +225,15 @@ projects/
 
 Each project also owns projects/<app>/styles/ - five byte-identical copies of
 _tokens.scss and _base.scss, because no project reads a sibling's stylesheet.
+
+builds/rspack/                   build 2: same feature code, Rspack + Module Federation
+  tsconfig.base.json             paths aliases mapping @rr/* onto projects/*
+  tools/                         share map, import.meta.url fix, the shell seam swap
+  shell/                         the host, :4210 - registers remotes at runtime
+    src/seam/                    the only two shell modules this pipeline replaces
+  catalog/ orders/               page remotes, :4211 / :4212
+  top-lots/ roast-queue/         widget MFEs, :4213 / :4214
+
+No builds/rspack project contains feature code - only entry points and build
+configuration. That is what makes the pipeline the only variable.
 ```

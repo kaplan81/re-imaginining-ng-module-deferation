@@ -1,0 +1,10 @@
+{
+  "name": "@rr/rspack-roast-queue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "rspack serve --mode development",
+    "build": "rspack build --mode production"
+  }
+}
