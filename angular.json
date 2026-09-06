@@ -94,7 +94,6 @@
               }
             ],
             "styles": ["projects/shell/src/styles.scss"],
-            "polyfills": ["es-module-shims"],
             "stylePreprocessorOptions": {
               "includePaths": ["projects/shell/styles"]
             }
@@ -198,7 +197,6 @@
               }
             ],
             "styles": ["projects/catalog/src/styles.scss"],
-            "polyfills": ["es-module-shims"],
             "stylePreprocessorOptions": {
               "includePaths": ["projects/catalog/styles"]
             }
@@ -302,7 +300,6 @@
               }
             ],
             "styles": ["projects/orders/src/styles.scss"],
-            "polyfills": ["es-module-shims"],
             "stylePreprocessorOptions": {
               "includePaths": ["projects/orders/styles"]
             }
@@ -406,7 +403,6 @@
               }
             ],
             "styles": ["projects/top-lots/src/styles.scss"],
-            "polyfills": ["es-module-shims"],
             "stylePreprocessorOptions": {
               "includePaths": ["projects/top-lots/styles"]
             }
@@ -510,7 +506,6 @@
               }
             ],
             "styles": ["projects/roast-queue/src/styles.scss"],
-            "polyfills": ["es-module-shims"],
             "stylePreprocessorOptions": {
               "includePaths": ["projects/roast-queue/styles"]
             }
