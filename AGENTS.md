@@ -134,8 +134,9 @@ Two kinds of remote, and the difference is load-bearing:
   why, and that a published styles library package is the way to scale it — at
   five copies that comment's "fourth consumer" threshold has already passed, so
   treat the package as overdue rather than hypothetical.
-- **Do not extract a shared UI library** between the five applications. The five
-  copies of the `remote-origin` component are intentional, and so is each widget
+- **Do not extract a shared UI library** between the five applications. The four
+  copies of the `remote-origin` component are intentional (the shell has none — it
+  is never the thing a remote renders), and so is each widget
   microfrontend owning its own service, interceptor, seed, models and enums rather
   than importing the page remote's. A widget MFE's numbers therefore do not match
   the corresponding page remote's — different application, different backend. That

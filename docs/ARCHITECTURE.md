@@ -1,11 +1,16 @@
 # Architecture
 
-How the three applications in this workspace are wired, which boundaries are
+How the five applications in this workspace are wired, which boundaries are
 deliberate, and what each choice costs.
+
+**Scope:** this document describes **build 1** — the Angular CLI + Native
+Federation baseline in `projects/`. The two custom pipelines that rebuild the same
+five applications are written up separately in
+[`PLAN-RSBUILD.md`](PLAN-RSBUILD.md) and [`PLAN-VITE.md`](PLAN-VITE.md).
 
 ---
 
-## 1. Three builds, one page
+## 1. Five applications, one page
 
 `angular.json` holds **five** application projects — a host, two page remotes and
 two widget microfrontends. Each has **two** build targets:
@@ -31,9 +36,7 @@ A federated page has to agree on shared dependencies _before_ any of them is
 evaluated. Hence the two-phase entry point in `projects/shell/src/main.ts`:
 
 ```ts
-initFederation('federation.manifest.json', {
-  hostRemoteEntry: { url: './remoteEntry.json' },
-})
+initFederation('federation.manifest.json', { shimMode: false })
   .then((runtime) => {
     setFederation(runtime);
     return import('./bootstrap');
@@ -43,9 +46,15 @@ initFederation('federation.manifest.json', {
 
 - `main.ts` imports nothing from Angular. `bootstrap.ts` — a **dynamic** import —
   is the first module that does.
-- `hostRemoteEntry` makes the shell publish its own `remoteEntry.json`, so the
-  host's shared dependencies take part in the same negotiation as the remotes'
-  instead of being a special case.
+- The shell publishes its own `remoteEntry.json` (13 shared packages, an empty
+  `exposes`), so the host's shared dependencies take part in the same negotiation
+  as the remotes' instead of being a special case. The Angular adapter does this
+  on its own — the explicit `hostRemoteEntry` option earlier versions needed is
+  gone.
+- `shimMode: false` installs the import map with the browser's **native** import
+  maps rather than `es-module-shims`. The builder's `esmsInitOptions` must agree,
+  or the entry stays `type="module-shim"` while the runtime expects native
+  resolution.
 - `setFederation` stores the returned handle in `src/federation.ts`. Native
   Federation also exports a module-scoped `loadRemoteModule`, but it resolves
   against whichever `initFederation` call ran last — brittle in tests and
@@ -53,8 +62,8 @@ initFederation('federation.manifest.json', {
   ordering dependency explicit: nothing can load a remote before the runtime is
   ready.
 
-Both remotes run the same two-phase boot with an empty remote map, so a remote
-served standalone behaves exactly like the federated one.
+All four remotes run the same two-phase boot with an empty remote map, so a
+remote served standalone behaves exactly like the federated one.
 
 ## 3. Two kinds of application, two contracts
 
@@ -179,7 +188,7 @@ navigation time.
 
 ## 4. Sharing policy
 
-Both `federation.config.mjs` files use the same `shareAll` policy:
+All five `federation.config.mjs` files use the same `shareAll` policy:
 
 ```js
 shareAll(
@@ -203,7 +212,10 @@ shareAll(
   out of `ignoreUnusedDeps`, so secondary entry points (`@angular/core/rxjs-interop`
   and friends) can never be resolved from a second copy.
 - `denseChunking: true` — groups chunks in `remoteEntry.json` to keep the metadata
-  file small. Each remote currently declares 13 shared packages.
+  file small. The shell and both page remotes currently declare 13 shared
+  packages; the two widget microfrontends declare 11, because neither imports
+  `@angular/router` and the share map is derived from what the exposed entry point
+  actually uses.
 
 `skip` drops the RxJS entry points nothing in this workspace imports at runtime.
 
@@ -266,12 +278,12 @@ own styles by that component's own build, so they survive the crossing. A
 nothing inside the shell.
 
 Each project owns its own `styles/` folder, wired in through that project's
-`stylePreprocessorOptions.includePaths`. The three copies of `_tokens.scss` and
+`stylePreprocessorOptions.includePaths`. The five copies of `_tokens.scss` and
 `_base.scss` are **byte-identical duplicates**, which leaves the workspace with
-**no build-time coupling between the three applications at all** — none of them
+**no build-time coupling between the five applications at all** — none of them
 reads a sibling's file for any purpose, in any phase.
 
-The cost is drift: edit one copy and nothing tells you the other two are stale.
+The cost is drift: edit one copy and nothing tells you the other four are stale.
 `diff` between any two is the check. The reason to accept that cost here is that
 tokens are inlined into every consuming component anyway (see the duplication
 figures above), so a single shared file was never buying deduplicated output —
@@ -280,7 +292,9 @@ styles library package consumed as a versioned dependency, which is what the
 header comment in `_tokens.scss` points at; it needs its own build, registry and
 release cadence, so it is out of scope for a demo workspace.
 
-The "Rendered by the … remote" strip is duplicated in both remotes on purpose. A
+The "Rendered by the … remote" strip is duplicated in all four remotes on
+purpose — the shell has no copy, because it is never the thing being rendered
+_by_ a remote. A
 shared UI library would be exactly the build-time dependency federation exists to
 avoid. Each copy reads its own origin from `import.meta.url`, so it prints `:4201`
 or `:4202` even while rendering inside the shell's document at `:4200`.
@@ -335,18 +349,20 @@ The `adg-coding-challenge` repo runs Native Federation 21 on Angular 21. Moving 
 | ------------------ | --------------------------------- | --------------------------------------------------------------------- |
 | Config file        | `federation.config.js` (CommonJS) | `federation.config.mjs` (ESM, `export default`)                       |
 | Federation program | implicit                          | explicit `tsconfig.federation.json` per project, passed as `tsConfig` |
-| Host entry         | host consumed only                | `hostRemoteEntry: { url: './remoteEntry.json' }` — hosts publish too  |
+| Host entry         | host consumed only                | hosts publish a `remoteEntry.json` too — now automatic, no option     |
 | Runtime handle     | module-scoped `loadRemoteModule`  | handle returned by `initFederation`; the global helper is deprecated  |
 | Shared build       | n/a                               | `build: 'package'`                                                    |
 | Chunk metadata     | n/a                               | `features.denseChunking`                                              |
 | Unused deps        | `features.ignoreUnusedDeps: true` | on by default; `includeSecondaries` is how you opt out                |
 | Orchestrator       | `@softarc/native-federation-node` | `@softarc/native-federation-orchestrator`                             |
-| Shims              | `es-module-shims` ^1.x            | ^2.x, now a direct dependency of the plugin                           |
+| Shims              | `es-module-shims` ^1.x            | opted out — `shimMode: false` + native import maps                    |
 
 ## 10. Trade-offs this baseline accepts
 
 Most of these are inherent to _any_ federation runtime, not to Native Federation.
-They are the material for the comparison with the Rsbuild and Vite builds.
+They were the material for the comparison with the Rspack and Vite builds, both of
+which are now implemented — see [`PLAN-RSBUILD.md`](PLAN-RSBUILD.md) and
+[`PLAN-VITE.md`](PLAN-VITE.md) for how each trade-off actually landed.
 
 | Topic                         | Position taken here                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -362,7 +378,7 @@ They are the material for the comparison with the Rsbuild and Vite builds.
 | **Duplicated style tokens**   | `_tokens.scss` and `_base.scss` exist as five byte-identical copies, not one shared file. Documented above as a deliberate trade rather than an oversight — and past the point where the header comment says a published package becomes correct.                                                                                                                                                                                                                  |
 | **No e2e**                    | Shell↔remote wiring is only verified manually. The honest gap in the test story. Every project does now carry at least one spec, because `@angular/build:unit-test` fails a target outright when a project has none — which silently breaks `npm test` for the whole workspace.                                                                                                                                                                                    |
 | **Descriptor asserted twice** | `./Routes` is typed `Routes`, owned by `@angular/router`, so both sides are structurally guaranteed to agree. The widget descriptor is a bespoke shape declared independently in the shell and in each remote, and nothing checks that they still match. Each remote's `/widgets` gallery is the mitigation: it consumes the descriptor list inside the remote's own build, so a broken descriptor fails in that remote's dev server rather than only in the host. |
-| **Manifest vs flat keys**     | One `./Widgets` key buys runtime discoverability and costs an extra round trip before first paint. Flat per-widget keys invert that. Build 2 should measure both rather than assume.                                                                                                                                                                                                                                                                               |
+| **Manifest vs flat keys**     | One `./Widgets` key buys runtime discoverability and costs an extra round trip before first paint. Flat per-widget keys invert that. Build 2 did **not** measure both — it ported the single-descriptor form unchanged, so this remains open (`PLAN-RSBUILD.md` §3.8).                                                                                                                                                                                             |
 | **Dev-server staleness**      | A running `ng serve` does not pick up a new `exposes` key — it serves a `remoteEntry.json` without it while serving the chunk, so the host reports "unreachable" with nothing in the log. Restart the remote after touching `federation.config.mjs`.                                                                                                                                                                                                               |
 | **Experimental API**          | `debounced()` from `@angular/core` is experimental in v22. Used in both containers because it replaces the RxJS `debounceTime` ceremony; swap for a `FormControl` pipeline if that matters.                                                                                                                                                                                                                                                                        |
 
