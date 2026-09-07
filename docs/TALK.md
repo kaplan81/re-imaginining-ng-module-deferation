@@ -64,6 +64,78 @@ Everything else is context, not content.
 - Land the setup line: _someone has to resolve that specifier — the browser, or
   a piece of JavaScript you shipped._
 
+### The scopes slide — "how do you declare a module?" (45 seconds, hard stop)
+
+Sets up the section's thesis by the same shape, one beat earlier: **the host
+decides.** It is a taxonomy slide, which is exactly the kind of thing that eats
+this section, so it is written to be delivered in three sentences and no more.
+
+**Slide text.** JS has one global scope and, inside it, three local scopes you
+write every day:
+
+| Scope        | Declared by         | Visible in the file? |
+| ------------ | ------------------- | -------------------- |
+| **Function** | `function`          | Yes                  |
+| **Block**    | `{ … }`             | Yes                  |
+| **Module**   | _nothing in a file_ | **No**               |
+
+The reveal is the third row. Function and block scope are declared by syntax you
+can point at. **Module scope is the only scope you cannot declare from inside the
+file.** Nothing in the text makes a file a module — `type="module"`,
+`"type": "module"`, the `.mjs` extension, or simply being the target of someone
+else's `import`. All four live outside the file.
+
+**The proof — two lines, same file, run it twice:**
+
+```js
+var x = 1;
+console.log(globalThis.x); // classic script: 1          | module: undefined
+console.log(this); // classic script: globalThis | module: undefined
+```
+
+**Speaker notes.**
+
+- Say the third row out loud rather than reading the table: _"you declare a
+  function with `function`, a block with braces, and a module with — nothing.
+  There is no keyword. The file does not get a say."_
+- Then the handoff, which is the only reason the slide is in the deck:
+  _"something outside the file decided what scope this code runs in. Hold onto
+  that — in four minutes something outside the file is going to decide what
+  `@angular/core` resolves to, too."_
+- **Do not** enumerate the four ways a file becomes a module. Name one
+  (`type="module"`) and gesture at the rest.
+
+**Pairs with the history slide.** In 2009 the language had no module scope, so
+Node manufactured one out of function scope — it wrapped every file:
+
+```js
+(function (exports, require, module, __filename, __dirname) {
+  /* your file */
+});
+```
+
+CommonJS built module scope out of the only tool it had. ESM made it a scope kind
+in the language. That is also the honest explanation for `__dirname`: it was a
+_wrapper parameter_, which is why it does not exist in ESM and why
+`import.meta.dirname` had to be invented. One sentence, on the CommonJS slide, not
+this one.
+
+**Pedant-proofing** — the audience for this talk contains at least one of each:
+
+- A **class body** is arguably a fourth local scope: it holds the class-name
+  binding and private names (`#x`). Saying "three you write every day" is what
+  makes the claim safe. Do not put the caveat on the slide.
+- In a classic script, top-level `var`/`function` become properties of
+  `globalThis`, but top-level `let`/`const`/`class` do not — so "global scope"
+  already has two compartments. Footnote-only; it weakens the slide if said aloud.
+- Module scope is a _top-level_ scope, so it is a slightly odd sibling of function
+  and block, which nest arbitrarily. "File scope" is the more precise label if the
+  grouping is challenged.
+- `with` creates an object scope. Sloppy mode only. Do not mention it.
+
+**If §1 runs long, this is the first thing to go** — ahead of the three items in
+§1's cut list, because the setup line it feeds does the same work on its own.
+
 ## 3. Section 2 — Build tools vs bundlers (8 min)
 
 The distinction most of the room does not have, and it is load-bearing for
