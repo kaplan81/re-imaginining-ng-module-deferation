@@ -388,9 +388,9 @@ apps before measuring anything.
 
 ### 2 · Make the config-lines metric reproducible
 Write a script that counts build/federation config under an explicit, documented
-rule, and commit it with its output. The slide then cites a rule rather than a
-remembered number. Expect it to show Rspack above Vite — **write the slide around
-what it actually says**, not around 340 < 382.
+rule, and leave it alongside its output ready to commit. The slide then cites a
+rule rather than a remembered number. Expect it to show Rspack above Vite —
+**write the slide around what it actually says**, not around 340 < 382.
 
 ### 3 · Re-measure the four rows that survive
 Five apps, production build, cold cache, one machine, each run twice, keeping
