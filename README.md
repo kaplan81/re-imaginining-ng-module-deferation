@@ -1,6 +1,6 @@
 # Re-imagining Angular Module Federation
 
-Demo workspace for the talk **"Module Federation in Angular: beyond the default toolchain"**.
+Demo workspace for the talk **"Re-imagining Module Federation in Angular"** (NG Poland 2026) — see [docs/NG-POLAND-2026.md](docs/NG-POLAND-2026.md).
 
 Five independently built Angular 22 applications are composed in the browser by
 [Angular Architects Native Federation](https://github.com/angular-architects/module-federation-plugin/blob/main/libs/native-federation/README.md):
