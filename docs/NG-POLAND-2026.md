@@ -41,6 +41,57 @@ to supporting mechanism. The argument now runs:
 to esbuild — builds 2 and 3 in this repo escape it. It is that every escape route
 carries an adapter tax, and `ngp` is what retires it.
 
+### What re-measuring proved (2026-10-20) — full numbers in `tools/measurements.md`
+
+**The deck's most striking number is a measurement artifact.** Slide 6.7 reports
+**268 kB** transferred for build 2 and uses it as the headline "Rspack ships least"
+figure. Measured properly, build 2's home page transfers **1261.9 kB**. The old
+number is build 2's **same-origin** total — it measures 267.4 kB today, a match to
+within 1 kB — so it counted only what the shell's own port served and missed
+~994 kB arriving from the four remote origins.
+
+The mechanism: cross-origin resources report `decodedBodySize: 0` to the
+Performance API unless the server sends `Timing-Allow-Origin`. A measurement taken
+without that header undercounts precisely the pipeline that fetches most from
+remotes, which is the one the slide was praising. **The 268 kB figure cannot be
+reused.**
+
+| Home page, uncompressed | 1 · CLI + NF      | 2 · Rspack         | 3 · Vite          |
+| ----------------------- | ----------------- | ------------------ | ----------------- |
+| Zürich claim            | 915 kB / 36       | 268 kB / 26        | 791 kB / 26       |
+| Measured now            | **779.5 kB** / 37 | **1261.9 kB** / 27 | **826.7 kB** / 28 |
+
+Where build 2's bytes go: every remote ships a **~117 kB `remoteEntry.js`**,
+fetched for all four at boot. That is the data-versus-code distinction made
+concrete — build 1's `remoteEntry.json` is 6 kB of data; build 2's equivalent is
+117 kB of executable container, four times over. `top-lots` adds 511 kB of chunks
+pulled at **19–41 ms, `initiatorType: "script"`**, as the ESM container's static
+import graph resolves — for a widget **not rendered on that page**.
+
+**Angular sharing is correct, and now verified rather than assumed.** Build 2's MF
+share scope holds exactly one `@angular/core`: `from: "shell"`, `useIn: ["shell",
+"top-lots"]`. The 628 kB from the widget origin is _not_ a second Angular. Build 1
+confirms the same property independently — one `_angular_core.*.js` request, 13
+shared entry points hash-identical across all five applications.
+
+**Cold builds: 7.6 / 8.2 / 7.1 s**, each pipeline's own caches cleared, two runs,
+both reproduced. Zürich had 8.4 / 10.3 / 8.1 — **the ordering is unchanged**, Vite
+fastest and Rspack slowest, on faster hardware and newer versions. Note "cold"
+matters here: build 1 keeps ~37 MB of pre-bundled shared packages in
+`node_modules/.cache`, and leaving that warm flatters it against a colleague's
+first build or CI.
+
+**`top-lots` JS on disk has inverted**: 766 → **644 kB** for build 1, now the
+smallest where it used to be the largest (762 / 706 for builds 2 / 3). That change
+is confounded between the Angular 22.2 bump and the `denseExternals` configuration
+change — they landed in one commit — so isolating it needs an A/B before claiming
+credit for either.
+
+⚠️ **Open question, must resolve before three single totals go on a slide.** Build 2
+fetches widget _code_ on the home page; builds 1 and 3 fetch only metadata there.
+Until that asymmetry is explained, present transferred bytes **per origin** rather
+than as one number per pipeline.
+
 ### Scope — the build, and nothing after it
 
 **Deployment is out of scope.** No Zephyr Cloud, no CDN strategy, no hosting, no
