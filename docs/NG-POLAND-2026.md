@@ -87,10 +87,46 @@ is confounded between the Angular 22.2 bump and the `denseExternals` configurati
 change — they landed in one commit — so isolating it needs an A/B before claiming
 credit for either.
 
-⚠️ **Open question, must resolve before three single totals go on a slide.** Build 2
-fetches widget _code_ on the home page; builds 1 and 3 fetch only metadata there.
-Until that asymmetry is explained, present transferred bytes **per origin** rather
-than as one number per pipeline.
+**RESOLVED — and it is the best finding of the re-measurement.** Build 2 fetched
+511 kB from the `top-lots` origin even though the widget was never mounted. The
+cause is the Module Federation **share-scope negotiation**: reading the live share
+scope on build 2's shell, **six of the nine shared packages are provided by
+`top-lots`, not the shell** — `@angular/common`, `@angular/common/http`,
+`@angular/core/primitives/di`, `@angular/core/primitives/signals`, `rxjs` and
+`tslib`. Only `@angular/core`, `@angular/platform-browser` and `@angular/router`
+come from the host.
+
+The shell ships **byte-identical copies in its own `dist`** — `542.js`,
+`common.js`, `65.js`, `597.js` and `178.js` have the same md5 in all three builds —
+and downloads them from a widget's origin regardless. `roast-queue`, structurally
+identical, registered second, lost every tie and serves nothing but its manifest.
+Every remote offers the same versions, so **the winner is whoever registered
+first**.
+
+Three consequences, in increasing order of interest:
+
+1. It explains the 268 kB illusion completely: the shell's own origin looked tiny
+   _because_ two thirds of its shared dependencies were being served from
+   elsewhere. Same-origin measurement plus cross-origin sharing flattered it twice.
+2. Builds 1 and 3 do not do this. Build 1's shell serves all its shared chunks from
+   its own origin and takes only 4.5–5.7 kB per remote, which is metadata. The
+   cross-origin shared-code dependency is specific to classic MF on Rspack here.
+3. **Build 2's host has a hard runtime dependency on a widget microfrontend.** Take
+   `top-lots` offline and the shell loses `@angular/common`, `rxjs` and `tslib`.
+   Slide 5.3 already says fault isolation is something _you_ write; this is a case
+   where federation silently created coupling in the opposite direction — host
+   depending on widget, for packages the host already had on disk.
+
+That third point is a better slide than any byte total: same five applications,
+same shared versions, and one pipeline quietly makes the shell depend on a widget
+for its framework.
+
+One caveat on all three transferred-byte figures: the browser pane used for the
+measurement runs as a background page where `IntersectionObserver` never fires, so
+the home page's `@defer (on viewport)` widget slots never activate. All three were
+measured under that identical condition — the comparison is fair — but they are
+"widgets not yet mounted" numbers, not what a user who scrolls will see. Full
+method and the share-scope dump are in `tools/measurements.md`.
 
 ### Scope — the build, and nothing after it
 

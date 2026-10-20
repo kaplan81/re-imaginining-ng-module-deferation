@@ -84,14 +84,66 @@ from the widget origin is **not** a second Angular. Build 1 independently confir
 the same property: one `_angular_core.*.js` request, and all 13 shared entry points
 hash-identical across the five applications.
 
-## OPEN QUESTION — resolve before these three numbers go on a slide
+## RESOLVED — why build 2 fetches widget code on the home page
 
-Build 2 fetches widget **code** on the home page (10 requests from `top-lots`);
-builds 1 and 3 fetch only metadata there (2 and 1 requests respectively, no chunks).
-Until it is understood why — eager ESM container graph, a widget-slot difference, or
-something in the shell's registration — the three transferred-byte figures are not
-strictly like-for-like, and the comparison should be presented per-origin rather
-than as three single totals.
+Two separate things were going on, and only one of them is a finding.
+
+### The measurement environment (not a finding)
+
+The home page's widget slots sit inside `@defer (on viewport)`. The browser pane
+used for these measurements runs as a background page where `IntersectionObserver`
+never fires — verified by observing a visibly positioned element directly — so the
+defer block never activates. All three pipelines were measured under that same
+condition, so the comparison is internally fair, but these are **"home page with
+widgets not yet mounted"** figures, not what a user who scrolls will see.
+
+### The finding: build 2's host downloads 6 of its 9 shared packages from a remote
+
+Build 2 fetched 511 kB of chunks from `top-lots` (`:4213`) at ~87 ms even though
+the defer never fired. The cause is the Module Federation share-scope negotiation.
+Reading the live share scope on the shell:
+
+| Shared package                     | Provided by  |
+| ---------------------------------- | ------------ |
+| `@angular/core`                    | shell        |
+| `@angular/platform-browser`        | shell        |
+| `@angular/router`                  | shell        |
+| `@angular/common`                  | **top-lots** |
+| `@angular/common/http`             | **top-lots** |
+| `@angular/core/primitives/di`      | **top-lots** |
+| `@angular/core/primitives/signals` | **top-lots** |
+| `rxjs`                             | **top-lots** |
+| `tslib`                            | **top-lots** |
+
+Six of nine resolve to the widget microfrontend. The shell ships **byte-identical
+copies in its own `dist`** — `542.js`, `common.js`, `65.js`, `597.js` and `178.js`
+have the same md5 in all three builds — and downloads them from `:4213` regardless.
+
+`roast-queue` is a structurally identical widget whose config and widget entry
+differ from `top-lots` only in names. It registered after `top-lots`, lost every
+tie, and therefore serves nothing but its manifest. That is the whole asymmetry:
+**every remote offers the same versions, so the winner is whoever registered
+first.**
+
+### Why this matters more than the byte count
+
+1. **The host has a hard runtime dependency on a widget remote.** Take `top-lots`
+   offline and build 2's shell loses `@angular/common`, `rxjs` and `tslib`. The
+   deck's own slide says fault isolation is something "you write" — this is a case
+   where federation silently created coupling in the opposite direction, from host
+   to widget, for packages the host already had.
+2. **It explains the 268 kB illusion completely.** The shell's own origin looked
+   tiny _because_ two thirds of its shared dependencies were being served from
+   somewhere else. Same-origin measurement plus cross-origin sharing flattered it
+   twice over.
+3. **Builds 1 and 3 do not do this.** Build 1's shell serves all its shared chunks
+   from its own origin (757.9 kB over 28 requests) and takes only 4.5–5.7 kB per
+   remote — metadata. Build 3 takes 1 request per remote. The cross-origin
+   shared-code dependency is specific to classic MF on Rspack here.
+
+This is a better slide than any byte total: same five applications, same shared
+versions, and one pipeline quietly makes the host depend on a widget for its
+framework.
 
 ## Configuration surface
 
