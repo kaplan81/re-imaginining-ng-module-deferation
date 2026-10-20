@@ -7,7 +7,7 @@ session should read this first, then `README.md`, then the two plan documents.
 
 - **Title is fixed.** It is what was submitted to the NG Poland organisers.
 - **Format:** recorded video, not a live talk. Aim ~26 min.
-- **Audience goal:** people leave with the *concepts*, not the inventory.
+- **Audience goal:** people leave with the _concepts_, not the inventory.
 - **Supersedes `docs/TALK.md`** (the 45-minute Angular Zürich Meetup version,
   removed in the same commit that added this file — recover it from git history
   if you need the original wording).
@@ -19,7 +19,7 @@ session should read this first, then `README.md`, then the two plan documents.
 > **Your bundler is becoming a choice. Module Federation is where you can already
 > see it. `ngp` is what makes it undeniable.**
 
-The Zürich spine — *"who turns that string into a file?"* — demotes from headline
+The Zürich spine — _"who turns that string into a file?"_ — demotes from headline
 to supporting mechanism. The argument now runs:
 
 1. Angular compilation today happens **inside** the bundler, as that bundler's own
@@ -37,7 +37,7 @@ to supporting mechanism. The argument now runs:
 6. **`ngp` removes the tax.** Once Angular emits `.ng.ts` as an artifact, a bundler
    needs no Angular knowledge at all — no adapter, no ceiling, no abandonment.
 
-**Framing correction, deliberately baked in:** it is not that Angular *bound* you
+**Framing correction, deliberately baked in:** it is not that Angular _bound_ you
 to esbuild — builds 2 and 3 in this repo escape it. It is that every escape route
 carries an adapter tax, and `ngp` is what retires it.
 
@@ -56,14 +56,14 @@ runtime. Where those artifacts get hosted is somebody else's talk.
 
 ## 2. Running order — ~21 slides, ~26 min
 
-| Act | Time | Slides | Beat |
-| --- | --- | --- | --- |
-| **1 · Hook** | 0:00–3:30 | 1–4 | The Angular compiler has a **frontend** and a **backend**. One diagram: `ng-analyze` marked Rust, `ng-preprocessor` marked JavaScript. It emits runtime code that goes **straight to a bundler**, so Angular compilation stops living *inside* the bundler. Therefore your bundler becomes a choice. *"Most people think there's one way to bundle Module Federation in Angular. I built the same product three ways."* |
-| **2 · Why MF is the lens** | 3:30–8:00 | 5–8 | What MF actually is (separate builds + runtime composition; the five nouns). What it is **not** (not micro-frontends, not an architecture). What micro-frontends really require — DI boundary, style isolation, fault isolation: *you* write those. Why MF is the right instrument: it makes you configure the bundler directly. |
-| **3 · The one mechanism** | 8:00–12:00 | 9–12 | `import { Component } from '@angular/core'` — who turns that into a file? The kinds of specifier that exist **today**; bare is the problem. Import map vs a loader you ship. The three times: build / load / runtime. |
-| **4 · Three builds + demo** | 12:00–21:00 | 13–17 | The three answers side by side. What each remote ships: **data** vs **executable container**. Who resolves the module. **Demo.** Then four rows of numbers. |
-| **5 · The cost of choice** | 21:00–25:00 | 18–19 | The adapter is the tax, with the Rsbuild evidence. Real reasons to pick Rspack; why Vite is harder to justify *today* — and what oxc changes about that. |
-| **6 · Close** | 25:00–27:00 | 20–21 | Back to `ngp`: when it ships, the tax retires. Repo link, thanks. |
+| Act                         | Time        | Slides | Beat                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------- | ----------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1 · Hook**                | 0:00–3:30   | 1–4    | The Angular compiler has a **frontend** and a **backend**. One diagram: `ng-analyze` marked Rust, `ng-preprocessor` marked JavaScript. It emits runtime code that goes **straight to a bundler**, so Angular compilation stops living _inside_ the bundler. Therefore your bundler becomes a choice. _"Most people think there's one way to bundle Module Federation in Angular. I built the same product three ways."_ |
+| **2 · Why MF is the lens**  | 3:30–8:00   | 5–8    | What MF actually is (separate builds + runtime composition; the five nouns). What it is **not** (not micro-frontends, not an architecture). What micro-frontends really require — DI boundary, style isolation, fault isolation: _you_ write those. Why MF is the right instrument: it makes you configure the bundler directly.                                                                                        |
+| **3 · The one mechanism**   | 8:00–12:00  | 9–12   | `import { Component } from '@angular/core'` — who turns that into a file? The kinds of specifier that exist **today**; bare is the problem. Import map vs a loader you ship. The three times: build / load / runtime.                                                                                                                                                                                                   |
+| **4 · Three builds + demo** | 12:00–21:00 | 13–17  | The three answers side by side. What each remote ships: **data** vs **executable container**. Who resolves the module. **Demo.** Then four rows of numbers.                                                                                                                                                                                                                                                             |
+| **5 · The cost of choice**  | 21:00–25:00 | 18–19  | The adapter is the tax, with the Rsbuild evidence. Real reasons to pick Rspack; why Vite is harder to justify _today_ — and what oxc changes about that.                                                                                                                                                                                                                                                                |
+| **6 · Close**               | 25:00–27:00 | 20–21  | Back to `ngp`: when it ships, the tax retires. Repo link, thanks.                                                                                                                                                                                                                                                                                                                                                       |
 
 ### What was cut from the Zürich deck, and why
 
@@ -95,16 +95,16 @@ voice.
 ## 3. The compiler — use Rickabaugh's own terms
 
 From **Alex Rickabaugh**'s ViteConf slides and the Angular blog post,
-[*An update on Angular's TypeScript 7-powered Compiler*](https://blog.angular.dev/an-update-on-angulars-typescript-7-powered-compiler-9619a35e2b0a)
+[_An update on Angular's TypeScript 7-powered Compiler_](https://blog.angular.dev/an-update-on-angulars-typescript-7-powered-compiler-9619a35e2b0a)
 (Rickabaugh & Mark Techson, 24 Sep 2026). Use his boxes and his words.
 
 **The existing compiler, as he draws it** — two dashed groups, and the labels are
 the whole point:
 
-| Group | Stages | He labels it |
-| --- | --- | --- |
+| Group        | Stages                | He labels it                  |
+| ------------ | --------------------- | ----------------------------- |
 | **Frontend** | `Analyze` → `Resolve` | **Complex · Slower · Global** |
-| **Backend** | `Generate Code` | **Fast · Local** |
+| **Backend**  | `Generate Code`       | **Fast · Local**              |
 
 That asymmetry is the argument in one picture. The frontend needs a whole-program
 view — it is the expensive, global half. The backend is per-file and already fast.
@@ -128,7 +128,7 @@ tsconfig  →  ng-analyze 🦀  →  Metadata
   **Runtime Code** and **Type-Checking Code** (the `.ng.ts` / `.ngtypecheck.ts`
   pair described in the blog post).
 
-Use *these* names. They match the merged source tree
+Use _these_ names. They match the merged source tree
 (`packages/compiler-cli/preprocessor/ng-analyze`) exactly.
 
 **How the analyzer loads** — his third slide, titled "Deployment", meaning how the
@@ -166,20 +166,22 @@ in Act 5, where it is a measurement rather than a prediction.
 ## 4. What changed since Zürich (verified 2026-10-19)
 
 **Angular 22 is still the current major** (22.2.3, patched 14 Oct 2026), and this
-repo is already on Rspack 2 and Vite 8. The drift is patch-and-minor, not major.
+repo is already on Rspack 2 and Vite 8. The drift was patch-and-minor, not major.
+**This bump has now been applied** — the table below is the gap as it stood, kept
+because the right-hand column is what the slide cites.
 
-| Package | In repo (HEAD) | npm today | Gap |
-| --- | --- | --- | --- |
-| `@angular/core` | 22.1.5 | 22.2.3 | minor |
-| `@angular/build` / `cli` | 22.1.7 | 22.2.x | minor |
-| `@angular-architects/native-federation` | 22.1.2 | 22.2.3 | minor — peers `@angular/build ~22.2.0`, so it moves *with* Angular |
-| `@rspack/core` / `cli` | 2.2.2 | 2.2.9 | patch |
-| `@module-federation/enhanced` · `rspack` | 2.9.0 | 2.9.2 | patch |
-| `@module-federation/vite` | 1.21.3 | 1.23.5 | minor |
-| `vite` | 8.2.2 (Rolldown 1.2.7) | 8.3.4 | minor |
-| `typescript` | 6.0.3 | **7.0.2** | Angular consumes TS 7.1 interop APIs for type-checking only |
-| `@nx/angular-rspack` | 23.2.0, peer `@angular/build >=20 <23` | 23.3.0 | this *is* the "adapter `<23`" ceiling — confirmed accurate |
-| `@nx/angular-rsbuild` | not installed | **still 21.2.0**, peer `@angular/common >=19 <21`, last published **4 Jun 2026** | the substitution rationale, now verifiable |
+| Package                                  | In repo (HEAD)                         | npm today                                                                        | Gap                                                                |
+| ---------------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `@angular/core`                          | 22.1.5                                 | 22.2.3                                                                           | minor                                                              |
+| `@angular/build` / `cli`                 | 22.1.7                                 | 22.2.x                                                                           | minor                                                              |
+| `@angular-architects/native-federation`  | 22.1.2                                 | 22.2.3                                                                           | minor — peers `@angular/build ~22.2.0`, so it moves _with_ Angular |
+| `@rspack/core` / `cli`                   | 2.2.2                                  | 2.2.9                                                                            | patch                                                              |
+| `@module-federation/enhanced` · `rspack` | 2.9.0                                  | 2.9.2                                                                            | patch                                                              |
+| `@module-federation/vite`                | 1.21.3                                 | 1.23.5                                                                           | minor                                                              |
+| `vite`                                   | 8.2.2 (Rolldown 1.2.7)                 | 8.3.4                                                                            | minor                                                              |
+| `typescript`                             | 6.0.3                                  | **7.0.2**                                                                        | Angular consumes TS 7.1 interop APIs for type-checking only        |
+| `@nx/angular-rspack`                     | 23.2.0, peer `@angular/build >=20 <23` | 23.3.0                                                                           | this _is_ the "adapter `<23`" ceiling — confirmed accurate         |
+| `@nx/angular-rsbuild`                    | not installed                          | **still 21.2.0**, peer `@angular/common >=19 <21`, last published **4 Jun 2026** | the substitution rationale, now verifiable                         |
 
 ### The four things that actually change the talk
 
@@ -192,7 +194,7 @@ substantially — `builds/rspack/tools/seam.ts` went 69→136 code lines and
 `module-script-tags.ts` was added.
 
 Current counts: **Rspack 1181 raw / 418 code-only vs Vite 1003 / 345.** Rspack is
-now the *heavier* of the two, where the slide says it is lighter. This is the one
+now the _heavier_ of the two, where the slide says it is lighter. This is the one
 factual error on the deck, it sits on the centrepiece slide, and it reverses a
 comparison the audience is asked to draw a conclusion from. Fixing it needs a
 stated, reproducible counting rule — **a script in the repo, not a number in a
@@ -207,13 +209,13 @@ experiment; it is a demonstrated outcome with a date on it. **Promote it rather
 than apologise for it.**
 
 **3 · Angular is replacing its compiler frontend with Rust/oxc.** See §3. The
-Zürich deck's closing claim — *"The Angular compiler is not a step before the
+Zürich deck's closing claim — _"The Angular compiler is not a step before the
 bundler. It runs inside it, as that bundler's own extension point. No intermediate
-folder of compiled JavaScript ever exists."* — is precisely what `ngp` inverts.
+folder of compiled JavaScript ever exists."_ — is precisely what `ngp` inverts.
 
 It has shipped into `main`:
-[PR #71259](https://github.com/angular/angular/pull/71259), *"integrate hybrid
-preprocessor into compiler-cli"* (atscott, merged by crisbeto 8 Oct 2026, squashed
+[PR #71259](https://github.com/angular/angular/pull/71259), _"integrate hybrid
+preprocessor into compiler-cli"_ (atscott, merged by crisbeto 8 Oct 2026, squashed
 as `dac7269`), adding `packages/compiler-cli/preprocessor`, the Rust `ng-analyze`
 crate with a WASM target, a language-service extension and an experimental
 `ngp-vscode-ng-language-service`.
@@ -232,6 +234,61 @@ prediction with receipts — worth saying out loud.
 **4 · TypeScript 7 shipped; this repo stays on 6.** The native Go port went stable
 July 2026. The "blocked on tsgo" framing is now wrong — Angular isn't waiting for
 TypeScript, it is routing around it.
+
+### What the bump itself proved (2026-10-20) — the headline finding
+
+The repo is now on Angular 22.2.3, Native Federation 22.2.3, Rspack 2.2.9, Vite
+8.3.4, `@module-federation/*` 2.9.2 / 1.23.5. All three builds green, 63 tests
+passing. Getting there produced better evidence than any slide the Zürich deck had.
+
+**`@nx/angular-rspack` stable does not build against Angular 22.2.3.** Not a
+regression in the newest release — **23.2.0 and 23.3.0 fail identically**. Two
+distinct breakages, one per code path:
+
+| Path                     | Error                                                                                                                                                                                                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Parallel (default)       | `DataCloneError: () => compilerOptions could not be cloned` — the adapter passes a function as Angular's compiler-options transformer (`setup-with-angular-compilation.js:84`), and Angular's parallel compilation structured-clones its arguments into a worker thread. |
+| `NG_BUILD_PARALLEL_TS=0` | `AssertionError: Hash utility must be initialized by awaiting initializeHash()`. That function exists in `@angular/build` 22.2.3; the adapter never calls it.                                                                                                            |
+
+Both are **private-API changes Angular shipped in a patch-level release**. The
+adapter's peer range declares `@angular/build >= 20.0.0 < 23.0.0` — it claims to
+support the exact version that breaks it. Meanwhile build 1 (first-party) and
+build 3 (`@analogjs/vite-plugin-angular`) bumped without a murmur.
+
+**The fix exists only in a prerelease.** `@nx/angular-rspack@24.0.0-beta.4` builds
+clean; it is what this repo now pins. So the honest statement of the version
+ceiling is not "adapter `<23`" — it is _to build current Angular with Rspack today
+you must run a prerelease adapter_.
+
+This inverts the Zürich conclusion, where Rspack was the credible alternative and
+Vite was not. Say that out loud: the talk changed its own mind, and the measurement
+is why.
+
+**Native Federation orchestrator 4.8.0 changed shared-externals behaviour.** It now
+warns that flat externals can make a remote load its own Angular, because it no
+longer stitches a package together from several builds. Acting on the advice cost
+three edits per project:
+
+1. `features.denseExternals: true` — groups entry points under their package with
+   one `bundle` key, so version negotiation happens once per package rather than
+   once per entry point. Verified: all 13 entry points stay hash-identical across
+   shell and remotes, `@angular/core` included.
+2. `includeSecondaries: { keepAll: true }` extended from `@angular/core` alone to
+   `@angular/common`, `@angular/platform-browser` and `@angular/router`.
+3. **Nine new `skip` entries** — because `keepAll` publishes _every_ entry point,
+   and `@angular/platform-browser/animations` imports `@angular/animations` while
+   `@angular/common/upgrade` and `@angular/router/upgrade` import
+   `@angular/upgrade`. Neither is installed here, so build 1 failed outright until
+   they were skipped. The tool predicted this in its own error NOTE.
+
+That chain — a warning, whose fix breaks the build, whose fix is nine lines of
+skip list — is a tidy illustration of what configuring federation by hand costs.
+
+**`tsconfig.federation.json`'s `files` array is now ignored.** The build warns:
+_"every build context compiles its own exposes and shared mappings. Remove 'files'
+to silence this."_ This **contradicts `AGENTS.md`**, which documents adding an
+exposed key as two edits — `federation.config.mjs` plus the `files` array. That
+second edit is now dead. Fix `AGENTS.md` before the next person follows it.
 
 ### Still true, carried over unchanged
 
@@ -254,7 +311,7 @@ and has not moved.
 
 This lands the "two independent axes" distinction in about ten seconds, it is the
 cleanest thing the three-build experiment actually proves, and under the new thesis
-it is *the* evidence that your bundler is already a choice. It was buried in §5 of
+it is _the_ evidence that your bundler is already a choice. It was buried in §5 of
 the Zürich document. Promote it.
 
 ### The closing line
@@ -289,7 +346,7 @@ Each failed with an error naming something other than the cause:
 4. A `mf-manifest.json` entry registers **eagerly** → one dead remote takes the
    whole host down, blank page.
 5. `lazyCompilation` (on by default in `rspack serve`) → a remote's second lazy
-   level posts its compile-trigger to the *host's* dev server. **The import never
+   level posts its compile-trigger to the _host's_ dev server. **The import never
    settles**, so the route renders an empty outlet — no error, no fallback,
    because a promise that never settles is not a rejection.
 6. A remote's dev client rides inside the container into the host's page and
@@ -298,8 +355,8 @@ Each failed with an error naming something other than the cause:
    `<script>`, console error on every standalone dev page load.
 
 **Items 5–7 are dev-server-only.** `npm run build:rspack:all` stayed perfectly
-green throughout. That is the slide: *a production build proves nothing about the
-dev server.*
+green throughout. That is the slide: _a production build proves nothing about the
+dev server._
 
 **Build 3 had none of the seven**, but does not prune unused shares — sharing all
 of `dependencies` put **607 kB of `@angular/compiler`** into all five bundles.
@@ -319,8 +376,8 @@ Four figures from the Zürich deck, already drawn:
 <https://claude.ai/code/artifact/20785ea5-cd60-4778-bc48-eb6dddacf4af>
 
 Three survive into the video cut and get **rebuilt as inline SVG sized for 1080p,
-not for a projector**: *the five nouns*, *who resolves the module*, and *what each
-remote ships*. The four-stages table is dropped — the demo does that work now.
+not for a projector**: _the five nouns_, _who resolves the module_, and _what each
+remote ships_. The four-stages table is dropped — the demo does that work now.
 
 ---
 
@@ -345,25 +402,25 @@ npm run start:everything      # all 15 dev servers, ~80 seconds
 
 **Ports** — canonical table in [`README.md`](../README.md#every-port).
 
-| App | 1 | 2 | 3 |
-| --- | --- | --- | --- |
-| `shell` | **4200** | **4210** | **5173** |
-| `catalog` | 4201 | 4211 | 5174 |
-| `orders` | 4202 | 4212 | 5175 |
-| `top-lots` | 4203 | 4213 | 5176 |
-| `roast-queue` | 4204 | 4214 | 5177 |
+| App           | 1        | 2        | 3        |
+| ------------- | -------- | -------- | -------- |
+| `shell`       | **4200** | **4210** | **5173** |
+| `catalog`     | 4201     | 4211     | 5174     |
+| `orders`      | 4202     | 4212     | 5175     |
+| `top-lots`    | 4203     | 4213     | 5176     |
+| `roast-queue` | 4204     | 4214     | 5177     |
 
 **Demo beats, in order:**
 
 1. Load the shell at `:4200`. Show the **import map in `<head>`**, written at boot,
-   *before Angular is imported*. This is the one thing the whole argument rests on.
+   _before Angular is imported_. This is the one thing the whole argument rests on.
 2. Navigate to `/catalog`. Watch `remoteEntry.json` fetch, then `Routes.js`. The
    "Rendered by the catalog remote localhost:42xx" strip proves which server
    actually answered.
 3. Show `@angular/core` resolved from the import map — **loaded once**, not
    re-downloaded per remote.
 4. Switch to `:4210` (Rspack). Same product, different network shape:
-   `remoteEntry.js` is *code*, chunks are numeric.
+   `remoteEntry.js` is _code_, chunks are numeric.
 5. Switch to `:5173` (Vite). Real ES modules, relative paths, only shared packages
    routed through a wrapper.
 6. Kill one remote → the fallback, not a dead router. The rest keeps working.
@@ -375,6 +432,7 @@ npm run start:everything      # all 15 dev servers, ~80 seconds
 ## 7. Working plan
 
 ### 1 · Bump the repo to current
+
 Work on a branch. Patch-and-minor drift, not a migration: Angular 22.1.5 → 22.2.3,
 Native Federation 22.1.2 → 22.2.3 (keep them in lockstep — the adapter peers
 `@angular/build ~22.2.0`), Rspack 2.2.2 → 2.2.9, `@module-federation/vite`
@@ -387,24 +445,28 @@ Confirm all 15 dev servers come up and all three shells still compose the same f
 apps before measuring anything.
 
 ### 2 · Make the config-lines metric reproducible
+
 Write a script that counts build/federation config under an explicit, documented
 rule, and leave it alongside its output ready to commit. The slide then cites a
 rule rather than a remembered number. Expect it to show Rspack above Vite —
 **write the slide around what it actually says**, not around 340 < 382.
 
 ### 3 · Re-measure the four rows that survive
+
 Five apps, production build, cold cache, one machine, each run twice, keeping
 numbers only if they reproduce: **cold build time**, **home page transferred +
 request count**, **config lines**, **version ceiling**. Put the machine and the date
 on the slide. Keep the full ten-row table in `README.md` for people who want it.
 
 ### 4 · Write the script
+
 Rewrite to the six-act structure in §2, drawing prose from §5. Because this is a
 recorded video, the script goes in the deck's **speaker notes**, written to be read
 aloud, with demo cues marked inline. Target ~26 minutes at a measured pace.
 
 ### 5 · Build the deck
-A Slides artifact titled *Re-imagining Module Federation in Angular* with **NG
+
+A Slides artifact titled _Re-imagining Module Federation in Angular_ with **NG
 Poland 2026** on the title slide. Rebuild the Zürich identity: near-black `#111`
 canvas, left-aligned Archivo headlines, Open Sans body, IBM Plex Mono code, blue
 accent links.
