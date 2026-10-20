@@ -185,20 +185,46 @@ because the right-hand column is what the slide cites.
 
 ### The four things that actually change the talk
 
-**1 · The config-lines row is not just stale — it is inverted.**
+**1 · The config-lines row was inverted — and is now reproducible.**
 The Zürich deck claims 156 / 340 / 382 lines for CLI / Rspack / Vite. Those numbers
-are hard-coded in markdown (here, and [`PLAN-VITE.md`](PLAN-VITE.md) line 336), are
-**not reproducible from the tree** under any counting rule tried, and three commits
-after they were written (`7a2752e`, `a85aa68`, `17d3f68`) grew the Rspack surface
-substantially — `builds/rspack/tools/seam.ts` went 69→136 code lines and
-`module-script-tags.ts` was added.
+are hard-coded in markdown, are **not reproducible from the tree** under any
+counting rule we could find, and they compared unlike things: build 1 counted as
+federation config only, builds 2 and 3 counted as their whole config surface.
 
-Current counts: **Rspack 1181 raw / 418 code-only vs Vite 1003 / 345.** Rspack is
-now the _heavier_ of the two, where the slide says it is lighter. This is the one
-factual error on the deck, it sits on the centrepiece slide, and it reverses a
-comparison the audience is asked to draw a conclusion from. Fixing it needs a
-stated, reproducible counting rule — **a script in the repo, not a number in a
-markdown table.**
+`tools/count-config.mjs` now counts under an explicitly documented rule, with its
+output committed at `tools/count-config.txt` and `tools/count-config.json`:
+
+| Metric                     | 1 · CLI + NF | 2 · Rspack | 3 · Vite |
+| -------------------------- | ------------ | ---------- | -------- |
+| All config, raw lines      | 991          | **1175**   | 997      |
+| Federation config only     | **304**      | 427        | 355      |
+| Config files               | 17           | 20         | 20       |
+| **Build-tooling packages** | **2**        | **6**      | **4**    |
+
+The old claim's _direction_ survives on the federation-only row — build 1 is
+lightest — but **builds 2 and 3 have swapped**: 427 against 355, where the slide
+said 340 < 382. Rspack is now the heavier of the two.
+
+Two caveats the script prints and the slide should carry. **Raw** is the fairer
+cross-pipeline measure, because build 1's config is JSON (no blank or comment
+lines, so ~100% "code") against the others' TypeScript (~40%) — comparing
+code-lines flatters the TypeScript pipelines. And build 1's `angular.json` is a
+single workspace file covering all five applications that also carries test
+targets, schematics and budgets the other two have no equivalent of, which is why
+its total looks large beside its federation-only figure.
+
+**Tooling packages — 2 / 6 / 4 — is the most robust of the four**, and the best
+candidate for the slide. It cannot drift when someone refactors a tools file, it
+needs no counting rule to defend, and it answers what an audience actually asks:
+_what do I have to install to get this?_ It also carries the adapter story in the
+same breath, because build 2's sixth package is the prerelease.
+
+**The orchestrator's advice has a price tag.** Applying 4.8.0's two
+recommendations took the five `federation.config.mjs` files from **185 to 304 raw
+lines — +119** — because `includeSecondaries: keepAll` then required nine `skip`
+entries per project. A warning about a correctness risk, whose fix costs 119 lines
+of configuration, is the most compact illustration in the repo of what
+hand-configuring federation costs.
 
 **2 · The Rsbuild caveat hardened into the finding.**
 Zürich apologised for substituting Vite because `@nx/angular-rsbuild` could not
@@ -431,7 +457,7 @@ npm run start:everything      # all 15 dev servers, ~80 seconds
 
 ## 7. Working plan
 
-### 1 · Bump the repo to current
+### 1 · Bump the repo to current — DONE (commit `f53d991`)
 
 Work on a branch. Patch-and-minor drift, not a migration: Angular 22.1.5 → 22.2.3,
 Native Federation 22.1.2 → 22.2.3 (keep them in lockstep — the adapter peers
@@ -444,18 +470,29 @@ Declare `@module-federation/runtime` explicitly rather than relying on hoisting.
 Confirm all 15 dev servers come up and all three shells still compose the same five
 apps before measuring anything.
 
-### 2 · Make the config-lines metric reproducible
+### 2 · Make the config-lines metric reproducible — DONE
 
-Write a script that counts build/federation config under an explicit, documented
-rule, and leave it alongside its output ready to commit. The slide then cites a
-rule rather than a remembered number. Expect it to show Rspack above Vite —
-**write the slide around what it actually says**, not around 340 < 382.
+`tools/count-config.mjs` counts build and federation configuration under a rule
+documented in its own header, and prints the caveats that make the numbers
+readable. Output is committed at `tools/count-config.txt` (human) and
+`tools/count-config.json` (machine). Regenerate with:
+
+```bash
+node tools/count-config.mjs > tools/count-config.txt && node tools/count-config.mjs --json > tools/count-config.json
+```
+
+Result: **991 / 1175 / 997** raw lines overall, **304 / 427 / 355** for federation
+config alone, **17 / 20 / 20** files, **2 / 6 / 4** tooling packages. See §4
+finding 1 for how to read them and which to put on the slide.
 
 ### 3 · Re-measure the four rows that survive
 
 Five apps, production build, cold cache, one machine, each run twice, keeping
 numbers only if they reproduce: **cold build time**, **home page transferred +
-request count**, **config lines**, **version ceiling**. Put the machine and the date
+request count**, **build-tooling packages** (2 / 6 / 4 — already measured, and the
+row least likely to rot), **version ceiling**. Federation config lines
+(304 / 427 / 355) are a fifth row if there is space, but the package count says the
+same thing with less to defend. Put the machine and the date
 on the slide. Keep the full ten-row table in `README.md` for people who want it.
 
 ### 4 · Write the script

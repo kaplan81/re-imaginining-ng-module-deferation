@@ -15,11 +15,34 @@ import { RemoteUnavailableComponent } from '@rr/shell/containers/remote-unavaila
  * It is very nearly a character-for-character copy of build 2's seam, and the
  * one difference is the import specifier: `@module-federation/runtime` here,
  * `@module-federation/enhanced/runtime` there - two entry points onto the same
- * 2.9.0 runtime. That is worth a sentence in the talk. Swapping the *bundler*
+ * 2.9.2 runtime. That is worth a sentence in the talk. Swapping the *bundler*
  * (Rspack to Vite/Rolldown) changed this file not at all; swapping the
  * *federation runtime* (Native Federation to MF) is what rewrote it. The two
  * axes the talk keeps separate really are separate, and this file is the
  * evidence.
+ *
+ * Why not `@module-federation/enhanced/runtime` here as well, which would spare
+ * the root manifest a declaration? Because the runtime guide
+ * (https://module-federation.io/guide/runtime) says to import the Runtime API
+ * from your plugin's own `/runtime` entry, so that the plugin and your code share
+ * one Runtime instance. That is not a tidiness rule: two instances mean two share
+ * scopes, and remotes then silently fail to find shared packages.
+ *
+ * `@module-federation/vite` exposes no `/runtime` entry at all - its export map
+ * is `.`, `./ssrEntryLoader`, `./injectExternalRuntimeCorePlugin` - so the
+ * nearest equivalent is the runtime that plugin itself depends on,
+ * `@module-federation/runtime`, which it pins exactly. Plugin and shell do
+ * resolve to one copy, so the guide's goal is met. `enhanced/runtime` is a
+ * two-hop re-export (-> `runtime-tools/runtime` -> `runtime`) belonging to the
+ * webpack/Rspack package that build 3 never loads; routing through it would add
+ * a second path to a runtime instance and buy nothing. Build 2 uses it because
+ * `@module-federation/enhanced` *is* what build 2 is built on, which is exactly
+ * what the guide prescribes.
+ *
+ * Related: `@module-federation/runtime` is declared in the root
+ * `devDependencies`, not `dependencies`, because `each build’s `tools/shared-deps.ts``
+ * derives the federation share map from `dependencies` - declaring it there
+ * would silently add the MF runtime itself to the shared packages.
  *
  * Line for line this is the baseline with two substitutions:
  *

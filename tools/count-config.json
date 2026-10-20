@@ -1,0 +1,451 @@
+{
+  "1 · Angular CLI + Native Federation": {
+    "total": {
+      "raw": 991,
+      "code": 887,
+      "files": 17
+    },
+    "byCategory": {
+      "bundler": {
+        "raw": 555,
+        "code": 555,
+        "files": 1,
+        "entries": [
+          {
+            "file": "angular.json",
+            "raw": 555,
+            "code": 555
+          }
+        ]
+      },
+      "federation": {
+        "raw": 304,
+        "code": 212,
+        "files": 5,
+        "entries": [
+          {
+            "file": "projects/catalog/federation.config.mjs",
+            "raw": 63,
+            "code": 43
+          },
+          {
+            "file": "projects/orders/federation.config.mjs",
+            "raw": 58,
+            "code": 43
+          },
+          {
+            "file": "projects/roast-queue/federation.config.mjs",
+            "raw": 61,
+            "code": 43
+          },
+          {
+            "file": "projects/shell/federation.config.mjs",
+            "raw": 61,
+            "code": 40
+          },
+          {
+            "file": "projects/top-lots/federation.config.mjs",
+            "raw": 61,
+            "code": 43
+          }
+        ]
+      },
+      "typescript": {
+        "raw": 132,
+        "code": 120,
+        "files": 11,
+        "entries": [
+          {
+            "file": "tsconfig.json",
+            "raw": 57,
+            "code": 55
+          },
+          {
+            "file": "projects/catalog/tsconfig.app.json",
+            "raw": 10,
+            "code": 8
+          },
+          {
+            "file": "projects/orders/tsconfig.app.json",
+            "raw": 10,
+            "code": 8
+          },
+          {
+            "file": "projects/roast-queue/tsconfig.app.json",
+            "raw": 10,
+            "code": 8
+          },
+          {
+            "file": "projects/shell/tsconfig.app.json",
+            "raw": 10,
+            "code": 8
+          },
+          {
+            "file": "projects/top-lots/tsconfig.app.json",
+            "raw": 10,
+            "code": 8
+          },
+          {
+            "file": "projects/catalog/tsconfig.federation.json",
+            "raw": 5,
+            "code": 5
+          },
+          {
+            "file": "projects/orders/tsconfig.federation.json",
+            "raw": 5,
+            "code": 5
+          },
+          {
+            "file": "projects/roast-queue/tsconfig.federation.json",
+            "raw": 5,
+            "code": 5
+          },
+          {
+            "file": "projects/shell/tsconfig.federation.json",
+            "raw": 5,
+            "code": 5
+          },
+          {
+            "file": "projects/top-lots/tsconfig.federation.json",
+            "raw": 5,
+            "code": 5
+          }
+        ]
+      },
+      "manifest": {
+        "raw": 0,
+        "code": 0,
+        "files": 0,
+        "entries": []
+      }
+    },
+    "tooling": [
+      {
+        "package": "@angular-architects/native-federation",
+        "version": "^22.1.2"
+      },
+      {
+        "package": "@softarc/native-federation-orchestrator",
+        "version": "^4.6.0"
+      }
+    ]
+  },
+  "2 · Rspack + classic MF": {
+    "total": {
+      "raw": 1175,
+      "code": 546,
+      "files": 20
+    },
+    "byCategory": {
+      "bundler": {
+        "raw": 601,
+        "code": 217,
+        "files": 5,
+        "entries": [
+          {
+            "file": "builds/rspack/catalog/rspack.config.ts",
+            "raw": 135,
+            "code": 41
+          },
+          {
+            "file": "builds/rspack/orders/rspack.config.ts",
+            "raw": 117,
+            "code": 41
+          },
+          {
+            "file": "builds/rspack/roast-queue/rspack.config.ts",
+            "raw": 120,
+            "code": 41
+          },
+          {
+            "file": "builds/rspack/shell/rspack.config.ts",
+            "raw": 109,
+            "code": 53
+          },
+          {
+            "file": "builds/rspack/top-lots/rspack.config.ts",
+            "raw": 120,
+            "code": 41
+          }
+        ]
+      },
+      "federation": {
+        "raw": 427,
+        "code": 201,
+        "files": 4,
+        "entries": [
+          {
+            "file": "builds/rspack/tools/module-script-tags.ts",
+            "raw": 73,
+            "code": 32
+          },
+          {
+            "file": "builds/rspack/tools/remote-origin.ts",
+            "raw": 38,
+            "code": 6
+          },
+          {
+            "file": "builds/rspack/tools/seam.ts",
+            "raw": 240,
+            "code": 136
+          },
+          {
+            "file": "builds/rspack/tools/shared-deps.ts",
+            "raw": 76,
+            "code": 27
+          }
+        ]
+      },
+      "typescript": {
+        "raw": 97,
+        "code": 78,
+        "files": 6,
+        "entries": [
+          {
+            "file": "builds/rspack/tsconfig.base.json",
+            "raw": 52,
+            "code": 33
+          },
+          {
+            "file": "builds/rspack/catalog/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          },
+          {
+            "file": "builds/rspack/orders/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          },
+          {
+            "file": "builds/rspack/roast-queue/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          },
+          {
+            "file": "builds/rspack/shell/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          },
+          {
+            "file": "builds/rspack/top-lots/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          }
+        ]
+      },
+      "manifest": {
+        "raw": 50,
+        "code": 50,
+        "files": 5,
+        "entries": [
+          {
+            "file": "builds/rspack/catalog/package.json",
+            "raw": 10,
+            "code": 10
+          },
+          {
+            "file": "builds/rspack/orders/package.json",
+            "raw": 10,
+            "code": 10
+          },
+          {
+            "file": "builds/rspack/roast-queue/package.json",
+            "raw": 10,
+            "code": 10
+          },
+          {
+            "file": "builds/rspack/shell/package.json",
+            "raw": 10,
+            "code": 10
+          },
+          {
+            "file": "builds/rspack/top-lots/package.json",
+            "raw": 10,
+            "code": 10
+          }
+        ]
+      }
+    },
+    "tooling": [
+      {
+        "package": "@rspack/cli",
+        "version": "^2.2.2"
+      },
+      {
+        "package": "@rspack/core",
+        "version": "^2.2.2"
+      },
+      {
+        "package": "@rspack/dev-server",
+        "version": "^2.2.1"
+      },
+      {
+        "package": "@module-federation/enhanced",
+        "version": "^2.9.0"
+      },
+      {
+        "package": "@module-federation/rspack",
+        "version": "^2.9.0"
+      },
+      {
+        "package": "@nx/angular-rspack",
+        "version": "24.0.0-beta.4"
+      }
+    ]
+  },
+  "3 · Vite + classic MF": {
+    "total": {
+      "raw": 997,
+      "code": 483,
+      "files": 20
+    },
+    "byCategory": {
+      "bundler": {
+        "raw": 484,
+        "code": 200,
+        "files": 5,
+        "entries": [
+          {
+            "file": "builds/vite/catalog/vite.config.ts",
+            "raw": 96,
+            "code": 39
+          },
+          {
+            "file": "builds/vite/orders/vite.config.ts",
+            "raw": 96,
+            "code": 39
+          },
+          {
+            "file": "builds/vite/roast-queue/vite.config.ts",
+            "raw": 100,
+            "code": 39
+          },
+          {
+            "file": "builds/vite/shell/vite.config.ts",
+            "raw": 92,
+            "code": 44
+          },
+          {
+            "file": "builds/vite/top-lots/vite.config.ts",
+            "raw": 100,
+            "code": 39
+          }
+        ]
+      },
+      "federation": {
+        "raw": 355,
+        "code": 145,
+        "files": 3,
+        "entries": [
+          {
+            "file": "builds/vite/tools/aliases.ts",
+            "raw": 58,
+            "code": 26
+          },
+          {
+            "file": "builds/vite/tools/seam.ts",
+            "raw": 158,
+            "code": 74
+          },
+          {
+            "file": "builds/vite/tools/shared-deps.ts",
+            "raw": 139,
+            "code": 45
+          }
+        ]
+      },
+      "typescript": {
+        "raw": 98,
+        "code": 78,
+        "files": 6,
+        "entries": [
+          {
+            "file": "builds/vite/tsconfig.base.json",
+            "raw": 53,
+            "code": 33
+          },
+          {
+            "file": "builds/vite/catalog/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          },
+          {
+            "file": "builds/vite/orders/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          },
+          {
+            "file": "builds/vite/roast-queue/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          },
+          {
+            "file": "builds/vite/shell/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          },
+          {
+            "file": "builds/vite/top-lots/tsconfig.json",
+            "raw": 9,
+            "code": 9
+          }
+        ]
+      },
+      "manifest": {
+        "raw": 60,
+        "code": 60,
+        "files": 6,
+        "entries": [
+          {
+            "file": "builds/vite/package.json",
+            "raw": 5,
+            "code": 5
+          },
+          {
+            "file": "builds/vite/catalog/package.json",
+            "raw": 11,
+            "code": 11
+          },
+          {
+            "file": "builds/vite/orders/package.json",
+            "raw": 11,
+            "code": 11
+          },
+          {
+            "file": "builds/vite/roast-queue/package.json",
+            "raw": 11,
+            "code": 11
+          },
+          {
+            "file": "builds/vite/shell/package.json",
+            "raw": 11,
+            "code": 11
+          },
+          {
+            "file": "builds/vite/top-lots/package.json",
+            "raw": 11,
+            "code": 11
+          }
+        ]
+      }
+    },
+    "tooling": [
+      {
+        "package": "vite",
+        "version": "^8.2.2"
+      },
+      {
+        "package": "@module-federation/vite",
+        "version": "^1.21.3"
+      },
+      {
+        "package": "@module-federation/runtime",
+        "version": "^2.9.2"
+      },
+      {
+        "package": "@analogjs/vite-plugin-angular",
+        "version": "^2.7.1"
+      }
+    ]
+  }
+}
