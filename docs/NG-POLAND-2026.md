@@ -671,6 +671,167 @@ rows of the table.
 If you show transferred bytes, state the caveat: raw and uncompressed, same static
 server for all three. **Quote the ratio, not the absolute figures.**
 
+### Correction: adding a remote after boot is NOT impossible in Native Federation
+
+The Zürich deck claimed remote overwrite after init with `{force: true}` was
+"impossible in Native Federation". Re-checked against the installed packages on
+2026-10-21, and that is too strong:
+
+- **Module Federation** — `registerRemotes(remotes, options?: { force?: boolean })`
+  is in `@module-federation/runtime`'s types. Replacing a remote's address after
+  init is supported.
+- **Native Federation 22.2.3** — `loadRemoteModule` takes a `remoteEntry` URL, and
+  its own docblock says this "enables lazy-loading remotes **not registered during
+  `initFederation`**", calling `initRemoteEntry(...)` first. So a *new* remote can
+  absolutely be loaded late.
+
+What Native Federation has no API for is **replacing** a remote already
+registered, and its shared resolution is fixed once the import map is published.
+So the honest version is "MF can replace a remote's address after boot; NF can add
+one but not replace one" — not "NF cannot add remotes". Do not repeat the Zürich
+wording.
+
+### Why Native Federation cannot rewrite a path — tested 2026-10-21
+
+The reason is **the web platform, not a missing API.** The library side can
+clearly write maps: the orchestrator has `overrideCachedRemotes: 'always' |
+'never' | 'init-only'` and installs its map with `replaceInDOM("importmap")`.
+So the claim needed testing rather than inferring. Run against build 1 at `:4200`
+in a Chromium browser:
+
+1. **At boot:** one `<script type="importmap">`, 17 entries.
+2. **After a client-side navigation to `/catalog`** (which loads a remote): still
+   one map, *the same DOM element* (marked and re-checked), identical content,
+   same 17 keys. The map is written once and never touched again.
+3. **Appending a second map with a new key:** accepted, no errors, and
+   `import('zzz-brand-new')` resolved. Adding mappings after boot works.
+4. **Appending two maps that define the same key**, then importing it: the module
+   that arrived was the one from the **first** map. No error, no warning. The
+   second mapping was silently ignored.
+
+So: new names can be added after boot; an existing name can never be repointed.
+Once published, a mapping is final for that page's lifetime. That is why the
+comparison row reads **"not possible — the first mapping wins"** rather than
+"no API for it", which was wrong.
+
+### Two axes, and the Zürich deck conflated them
+
+The comparison has **two independent variables**: the federation library (Module
+Federation vs Native Federation) and the bundler (esbuild / Rspack / Rolldown).
+Several things the Zürich deck filed under "why Rspack could be an option" are
+bundler properties, not Module Federation properties, and belong in section 3.
+
+**Chunk URL rewriting is the clearest case.** It depends on the bundler:
+
+- Rspack keeps a runtime that computes chunk URLs from a public-path variable —
+  `output: { publicPath: 'auto' }` is set in every `builds/rspack/*/rspack.config.ts`.
+  A variable in shipped code can be changed, so every chunk URL can be rewritten.
+- Rolldown emits real ESM import statements with relative paths — build 3's catalog
+  output has 65 of them and zero `__webpack_require__`. The URL is *in the import
+  statement*; there is no variable to reassign.
+
+So "no chunk URL rewriting" is a fact about Vite/Rolldown, not about Module
+Federation. Say it that way.
+
+**Unverified today:** build 2's `dist` is empty, so its output form could not be
+checked. Its config sets `library: { type: 'module' }` on remotes and
+`remoteType: 'module'` on the host, which means the *container boundary* is ESM
+even though Rspack's own module graph uses `__webpack_require__` with numeric ids
+internally. Rebuild it before claiming either on a slide.
+
+### Two API corrections — verified 2026-10-21
+
+**Shared packages are off the comparison slide — leave them off.** A row claiming
+"Module Federation uses `loadShare` calls, Native Federation uses ESM imports" is
+false as a general statement: build 3's catalog output has 65 ESM import
+statements sitting next to `loadShare`. The import *style* in the output is a
+bundler property, not a federation one. Rescoping the row to shared packages only
+made it narrowly true while quietly changing what it claimed, which is worse than
+cutting it. It is cut. The table carries three rows, all unambiguously
+federation-level.
+
+For the record, since it will come up: `@module-federation/runtime` exports
+`loadRemote`, `loadShare` and `loadShareSync` separately — `loadShare` is for
+shared packages, `loadRemote` for remote modules — and loading a remote module is
+a function call on both sides (`loadRemote` vs `loadRemoteModule`).
+
+**Native Federation can load an unregistered remote.** This was a limitation once
+and no longer is. It is documented at
+<https://native-federation.com/docs/v4/angular-adapter/runtime/#adding-remotes-later-with-initremoteentry>,
+the orchestrator type is literally `DynamicInitResult` with
+`initRemoteEntry(remoteEntryUrl, remote?)`, and the Angular adapter's
+`loadRemoteModule` docblock says its `remoteEntry` option "enables lazy-loading
+remotes not registered during `initFederation`". Do not repeat the older
+limitation from memory.
+
+**And therefore it is off the slide.** It was briefly a row on the comparison
+table and was removed: both implementations can do it, so it is not a difference,
+and a comparison table carries only differences. Putting a matching row in invites
+the audience to look for a distinction that is not there.
+
+**Still unverified:** whether a dynamically added remote can bring *new* shared
+packages, given the import map is already published. Browsers have supported
+multiple import maps since Chrome 133 (which `projects/shell/src/main.ts` already
+notes for `shimMode: false`), so it may append a second map — but that has not
+been checked, and the caveat should not be stated either way until it is.
+
+### Section 3 material: the note versus the librarian
+
+The single architectural difference between the two implementations, and the pros
+and cons both sides inherit from it. Everything below is verified against the
+installed packages and this repo's own `dist` on 2026-10-21.
+
+**The mechanism.** In Native Federation the import statement *survives into
+production* and the browser resolves it from the published map. Build 1's exposed
+`Routes.js` really ships:
+
+```js
+import { provideHttpClient, withInterceptors } from "@angular/common/http"
+import { of } from "rxjs"
+```
+
+Build 3 has no such lines. The bundler replaced them with `loadShare(...)` — calls
+into the federation runtime. So: **the browser does the lookup, or shipped code
+does.**
+
+| | Native Federation | Module Federation |
+| --- | --- | --- |
+| Who resolves | the browser, from the import map | shipped code, from the share scope |
+| In the output | ordinary `import` statements | `loadShare(...)` calls |
+| Paths written | once, at boot | never written; consulted each time |
+| Rewrite a path later | **no API for it** | `registerRemotes(…, { force: true })` |
+| Add an unregistered remote later | yes — `loadRemoteModule({ remoteEntry })` | yes — `registerRemotes` |
+| Per-import cost | none after boot; the browser handles it | a function call every time |
+
+**The trade, in one line:** Native Federation buys a standard, zero-overhead lookup
+at the price of an arrangement that is fixed once the map is published. Module
+Federation keeps the arrangement open at the price of a runtime in the path of
+every shared import.
+
+**Still to verify** before claiming it: whether an unreachable remote at boot fails
+`initFederation` outright in Native Federation. If it does, that is a real
+availability consequence of negotiating everything up front, and belongs in the
+same comparison.
+
+### Only the host has a manifest — verified 2026-10-21
+
+`federation.manifest.json` exists in **the shell of all three pipelines** and in no
+remote. Its shape is a name-to-URL map:
+
+```json
+{ "catalog": "http://localhost:4201/remoteEntry.json", … }
+```
+
+The three copies differ only in their ports, so the earlier note in
+`tools/count-config.mjs` calling them "byte-comparable" is loose — the *shape* is
+identical, the bytes are not. Build 1 reads it in `main.ts` via
+`initFederation('federation.manifest.json')`.
+
+It is a model-level asymmetry worth showing: the host declares which remotes exist
+and where; a remote declares only what it offers. On the `mf-is` diagram it is a
+chip to the left of the host box, so the three application boxes stay identical —
+what differs is the role, and the manifest is part of the host role.
+
 ### Who emits a remote entry — verified 2026-10-21
 
 Checked across all three builds, and it is not uniform:
@@ -886,18 +1047,27 @@ aloud, with demo cues marked inline. Target ~26 minutes at a measured pace.
 
 ### 5 · Build the deck — Acts 1 and 2 done (8 slides), 16 to go
 
-**State on 2026-10-21, and where to resume.** Eight slides exist and are
-published: `cover`, `decorator`, `ivy-output`, `ngtsc-wraps`, `phases`, `ts7`,
-`compiler` (Act 1, the compiler) and `three-ways` (Act 2, the bridge). Narration
-runs 16:52 at 140 wpm — ignore that number for pacing; Andres speaks to the slide
-rather than reading the notes, and times himself against a mirror once the whole
-deck exists. Artifact: <https://claude.ai/artifact/XcyRCLzcqeFX78fwy4MypG>.
+**State on 2026-10-22, and where to resume.** Eighteen slides exist and are
+published. Sections 0 (Angular compilers, slides 1–8), 1 (Modules, 9–15) and 2
+(Module Federation, 16–18) are **done**. Narration runs about 36 minutes at 140
+wpm — ignore that for pacing; Andres speaks to the slide and times himself against
+a mirror once the whole deck exists. Artifact:
+<https://claude.ai/artifact/XcyRCLzcqeFX78fwy4MypG>.
 
-**Resume at Act 3 — modules, three slides.** What a specifier is; the kinds that
-exist today, with bare being the problem; the three times, build / load / runtime.
-The third of those is where Module Federation arrives in Act 4, so Act 3 must not
-name it. Slide 8 ends, spoken, on the question those three slides answer: who
-turns `import { Component } from '@angular/core'` into a file?
+Slide order: `cover`, `decorator`, `ivy-output`, `ngtsc-wraps`, `phases`, `ts7`,
+`compiler`, `three-ways`, `specifier`, `kinds`, `static-dynamic`, `resolution`,
+`build-time`, `load-time`, `run-time`, `mf-basis`, `mf-is`, `implementations`.
+
+**Resume at section 3 — Bundlers.** The same product on three pipelines: what each
+publishes, who resolves the module, the demo, the numbers, the adapter tax with the
+Rsbuild evidence, the share-scope finding, and why Rspack over Vite today. Read
+"Two axes, and the Zürich deck conflated them" first — several Zürich claims filed
+under Module Federation are really bundler properties, and untangling them is what
+this section is for.
+
+All fifteen dev servers were running on 2026-10-21 and the import-map experiment
+was done against them; build 2's `dist` is empty and needs a rebuild before its
+output form goes on a slide.
 
 `docs/deck/drafts/choice.html` is **superseded** — slide 7 (`compiler`) does its
 job. Delete it or leave it; do not build on it.

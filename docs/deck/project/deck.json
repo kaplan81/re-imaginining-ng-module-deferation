@@ -23,7 +23,8 @@
     "load-time",
     "run-time",
     "mf-basis",
-    "mf-is"
+    "mf-is",
+    "implementations"
   ],
   "sections": {
     "hook": {
