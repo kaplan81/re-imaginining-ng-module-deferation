@@ -1,0 +1,29 @@
+<section id="load-time" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:120px 128px 150px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">1 - Modules</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:68px;font-weight:700;line-height:1.08;width:1400px">Load time — the browser resolves it</h2>
+<div style="width:1400px;background:#0C0E12;border:1px solid #2A3039;border-radius:14px;padding:32px 40px;display:flex;flex-direction:column;gap:2px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:27px;line-height:1.5;color:#9BC0FA">&lt;script type="importmap"&gt;</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:27px;line-height:1.5;color:#EEF2F7">{ "imports": {</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:27px;line-height:1.5;color:#9AA6B2">&#160;&#160;<span style="color:#F0A878">"@angular/core"</span>: "/assets/core-DG2k.js",</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:27px;line-height:1.5;color:#9AA6B2">&#160;&#160;<span style="color:#F0A878">"rxjs"</span>: "/assets/rxjs-9Fz1.js"</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:27px;line-height:1.5;color:#EEF2F7">} }</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:27px;line-height:1.5;color:#9BC0FA">&lt;/script&gt;</p>
+</div>
+<p style="font-size:31px;line-height:1.45;width:1300px;color:#9AA6B2">No library. This is the browser’s own loader — and the map has to be in the page <b style="color:#EEF2F7">before the first import runs</b>.</p>
+<p style="font-size:26px;line-height:1.4;width:1300px;color:#5A6472">A web standard, available in every major browser since 2023.</p>
+<aside>Second moment. This one is a browser feature, and a surprising number of people have never seen it.
+
+It is a script tag, with a type of importmap, and inside it a piece of JSON. The JSON says: when any module asks for at-angular-slash-core, fetch this file instead. When anything asks for rxjs, fetch that one.
+
+That is the whole mechanism. There is no library here. Nothing was installed. This is the browser's own module loader doing the lookup, using a table it was handed.
+
+Two things are worth knowing about it.
+
+The first is timing, and it is strict. The map has to be in the document before the first module import runs. Not shortly after. Before. Which is why applications that rely on it split their startup into two files — one tiny script that installs the map, and then a second one that actually starts the application.
+
+The second is that it is not new and it is not experimental. Import maps are a web standard and they have worked in every major browser since 2023. No polyfill, no bundler plugin, no runtime.
+
+So here a bare specifier does reach the browser, and the browser can resolve it — because somebody handed it the answers in advance.
+
+[Read the JSON out — it is three lines and it explains itself. Then the timing rule, which is the part people get wrong.]</aside>
+</section>

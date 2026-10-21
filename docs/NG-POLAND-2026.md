@@ -160,7 +160,7 @@ table the audience has already seen, instead of needing its own introduction.
 | -------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **1 · The compiler**       | 1–7    | The decorator is not a TypeScript decorator; it is read by a compiler and deleted. What ngtsc does to it, in six phases. TypeScript 7 removes the API that made it possible. `ngp` replaces it by printing a file. **DONE.** |
 | **2 · Already a choice**   | 8      | *Angular does not require esbuild.* Three bundlers and the plugin that builds Angular on each — `@angular/build`, `@nx/angular-rspack`, `@analogjs/vite-plugin-angular`. Pays off slide 7's "every bundler needs its own adapter": the adapters exist, and two of three are written by somebody outside the Angular team. Plants the Act 6 tax without naming it. No ports, no app counts, no federation — this slide explains a concept, it does not trail the demo. **DONE.** |
-| **3 · Modules**            | 9–11   | What a specifier is. The kinds that exist today — bare is the problem. The three times: build / load / runtime.                                                               |
+| **3 · Modules**            | 9–15   | What a specifier is. The four types. Static vs dynamic imports. Module resolution, then one slide per moment with a real example: **build time** (`'@angular/core'` → `_angular_core.AnS7MGp98i.js`, from this repo's own build — the bundler had `node_modules`, the browser never will), **load time** (a real `<script type="importmap">`, a web standard since 2023, and the rule that it must be in the page before the first import), **runtime** (a URL that did not exist at build time, handed to a dynamic import). **DONE.** |
 | **4 · Module Federation**  | 12–14  | What MF is (separate builds + runtime composition; the five nouns). What it is **not** — not micro-frontends, not an architecture. What micro-frontends actually require: DI boundary, style isolation, fault isolation, all of which you write yourself. |
 | **5 · Three builds + demo**| 15–19  | The three answers side by side. What each remote ships: **data** vs **executable container**. Who resolves the module. **Demo.** Four rows of numbers.                        |
 | **6 · The cost of choice** | 20–22  | The adapter is the tax, with the Rsbuild evidence. The share-scope finding: build 2's shell takes 6 of its 9 shared packages from a widget it already has on disk. Real reasons to pick Rspack; why Vite is harder to justify today. |
@@ -171,6 +171,52 @@ to the slide rather than reading the notes, and times himself against a mirror
 once the whole thing exists. Build all of it, then cut. If it overruns, the demo
 is the first thing to drop — the repo link carries it — because the goal is clear
 concepts, not coverage.
+
+### Type-checking is backend work
+
+Corrected 2026-10-21, after re-reading the ViteConf diagram. Rickabaugh's two
+dashed groups are **Analyze → Resolve** (Complex / Slower / Global) and
+**Generate Code** (Fast / Local). Type-checking has no box of its own there, and
+the 2026 blog settles where it belongs: the backend "invok[es] Angular's existing
+template compiler to generate output TypeScript code, **either for runtime or for
+type-checking**".
+
+So the split on the phases table is 1–3 frontend, 4–6 backend — not 1–4 / 5–6.
+
+**And the backend's two outputs are not sequential.** `NgCompiler` exposes
+`getDiagnostics()` and `prepareEmit()` as separate entry points, each calling
+`ensureAnalyzed()` first; `@angular/build` likewise has separate `diagnoseFiles`
+and `emitAffectedFiles`. Type-check blocks and the runtime definitions are two
+independent consumers of one analysis, which is exactly the shape ngp makes
+explicit with its two output files per source file. The table keeps its six
+numbered rows, with a line beneath saying so.
+
+### Eyebrows are section labels
+
+The eyebrow line on every slide names the section, nothing else — `0 - Angular
+compilers`, `1 - Modules`, and so on, numbered from zero. It replaces the vertical
+stacks the slides.com deck used to show position, so the viewer always knows where
+they are. The cover has no section label.
+
+Anything an eyebrow used to carry as content moves into the slide body: the ngp
+merge date, the "every decorated class" scope on the phases table, TypeScript 7's
+release date, and the note that the compiled output shown is real, from this repo's
+own production build. Never let a fact die in a retitled eyebrow.
+
+### Do not repeat a phrase across slides
+
+"A name, not a location" appeared on two consecutive slides and had to go. When
+talking about what a specifier is or is not, say **module** or **file** — a
+specifier names a module; it does not say where that module's file is.
+
+### Neither federation is named before Act 4
+
+The three resolution moments are deliberately presented as mechanisms with no
+product names on them. Naming Native Federation at load time and Module Federation
+at runtime would spend the reveal early and leave two unexplained terms sitting on
+slides the audience is still absorbing — and Act 4 would have to introduce both
+properly anyway. Act 4 opens by mapping the three mechanisms onto the three builds,
+which only works if the mechanisms are already understood.
 
 ### No forward references
 

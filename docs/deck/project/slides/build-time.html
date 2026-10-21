@@ -1,0 +1,26 @@
+<section id="build-time" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:128px 128px 150px;display:flex;flex-direction:column;gap:36px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">1 - Modules</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:68px;font-weight:700;line-height:1.08;width:1400px">Build time — the bundler resolves it</h2>
+<div style="width:1400px;background:#0C0E12;border:1px solid #2A3039;border-radius:14px;padding:36px 40px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:baseline;gap:28px">
+<p style="font-size:24px;color:#6B7684;width:180px">you wrote</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:33px;color:#F0A878">'@angular/core'</p>
+</div>
+<div style="display:flex;align-items:baseline;gap:28px">
+<p style="font-size:24px;color:#6B7684;width:180px">it shipped</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:33px;color:#9BC0FA">_angular_core.AnS7MGp98i.js</p>
+</div>
+</div>
+<p style="font-size:33px;line-height:1.45;width:1300px;color:#9AA6B2">The bundler had <span style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:30px;color:#EEF2F7">node_modules</span> on a disk. <b style="color:#EEF2F7">The browser never will.</b></p>
+<aside>Three moments, one at a time. This is the first, and it is the one almost everybody is already using without thinking about it.
+
+At build time, the bundler does the resolving. It reads a specifier, goes looking on the file system, finds the package inside node_modules, and writes the answer into the output.
+
+Here is what that looks like. On the top line, what was written in the source: at-angular-slash-core. On the bottom, the file that came out of the build. The bundler has taken the package, bundled it into a chunk, given it a name of its own and a content hash so it can be cached forever.
+
+And notice what is no longer there. The name is gone. Nothing in that output needs looking up any more, because the lookup already happened — on a machine, months or minutes ago, with a disk full of packages on it.
+
+Which is the thing to hold on to, and the reason the other two moments exist at all. The bundler could do this because node_modules was sitting right there. A browser has no node_modules. It has never had one, and it never will. So the moment you want a name resolved anywhere other than at build time, somebody has to answer the question a different way.
+
+[Two lines. Point at the top one, then the bottom one. The last sentence is the one that matters.]</aside>
+</section>

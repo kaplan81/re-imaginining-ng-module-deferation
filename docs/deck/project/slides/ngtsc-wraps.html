@@ -1,6 +1,6 @@
 <section id="ngtsc-wraps" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">The Angular compiler · ngtsc</p>
-<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:76px;font-weight:700;line-height:1.08;width:1460px">ngtsc is a superset of tsc</h2>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">0 - Angular compilers</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:76px;font-weight:700;line-height:1.08;width:1460px">ngc is a superset of tsc</h2>
 <div style="display:flex;flex-direction:column;gap:16px;width:1340px">
 <div style="display:flex;align-items:center;gap:24px;background:#191D24;border:1px solid #2A3039;border-radius:12px;padding:26px 32px">
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:29px;color:#F0A878;width:360px">NgtscProgram</p>
@@ -19,7 +19,9 @@
 </div>
 </div>
 <p style="font-size:33px;line-height:1.45;width:1340px;color:#9AA6B2">The Angular compiler <b style="color:#EEF2F7">wraps the TypeScript compiler</b> — so everything Angular does to your code has to fit through TypeScript’s own compiler API.</p>
-<aside>So what is the thing that deleted your decorator? It is called ngtsc, and the name is the clue: ng, plus tsc. In the blog posts Alex Rickabaugh calls it ngc — the Angular Compiler — and describes it as an extended TypeScript compiler which also knows how to execute Angular decorators, applying their effects at build time instead of run time.
+<aside>So what is the thing that deleted your decorator? It is called ngc — the Angular Compiler — and it ships as a real command in at-angular-slash-compiler-cli. Alex Rickabaugh describes it as an extended TypeScript compiler which also knows how to execute Angular decorators, applying their effects at build time instead of run time.
+
+You will see a second name on this slide, and it is worth one sentence so it does not distract you. Ngtsc is what the implementation is called inside Angular's source — ng, plus tsc — which is why these three classes are named the way they are. Same compiler. Ngc is what it is called from outside.
 
 The architectural fact underneath that is this: it does not replace the TypeScript compiler, and it is not a fork of it. It wraps it. NgtscProgram wraps TypeScript's Program. NgCompilerHost wraps TypeScript's CompilerHost — that is how it sneaks in extra files, like the template type-checking shims. And NgCompiler sits on top and drives all the Angular-specific work.
 

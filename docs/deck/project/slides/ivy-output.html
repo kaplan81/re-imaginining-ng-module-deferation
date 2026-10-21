@@ -1,5 +1,5 @@
 <section id="ivy-output" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:112px 128px 150px;display:flex;flex-direction:column;gap:26px">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:23px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">The same component, from this repo’s own production bundle</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">0 - Angular compilers</p>
 <h2 style="font-family:'Archivo', Arial, sans-serif;font-size:76px;font-weight:700;line-height:1.08;width:1400px">It is an Angular definition</h2>
 <div style="width:1340px;background:#0C0E12;border:1px solid #2A3039;border-radius:14px;padding:28px 36px;display:flex;flex-direction:column;gap:1px">
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#EEF2F7">class BeanGridComponent {</p>
@@ -8,19 +8,20 @@
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#5A6472">&#160;</p>
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#EEF2F7">&#160;&#160;static ɵfac = (t) =&gt; new (t || BeanGridComponent)(); <span style="color:#5A6472">// added</span></p>
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#EEF2F7">&#160;&#160;static ɵcmp = <span style="color:#9BC0FA">ɵɵdefineComponent</span>({ <span style="color:#5A6472">// added</span></p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#9AA6B2">&#160;&#160;&#160;&#160;type: BeanGridComponent,</p>
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#9AA6B2">&#160;&#160;&#160;&#160;selectors: [[<span style="color:#F0A878">"cat-bean-grid"</span>]], inputs: { items: [1, <span style="color:#F0A878">"items"</span>] },</p>
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#EEF2F7">&#160;&#160;&#160;&#160;template: <span style="color:#9BC0FA">function</span> (rf, ctx) {</p>
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#E0824B">&#160;&#160;&#160;&#160;&#160;&#160;1 &amp; rf &amp;&amp; ( ɵɵdomElementStart(0, "ul", 0), ɵɵrepeaterCreate(1, …), ɵɵdomElementEnd() );</p>
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#6E9BF7">&#160;&#160;&#160;&#160;&#160;&#160;2 &amp; rf &amp;&amp; ( ɵɵadvance(), ɵɵrepeater(ctx.items()) );</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#E0824B">&#160;&#160;&#160;&#160;&#160;&#160;rf &amp; 1 &amp;&amp; ( ɵɵdomElementStart(0, "ul", 0), ɵɵrepeaterCreate(1, …), ɵɵdomElementEnd() );</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#6E9BF7">&#160;&#160;&#160;&#160;&#160;&#160;rf &amp; 2 &amp;&amp; ( ɵɵadvance(), ɵɵrepeater(ctx.items()) );</p>
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#EEF2F7">&#160;&#160;&#160;&#160;}</p>
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#EEF2F7">&#160;&#160;});</p>
 <p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.45;color:#EEF2F7">}</p>
 </div>
 <div style="display:flex;gap:40px;width:1300px">
-<p style="flex:1;font-size:25px;line-height:1.4;color:#E0824B"><b>1 &amp; rf — create.</b> <span style="color:#9AA6B2">Runs once. Builds the DOM.</span></p>
-<p style="flex:1;font-size:25px;line-height:1.4;color:#6E9BF7"><b>2 &amp; rf — update.</b> <span style="color:#9AA6B2">Runs on every change detection.</span></p>
+<p style="flex:1;font-size:25px;line-height:1.4;color:#E0824B"><b>rf &amp; 1 — create.</b> <span style="color:#9AA6B2">Runs once. Builds the DOM.</span></p>
+<p style="flex:1;font-size:25px;line-height:1.4;color:#6E9BF7"><b>rf &amp; 2 — update.</b> <span style="color:#9AA6B2">Runs on every change detection.</span></p>
 </div>
-<aside>Here is the same component, pulled out of the production bundle of the repository we are going to run later. Nothing is simplified except the parts replaced with an ellipsis.
+<aside>Here is the same component after compilation. Nothing is simplified except the parts replaced with an ellipsis.
 
 Start at the top, because the top is the surprising part. Your class is still your class. The field is still a field. stockState is still an ordinary method, with the same ternary you wrote. If you pasted that class into the TypeScript playground with the decorator removed, you would get almost exactly these lines. The compiler did not touch your code.
 
@@ -28,7 +29,7 @@ What it did was add two static properties, and delete the decorator.
 
 The first one, ɵfac, is the factory — how to construct this class, and what to inject when you do.
 
-The second is ɵcmp, and this is where everything from the decorator went. The selector is here. The inputs are here. And the template — the HTML file, the one sitting next to the component — has become a function.
+The second is ɵcmp, and this is where everything from the decorator went. The first property in it is type, and it points straight back at the class above it — this definition belongs to that class, and the runtime follows that reference in both directions. Then the selector is here. The inputs are here. And the template — the HTML file, the one sitting next to the component — has become a function.
 
 Two arguments. rf and ctx. rf is a bitmask, and the function has two halves. One runs when the view is created and builds the DOM. The other runs on every change detection pass and updates it. The whole of Angular's rendering model is in those two lines: build once, update many times.
 

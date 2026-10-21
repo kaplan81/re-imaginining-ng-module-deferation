@@ -1,0 +1,30 @@
+<section id="static-dynamic" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:120px 128px 150px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">1 - Modules</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.08;width:1500px">Static imports and dynamic imports</h2>
+<div style="display:flex;gap:36px;width:1600px">
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;background:#191D24;border:1px solid #2A3039;border-radius:14px;padding:30px 32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:19px;letter-spacing:3px;text-transform:uppercase;color:#6B7684">Static</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.4;color:#9BC0FA">import { Component } from '@angular/core';</p>
+<p style="font-size:25px;line-height:1.5;color:#9AA6B2">Only at the top of a file.<br>The specifier <b style="color:#EEF2F7">must be a literal string</b>, so the whole graph is known before anything runs.<br>This is what tree-shaking is built on.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;background:#191D24;border:1px solid #2A3039;border-radius:14px;padding:30px 32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:19px;letter-spacing:3px;text-transform:uppercase;color:#6B7684">Dynamic</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.4;color:#9BC0FA">const routes = await import('./catalog.routes');</p>
+<p style="font-size:25px;line-height:1.5;color:#9AA6B2">Anywhere code can go. Returns a promise.<br>Resolved when the line runs.<br>The specifier <b style="color:#EEF2F7">can be a variable</b>.</p>
+</div>
+</div>
+<p style="font-size:33px;line-height:1.45;width:1300px;color:#9AA6B2">A static specifier is known <b style="color:#EEF2F7">before the program starts</b>. A dynamic one does not have to be.</p>
+<aside>A specifier does not only turn up in one place.
+
+On the left is the one everybody knows. A static import, at the top of the file. The specifier is written there as a literal string, and it cannot be anything else. You cannot build it, you cannot pass a variable, you cannot read it from a configuration file.
+
+That restriction sounds like a limitation. It is actually what makes the whole build pipeline possible. Because every static specifier is a literal, a tool can read your entire program without running a single line of it, follow every import, and know the complete list of files in advance. That is what lets a bundler build a graph. It is also what lets it shake the tree, because it can see what is never reached.
+
+On the right is the other one. A dynamic import. It is not a statement, it is an expression — it goes anywhere a function call can go, and it hands back a promise.
+
+And its specifier is not required to be a literal. It can be a variable. It can be assembled from a string. It can be a value that did not exist anywhere when the application was compiled.
+
+So the difference that matters is this one. A static specifier is known before the program starts. A dynamic specifier does not have to be — it can be decided while the application is already running.
+
+[Two columns. Read the two lines of code, then stop on the last line.]</aside>
+</section>

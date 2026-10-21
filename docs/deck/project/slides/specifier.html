@@ -1,0 +1,24 @@
+<section id="specifier" data-transition="push" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:128px 128px 150px;display:flex;flex-direction:column;gap:40px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">1 - Modules</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:76px;font-weight:700;line-height:1.08;width:1400px">Let us start from the beginning</h2>
+<div style="width:1400px;background:#0C0E12;border:1px solid #2A3039;border-radius:14px;padding:44px 40px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:50px;line-height:1.3;color:#9AA6B2">import { Component } from <span style="color:#F0A878">'@angular/core'</span></p>
+</div>
+<p style="font-size:36px;line-height:1.4;width:1300px;color:#EEF2F7">That quoted string is a <b>specifier</b>. It names a module — in practice, a file — but says nothing about where that file is.</p>
+<p style="font-size:31px;line-height:1.4;width:1300px;color:#9AA6B2">Something has to turn it into a file a browser can fetch.</p>
+<aside>So: who turns that string into a file?
+
+Here is a line that has to appear in every component file ever written, because the decorator has to come from somewhere. Import Component, from at-angular-slash-core.
+
+Look at the part in quotes. That string has a name — it is called a specifier — and the thing worth noticing is what it is not.
+
+It is not a path. It is not a file name. It is not a URL. There is no folder called at-angular-slash-core sitting on a disk somewhere, and there is certainly no file by that name on a web server.
+
+It is a name. Somebody, at some point, has to look that name up and decide which actual file it means.
+
+A browser cannot do that on its own. Hand a browser that string inside an import and it will refuse it — failed to resolve module specifier — because as far as the web platform is concerned, that is not an address at all.
+
+So something has to resolve it. What that something is, and when it runs, is not the same in every Angular application.
+
+[One line on screen. Say it, then let the room look at it. The weight is on "a name, not a location".]</aside>
+</section>

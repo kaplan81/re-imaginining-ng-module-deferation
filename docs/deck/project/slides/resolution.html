@@ -1,0 +1,23 @@
+<section id="resolution" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:120px 128px 150px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">1 - Modules</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:60px;font-weight:700;line-height:1.08;width:1560px">Module resolution turns a specifier into a file</h2>
+<table style="width:1200px;font-family:'Open Sans', Verdana, sans-serif;font-size:30px;color:#EEF2F7;border:none">
+<tr style="background:#1A1F27;font-size:22px;color:#9AA6B2"><th style="width:38%;text-align:left;padding:16px 24px">When</th><th style="width:62%;text-align:left">Who resolves it</th></tr>
+<tr><td style="padding:16px 24px">Build time</td><td style="color:#9AA6B2">the bundler</td></tr>
+<tr><td style="padding:16px 24px">Load time</td><td style="color:#9AA6B2">the browser’s own loader</td></tr>
+<tr><td style="padding:16px 24px">Runtime</td><td style="color:#9AA6B2">code you shipped</td></tr>
+</table>
+<aside>All of this has a name. It is called module resolution, and it is one job: take a specifier, and work out which file it means.
+
+What is worth knowing is that the job can happen at three completely different moments, and that the choice between them changes a great deal about how an application is built and shipped.
+
+The bundler can do it, before anything ships at all.
+
+The browser can do it, by itself, as the page loads.
+
+Or code can do it, while the application is already running.
+
+Three moments. One at a time.
+
+[Name the concept, read the three rows, move on. This is a signpost, not an explanation.]</aside>
+</section>

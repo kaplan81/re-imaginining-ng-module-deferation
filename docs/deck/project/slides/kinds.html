@@ -1,0 +1,31 @@
+<section id="kinds" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:120px 128px 150px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">1 - Modules</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.08;width:1300px">The four types of specifier</h2>
+<table style="width:1300px;font-family:'Open Sans', Verdana, sans-serif;font-size:28px;color:#EEF2F7;border:none">
+<tr style="background:#1A1F27;font-size:22px;color:#9AA6B2"><th style="width:34%;text-align:left;padding:14px 22px">Type</th><th style="width:66%;text-align:left">Example</th></tr>
+<tr><td style="padding:14px 22px">Relative URL path</td><td style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;color:#9BC0FA">./util.js</td></tr>
+<tr><td style="padding:14px 22px">Absolute URL path</td><td style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;color:#9BC0FA">/lib/util.js</td></tr>
+<tr><td style="padding:14px 22px">Full URL</td><td style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;color:#9BC0FA">https://cdn.example/x.js</td></tr>
+<tr><td style="padding:14px 22px;color:#F0A878">Bare specifier</td><td style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;color:#F0A878">@angular/core</td></tr>
+</table>
+<p style="font-size:31px;line-height:1.45;width:1300px;color:#9AA6B2">The first three tell a browser where the module’s file is. <b style="color:#EEF2F7">A bare specifier does not</b>.</p>
+<aside>There are four types, and the difference between them is the whole of this section.
+
+A relative URL path. Dot-slash util-dot-js. Relative to the file doing the importing.
+
+An absolute URL path. Slash-lib-slash-util-dot-js. From the root of the site.
+
+A full URL. A complete address, pointing at any server you like.
+
+And a bare specifier. At-angular-slash-core — the one from the slide before.
+
+The first three are locations. A browser can take any of them and go and fetch the file, with no help from anybody. The third one could be pasted into an address bar.
+
+The fourth is not a location. There is no server anywhere with a folder called lodash. It is a name, and names have to be looked up by somebody.
+
+And this is the type that matters here, because it is the only one a browser cannot resolve by itself. At-angular-slash-core. Rxjs. Names, with no location attached.
+
+Which is why handing a browser a bare specifier gets it refused — failed to resolve module specifier. Not because the file is missing. Because nothing ever told it where to look.
+
+[Four rows. Read the types, do not read the examples — they are on screen. The time goes on the fourth.]</aside>
+</section>

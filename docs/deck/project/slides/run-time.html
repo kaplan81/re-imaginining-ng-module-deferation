@@ -1,0 +1,25 @@
+<section id="run-time" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:128px 128px 150px;display:flex;flex-direction:column;gap:36px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">1 - Modules</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:68px;font-weight:700;line-height:1.08;width:1440px">Runtime — code you shipped resolves it</h2>
+<div style="width:1400px;background:#0C0E12;border:1px solid #2A3039;border-radius:14px;padding:36px 40px;display:flex;flex-direction:column;gap:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:30px;line-height:1.5;color:#9AA6B2">const url = <span style="color:#EEF2F7">registry</span>.lookup(<span style="color:#F0A878">'catalog'</span>);</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:30px;line-height:1.5;color:#9AA6B2">const mod = <span style="color:#9BC0FA">await import</span>(url);</p>
+</div>
+<p style="font-size:33px;line-height:1.45;width:1300px;color:#9AA6B2">That URL <b style="color:#EEF2F7">did not exist when the application was built</b>. It was fetched, or computed, while the app was already running.</p>
+<p style="font-size:26px;line-height:1.4;width:1300px;color:#5A6472">Only possible with a dynamic import — a static one needs a literal.</p>
+<aside>Third moment, and this is the one that behaves differently from the other two.
+
+Here the resolving is done by code. Not by a bundler on somebody's machine, not by the browser's loader — by JavaScript that was shipped as part of the application and is running right now.
+
+Two lines. The first asks something for an address. That something could be anything: a registry object, a fetch to a JSON file on a server, a lookup in a table that was downloaded a second ago. The second line takes whatever came back and imports it.
+
+And the important word in that is whatever. The address on the second line did not exist when this application was compiled. Nobody wrote it down. It was not in any configuration file that went through the build. It arrived while the application was running, and the application acted on it.
+
+That is a genuinely different capability from the other two moments, and it is the reason this one needs a dynamic import. A static import needs a literal string, decided before anything runs. This cannot be a literal, because the value is not known yet.
+
+So: three moments. The bundler, before anything ships. The browser's loader, before the application starts. And code, while it is already running.
+
+Three answers to the same question. Which one an application picks turns out to decide a great deal about how it is built, how it is deployed, and what can change without rebuilding it.
+
+[Two lines of code. The weight is on "did not exist when the application was built".]</aside>
+</section>
