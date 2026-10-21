@@ -161,9 +161,8 @@ table the audience has already seen, instead of needing its own introduction.
 | **0 · Angular compilers** | 1–8 | **DONE.** The decorator is not a TypeScript decorator; it is read by a compiler and deleted. What `ngc` does to it, in six phases, 1–3 frontend and 4–6 backend. TypeScript 7 removes the API that made it possible, and `ngp` replaces it by printing a file. Closes on *Angular does not require esbuild* — three pipelines and the plugin that builds Angular on each. |
 | **1 · Modules** | 9–15 | **DONE.** What a specifier is. The four types. Static versus dynamic imports. Module resolution, then one slide per moment with a real example: build time, load time (a real `<script type="importmap">`), runtime. |
 | **2 · Module Federation** | 16–20 | **16–17 DONE.** *Modules can be federated* — code splitting is one build, federation is several builds interconnected. Then the mental model: one host, two remotes, identical boxes, `remoteEntry` on every one, arrows both ways. **Still to build:** the two implementations, both inside this section, because both implement this model. Native Federation is named here for the first time. Both ship a runtime and both decide at runtime; they differ in when the answer stops being negotiable — an import map published before the app starts, versus a share scope consulted on demand. What each publishes (`remoteEntry.json` is data; `remoteEntry.js` is code). The consequence: `registerRemotes` with `{force:true}` works on one and cannot work on the other. |
-| **3 · Three pipelines + demo** | 21– | The same product on three bundlers. Who resolves the module in each. **Demo.** Four rows of numbers. |
-| **4 · The cost of choice** | | The adapter is the tax, with the Rsbuild evidence. The share-scope finding: build 2's shell takes 6 of its 9 shared packages from a widget it already has on disk. Real reasons to pick Rspack; why Vite is harder to justify today. |
-| **5 · Close** | | `ngp` retires the tax. Repo link, thanks. |
+| **3 · Bundlers** | 21– | The same product on three pipelines, side by side: what each one publishes, who resolves the module, and the numbers. **Demo.** Then the cost of the choice — the adapter is the tax, with the Rsbuild evidence; the share-scope finding (build 2's shell takes 6 of its 9 shared packages from a widget it already has on disk); real reasons to pick Rspack, and why Vite is harder to justify today. |
+| Close | | `ngp` retires the tax. Repo link, thanks. No section label, like the cover. |
 
 **On length.** Do not pace the deck by the narration's word count. Andres speaks
 to the slide rather than reading the notes, and times himself against a mirror
@@ -192,8 +191,9 @@ numbered rows, with a line beneath saying so.
 
 ### Eyebrows are section labels
 
-The eyebrow line on every slide names the section, nothing else — `0 - Angular
-compilers`, `1 - Modules`, and so on, numbered from zero. It replaces the vertical
+There are four sections and no more: **0 - Angular compilers**, **1 - Modules**,
+**2 - Module Federation**, **3 - Bundlers**. The eyebrow on every slide names its
+section, nothing else. The cover carries none, and neither do the closing slides. It replaces the vertical
 stacks the slides.com deck used to show position, so the viewer always knows where
 they are. The cover has no section label.
 
