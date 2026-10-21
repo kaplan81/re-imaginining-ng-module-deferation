@@ -110,7 +110,7 @@ Three consequences, in increasing order of interest:
    elsewhere. Same-origin measurement plus cross-origin sharing flattered it twice.
 2. Builds 1 and 3 do not do this. Build 1's shell serves all its shared chunks from
    its own origin and takes only 4.5–5.7 kB per remote, which is metadata. The
-   cross-origin shared-code dependency is specific to classic MF on Rspack here.
+   cross-origin shared-code dependency is specific to Module Federation on Rspack here.
 3. **Build 2's host has a hard runtime dependency on a widget microfrontend.** Take
    `top-lots` offline and the shell loses `@angular/common`, `rxjs` and `tslib`.
    Slide 5.3 already says fault isolation is something _you_ write; this is a case
@@ -141,7 +141,7 @@ runtime. Where those artifacts get hosted is somebody else's talk.
 
 ---
 
-## 2. Running order — ~21 slides, ~26 min
+## 2. Running order — ~22 slides, ~26 min
 
 | Act                         | Time        | Slides | Beat                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | --------------------------- | ----------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -149,8 +149,8 @@ runtime. Where those artifacts get hosted is somebody else's talk.
 | **2 · Why MF is the lens**  | 3:30–8:00   | 5–8    | What MF actually is (separate builds + runtime composition; the five nouns). What it is **not** (not micro-frontends, not an architecture). What micro-frontends really require — DI boundary, style isolation, fault isolation: _you_ write those. Why MF is the right instrument: it makes you configure the bundler directly.                                                                                        |
 | **3 · The one mechanism**   | 8:00–12:00  | 9–12   | `import { Component } from '@angular/core'` — who turns that into a file? The kinds of specifier that exist **today**; bare is the problem. Import map vs a loader you ship. The three times: build / load / runtime.                                                                                                                                                                                                   |
 | **4 · Three builds + demo** | 12:00–21:00 | 13–17  | The three answers side by side. What each remote ships: **data** vs **executable container**. Who resolves the module. **Demo.** Then four rows of numbers.                                                                                                                                                                                                                                                             |
-| **5 · The cost of choice**  | 21:00–25:00 | 18–19  | The adapter is the tax, with the Rsbuild evidence. Real reasons to pick Rspack; why Vite is harder to justify _today_ — and what oxc changes about that.                                                                                                                                                                                                                                                                |
-| **6 · Close**               | 25:00–27:00 | 20–21  | Back to `ngp`: when it ships, the tax retires. Repo link, thanks.                                                                                                                                                                                                                                                                                                                                                       |
+| **5 · The cost of choice**  | 21:00–25:00 | 18–20  | The adapter is the tax, with the Rsbuild evidence. **Then the share-scope slide: build 2’s shell takes 6 of its 9 shared packages from a widget it already has on disk, so the host depends on a widget for `@angular/common`, `rxjs` and `tslib`.** Real reasons to pick Rspack; why Vite is harder to justify _today_ — and what oxc changes about that.                                                              |
+| **6 · Close**               | 25:00–27:00 | 21–22  | Back to `ngp`: when it ships, the tax retires. Repo link, thanks.                                                                                                                                                                                                                                                                                                                                                       |
 
 ### What was cut from the Zürich deck, and why
 
@@ -232,6 +232,31 @@ This replaces the Zürich deck's "three parts" framing (TypeScript compiler /
 template compiler / Ivy renderer). **Two parts, his names, one of them currently
 Rust.**
 
+### Do not put Angular's internal component names on a slide
+
+Verified against the repository itself, `packages/compiler-cli/preprocessor/`
+(read 2026-10-20), not just the blog:
+
+- The whole prototype directory is "the preprocessor". Its README opens with
+  **"Caution — Prototype — External Contributions Not Accepted"** and describes
+  "a native AST analysis preprocessor and typecheck block (TCB) generation
+  pipeline… Rust-based AST analysis (`ng-analyze`) using oxc with a
+  TypeScript-based typechecking coordination layer."
+- `ng-analyze/src/` contains `analyzer/`, `evaluator/`, `query/`, `types/`,
+  `utils/`, `resource_loader.rs`, `tsconfig_resolution.rs`, `wasm.rs` — **and a
+  `compiler/` module**. So the Rust side does more than analysis, and the blog's
+  tidy frontend/backend split is a simplification.
+- `ngp` names the whole tool; the ViteConf diagram also labels the JavaScript box
+  `ng-preprocessor`. "Pre-processor" reads as "runs first", which it does not.
+
+**Two naming traps, so the slide uses neither name.** The ngp slide shows one Rust
+box (`ng-analyze`, oxc) and its output — TypeScript files written out — and says
+nothing about frontend or backend. That argument was already made on the `phases`
+slide, where it belongs; repeating it here only invites the collision.
+
+The internal split is also moving weekly, so anything precise said about it ages
+badly. Say what does not: **it writes files instead of rewriting the tree.**
+
 ### How it appears in the hook
 
 One diagram, not two. Built on his new-compiler shape, with `ng-analyze` marked
@@ -247,6 +272,17 @@ integration is a prototype. The hook says this is clearly where Angular is headi
 and lets the commit traffic carry the weight. It does **not** assert that bundler
 adapters are going away — that conclusion is left standing on the Rsbuild evidence
 in Act 5, where it is a measurement rather than a prediction.
+
+**The checkable version, verified 2026-10-20.** The shipped
+`@angular/compiler-cli@22.2.3` — the one that builds this repo — contains **no
+`preprocessor` directory, no `ng-analyze`, and not one `.wasm` or `.node`
+artefact**. PR #71259 carried the label `target: minor`, so it lands in 22.3.0 at
+the earliest, and the blog only _aims_ the experimental build at the end of 2026.
+
+So the slide may never say Angular **is** half Rust. It says Angular **is being
+rewritten** that way. Put the disproof on the slide rather than in the notes — "the
+`@angular/compiler-cli` you installed this morning contains none of it" is a
+checkable line that buys credibility for everything after it.
 
 ---
 
@@ -292,7 +328,7 @@ The old claim's _direction_ survives on the federation-only row — build 1 is
 lightest — but **builds 2 and 3 have swapped**: 427 against 355, where the slide
 said 340 < 382. Rspack is now the heavier of the two.
 
-Two caveats the script prints and the slide should carry. **Raw** is the fairer
+Two caveats the counting tool prints and the slide should carry. **Raw** is the fairer
 cross-pipeline measure, because build 1's config is JSON (no blank or comment
 lines, so ~100% "code") against the others' TypeScript (~40%) — comparing
 code-lines flatters the TypeScript pipelines. And build 1's `angular.json` is a
@@ -542,7 +578,54 @@ npm run start:everything      # all 15 dev servers, ~80 seconds
 
 ---
 
-## 7. Working plan
+## 7. Recording and delivery
+
+From <https://ng-poland.pl/pre-recorded>.
+
+| Requirement  | Value                                                                 |
+| ------------ | --------------------------------------------------------------------- |
+| Resolution   | 1920 × 1080, 16:9, **no black borders**                               |
+| Frame rate   | consistent 25 or 30 fps                                               |
+| Video        | single MP4, H.264, 8–12 Mbps                                          |
+| Audio        | AAC, 48 kHz, 192–320 kbps, steady level, no clipping or echo          |
+| Length       | **20–30 minutes**, English                                            |
+| Head/tail    | ~2 seconds of clean footage at each end                               |
+| Captions     | separate SRT/VTT if supplied — **never burned in**                    |
+| Forbidden    | music, conference branding                                            |
+| File name    | `Andres-Gesteira-Re-imagining-Module-Federation-in-Angular.mp4`       |
+| **Deadline** | **30 October 2026** for review and publication before the conference  |
+| Submission   | form on that page, with a download link (Drive, Dropbox, WeTransfer…) |
+
+Capture the screen directly rather than filming a monitor, and enlarge the editor
+during the demo.
+
+### The webcam safe zone — a hard layout constraint
+
+The webcam overlay sits **bottom right**, a circle roughly 15% of frame width. The
+organisers only say "position it so it does not cover slides", which puts the
+burden on the slides.
+
+**Rule: no content inside the bottom-right 460 × 420 block — that is `x ≥ 1460`
+and `y ≥ 660` on the 1920 × 1080 canvas.**
+
+In practice, on a deck with 128px margins (content box 1664 × 824 starting at
+128,128):
+
+- Anything sitting **below y 660** must end by **x 1460** — so give low paragraphs
+  `width:1300px` rather than the full 1664.
+- **Full-width rows** (card rows, tables, diagrams) must finish **above y 660**, or
+  be narrowed to 1300.
+- **Footers** pinned at `bottom:64px` get `width:1240px`, left-aligned.
+- A statement slide can still use the full width at the top; it is only the lower
+  right that is lost.
+
+This doubles as useful discipline: it enforces the "much less text per slide than
+the Zürich deck" rule that a 1080p video needs anyway.
+
+All four Act 1 slides were rebuilt against this rule after it was discovered —
+check every new slide against it before publishing.
+
+## 8. Working plan
 
 ### 1 · Bump the repo to current — DONE (commit `f53d991`)
 
@@ -572,23 +655,45 @@ Result: **991 / 1175 / 997** raw lines overall, **304 / 427 / 355** for federati
 config alone, **17 / 20 / 20** files, **2 / 6 / 4** tooling packages. See §4
 finding 1 for how to read them and which to put on the slide.
 
-### 3 · Re-measure the four rows that survive
+### 3 · Re-measure the four rows that survive — DONE
 
-Five apps, production build, cold cache, one machine, each run twice, keeping
-numbers only if they reproduce: **cold build time**, **home page transferred +
-request count**, **build-tooling packages** (2 / 6 / 4 — already measured, and the
-row least likely to rot), **version ceiling**. Federation config lines
-(304 / 427 / 355) are a fifth row if there is space, but the package count says the
-same thing with less to defend. Put the machine and the date
-on the slide. Keep the full ten-row table in `README.md` for people who want it.
+`tools/measure-builds.mjs` (cold builds, each pipeline's own caches cleared) and
+`tools/serve-dist.mjs` (one static server for all three, `Timing-Allow-Origin`
+set) produce the numbers; method and caveats in `tools/measurements.md`.
 
-### 4 · Write the script
+| Row                    | 1 · CLI + NF                | 2 · Rspack                | 3 · Vite  |
+| ---------------------- | --------------------------- | ------------------------- | --------- |
+| Cold build, 5 apps     | 7.6 s                       | 8.2 s                     | **7.1 s** |
+| Home page transferred  | **779.5 kB**                | 1261.9 kB                 | 826.7 kB  |
+| Requests               | 37                          | 27                        | 28        |
+| Build-tooling packages | **2**                       | 6                         | 4         |
+| Version ceiling        | tracks Angular to the minor | **stable broken on 22.2** | `^18–^22` |
+
+Machine and date are recorded in the output files and must appear on the slide.
+
+### 4 · Write the narration
 
 Rewrite to the six-act structure in §2, drawing prose from §5. Because this is a
-recorded video, the script goes in the deck's **speaker notes**, written to be read
+recorded video, the narration goes in the deck's **speaker notes**, written to be read
 aloud, with demo cues marked inline. Target ~26 minutes at a measured pace.
 
-### 5 · Build the deck
+### 5 · Build the deck — Act 1 done, 18 slides to go
+
+**`docs/deck/` is the source of truth for the deck**, not the published artifact and
+not a scratchpad. It holds `project/deck.json` and one `project/slides/<id>.html`
+per slide, in the Slides artifact format (1920 × 1080, inline styles only).
+Publish from there, with `root` set to `docs/deck`.
+
+**`docs/NARRATION.md` is generated**, never hand-edited:
+
+```bash
+node tools/deck-to-narration.mjs        # add --rate 160 for a faster pace
+```
+
+It flattens every slide into on-screen content plus speaker notes, with word counts
+and spoken-time estimates at 140 wpm, so the whole talk can be read, diffed and
+timed as one document. Regenerate it after any slide change. To change wording,
+edit the slide and regenerate — never the other way round.
 
 A Slides artifact titled _Re-imagining Module Federation in Angular_ with **NG
 Poland 2026** on the title slide. Rebuild the Zürich identity: near-black `#111`
@@ -600,7 +705,7 @@ reads perhaps a third of what a room full of people will.**
 
 ---
 
-## 8. Verification
+## 9. Verification
 
 - Run all three production builds clean, **twice**, and confirm every captured
   number reproduces before it goes on a slide.
@@ -613,7 +718,7 @@ reads perhaps a third of what a room full of people will.**
 - Re-check the `ngp` commit activity and the `@nx/angular-rsbuild` registry row on
   the recording day — both are live and both are load-bearing.
 
-## 9. Open items
+## 10. Open items
 
 - Slides not started. This document is the brief; the deck is not written.
 - `docs/ARCHITECTURE.md` is agent-generated prose and has not been re-read against

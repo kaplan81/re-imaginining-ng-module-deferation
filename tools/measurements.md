@@ -139,7 +139,7 @@ first.**
 3. **Builds 1 and 3 do not do this.** Build 1's shell serves all its shared chunks
    from its own origin (757.9 kB over 28 requests) and takes only 4.5–5.7 kB per
    remote — metadata. Build 3 takes 1 request per remote. The cross-origin
-   shared-code dependency is specific to classic MF on Rspack here.
+   shared-code dependency is specific to Module Federation on Rspack here.
 
 This is a better slide than any byte total: same five applications, same shared
 versions, and one pipeline quietly makes the host depend on a widget for its

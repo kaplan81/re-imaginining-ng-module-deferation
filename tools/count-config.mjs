@@ -54,7 +54,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 /** Files that exist to make a given pipeline build, by category. */
 const PIPELINES = {
-  '1 · Angular CLI + Native Federation': {
+  '1 · Native Federation on Angular CLI': {
     bundler: ['angular.json'],
     federation: ['projects/*/federation.config.mjs'],
     typescript: [
@@ -64,13 +64,13 @@ const PIPELINES = {
     ],
     manifest: [],
   },
-  '2 · Rspack + classic MF': {
+  '2 · Module Federation on Rspack': {
     bundler: ['builds/rspack/*/rspack.config.ts'],
     federation: ['builds/rspack/tools/*.ts'],
     typescript: ['builds/rspack/tsconfig.base.json', 'builds/rspack/*/tsconfig.json'],
     manifest: ['builds/rspack/*/package.json'],
   },
-  '3 · Vite + classic MF': {
+  '3 · Module Federation on Vite': {
     bundler: ['builds/vite/*/vite.config.ts'],
     federation: ['builds/vite/tools/*.ts'],
     typescript: ['builds/vite/tsconfig.base.json', 'builds/vite/*/tsconfig.json'],
@@ -80,11 +80,11 @@ const PIPELINES = {
 
 /** Build-tooling packages each pipeline requires in the root manifest. */
 const TOOLING = {
-  '1 · Angular CLI + Native Federation': [
+  '1 · Native Federation on Angular CLI': [
     '@angular-architects/native-federation',
     '@softarc/native-federation-orchestrator',
   ],
-  '2 · Rspack + classic MF': [
+  '2 · Module Federation on Rspack': [
     '@rspack/cli',
     '@rspack/core',
     '@rspack/dev-server',
@@ -92,7 +92,7 @@ const TOOLING = {
     '@module-federation/rspack',
     '@nx/angular-rspack',
   ],
-  '3 · Vite + classic MF': [
+  '3 · Module Federation on Vite': [
     'vite',
     '@module-federation/vite',
     '@module-federation/runtime',

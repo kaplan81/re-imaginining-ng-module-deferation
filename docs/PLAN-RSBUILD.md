@@ -2,7 +2,7 @@
 
 Second of the three builds in the talk. Same product, same application code, a
 **different build pipeline and a different federation runtime**: Rspack instead of
-the Angular CLI application builder, classic Module Federation instead of Native
+the Angular CLI application builder, Module Federation instead of Native
 Federation.
 
 Status: **implemented and verified.** Code in [`builds/rspack/`](../builds/rspack).

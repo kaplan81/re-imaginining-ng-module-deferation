@@ -1,0 +1,41 @@
+<section id="ts7" data-transition="push" style="display:flex; flex-direction:column; gap:30px; padding:112px 128px 160px; background:#161a21">
+  <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:23px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:#e0824b">TypeScript 7 · rewritten in Go · stable July 2026</p>
+  <h2 style="width:1300px; font-family:Archivo, Arial, sans-serif; font-size:72px; font-weight:700; line-height:1.08; color:#eef2f7">The APIs Angular needs are gone</h2>
+  <div style="width:1300px; display:flex; flex-direction:column; gap:14px; padding:28px 36px; background:#111317; border-left:4px solid #e0824b; border-radius:4px">
+    <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:33px; line-height:1.45; color:#eef2f7">“The Angular compiler implements its own code transformations via the <span style="color:#9bc0fa">ts.Transformer</span> API <b>which is not available cross-language</b>.”</p>
+    <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:24px; color:#6b7684">Angular blog · <i>An update on Angular’s TypeScript 7-powered Compiler</i> · September 2026</p>
+  </div>
+  <div style="width:1300px; display:flex; flex-direction:column; gap:16px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:start">
+      <p style="width:34px; font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:26px; color:#e0824b">1</p>
+      <p style="flex:1; font-family:'Open Sans', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#eef2f7">TypeScript 7’s compiler is a program written in <b>Go</b>.</p>
+    </div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:start">
+      <p style="width:34px; font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:26px; color:#e0824b">2</p>
+      <p style="flex:1; font-family:'Open Sans', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#9aa6b2"><span style="color:#9bc0fa">ts.Transformer</span> is only possible while both sides are JavaScript.</p>
+    </div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:start">
+      <p style="width:34px; font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:26px; color:#e0824b">3</p>
+      <p style="flex:1; font-family:'Open Sans', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#9aa6b2">Go and JavaScript <span style="color:#eef2f7"><b>cannot share objects</b></span>. So those APIs cannot be made public again</p>
+    </div>
+  </div>
+  <aside>And then this happened.
+
+TypeScript 7 shipped in July. Same language, same type system, but the compiler itself has been rewritten in Go, and it is roughly ten times faster.
+
+Here is the Angular team's own sentence about what that costs them. The Angular compiler implements its own code transformations via the ts dot Transformer API, which is not available cross-language.
+
+Three steps to see why, and they are worth taking slowly.
+
+One. The new TypeScript compiler is a Go program. Not JavaScript that got faster — a different language, compiled to a binary.
+
+Two. ts.Transformer is not a file format and it is not a protocol. It is TypeScript calling a JavaScript function that Angular supplies, handing it a live object — the syntax tree — letting Angular rearrange that object in place, and then carrying on with the result. Both sides are JavaScript. Both sides are in the same process. They are pointing at the same objects in the same memory.
+
+Three. Go and JavaScript cannot do that. You can send data between them — text, JSON, bytes down a pipe. What you cannot do is hand a Go program a JavaScript function and have it call you back with a live tree.
+
+So this is not an API that got harder to use, or changed shape, or needs a wrapper written for it. A set of APIs that used to be public simply cannot be public any more, because there is no way to express them across two languages. Angular will use TypeScript 7's interop for type-checking and diagnostics, where sending data is enough. For compilation and transformation, sending data is not enough.
+
+Which means the capabilities TypeScript used to provide, Angular now has to provide itself.
+
+[Read the quote aloud, then count the three points on your fingers. Point two is the one that does the work.]</aside>
+</section>

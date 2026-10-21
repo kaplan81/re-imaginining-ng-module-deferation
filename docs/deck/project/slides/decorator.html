@@ -1,0 +1,30 @@
+<section id="decorator" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:128px 128px 150px;display:flex;flex-direction:column;gap:38px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">Every Angular component you have ever written</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:76px;font-weight:700;line-height:1.08;width:1460px">This is not a TypeScript decorator</h2>
+<div style="width:1300px;background:#0C0E12;border:1px solid #2A3039;border-radius:14px;padding:36px 40px;display:flex;flex-direction:column;gap:2px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:29px;line-height:1.5;color:#9BC0FA">@Component({</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:29px;line-height:1.5;color:#9AA6B2">&#160;&#160;selector: <span style="color:#F0A878">'cat-bean-grid'</span>,</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:29px;line-height:1.5;color:#9AA6B2">&#160;&#160;imports: [CurrencyPipe, DecimalPipe],</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:29px;line-height:1.5;color:#9AA6B2">&#160;&#160;templateUrl: <span style="color:#F0A878">'./bean-grid.component.html'</span>,</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:29px;line-height:1.5;color:#9AA6B2">&#160;&#160;styleUrl: <span style="color:#F0A878">'./bean-grid.component.scss'</span>,</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:29px;line-height:1.5;color:#9BC0FA">})</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:29px;line-height:1.5;color:#EEF2F7">export class BeanGridComponent { … }</p>
+</div>
+<aside>A component decorator. A selector, two pipes it imports, a template file, a stylesheet, and a class underneath.
+
+TypeScript does have decorators. Microsoft added them to the language years ago, and Alex Rickabaugh from the Angular team will tell you they were added largely because Angular needed them. So it would be reasonable to assume this is one of those.
+
+It is not. This is Angular's own decorator, and it behaves nothing like TypeScript's.
+
+A TypeScript decorator is a function. It runs. At runtime, when the class is defined, the function is called and it can do something to the class.
+
+This one never runs. In the build that reaches your users it is not there at all — open the bundle and search for the word Component and you will not find it. It was read at compile time, by a compiler, and then deleted.
+
+Everything inside those braces is metadata. A description. The selector is a description of how to find this component in HTML. The imports are a description of what the template is allowed to use. The HTML is metadata. The SCSS is metadata. None of it is code that runs.
+
+So if it is a description rather than instructions, something has to read it and turn it into something that does run.
+
+That something is what the next few minutes are about.
+
+[Five lines on screen, so do not read them out. Point at styleUrl and templateUrl when you reach "the HTML is metadata, the SCSS is metadata".]</aside>
+</section>

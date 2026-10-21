@@ -45,7 +45,7 @@ import { cpus, totalmem } from 'node:os';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const PIPELINES = {
-  '1 · Angular CLI + Native Federation': {
+  '1 · Native Federation on Angular CLI': {
     key: '1',
     command: 'npm run build',
     caches: ['.angular/cache', 'node_modules/.cache/native-federation'],
@@ -53,7 +53,7 @@ const PIPELINES = {
     // per-application output lives in dist/<app>/browser
     appDist: (app) => `dist/${app}/browser`,
   },
-  '2 · Rspack + classic MF': {
+  '2 · Module Federation on Rspack': {
     key: '2',
     command: 'npm run build:rspack:all',
     caches: ['.nx/workspace-data'],
@@ -66,7 +66,7 @@ const PIPELINES = {
     ],
     appDist: (app) => `builds/rspack/${app}/dist`,
   },
-  '3 · Vite + classic MF': {
+  '3 · Module Federation on Vite': {
     key: '3',
     command: 'npm run build:vite:all',
     caches: ['node_modules/.cache/analog', 'node_modules/.vite'],

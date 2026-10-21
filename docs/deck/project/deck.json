@@ -1,0 +1,36 @@
+{
+  "v": 4,
+  "createdOnFiles": { "v": 1, "at": "2026-10-20T12:00:00Z" },
+  "lists": "css",
+  "title": "Re-imagining Module Federation in Angular",
+  "order": ["cover", "decorator", "ivy-output", "ngtsc-wraps", "phases", "ts7", "compiler"],
+  "sections": {
+    "hook": {
+      "description": "The decorator you write never runs, and what replaces it is plain JavaScript any bundler can read.",
+      "start": "cover"
+    },
+    "ngtsc": {
+      "description": "What the Angular compiler actually does, and why it has been married to TypeScript's compiler API for ten years.",
+      "start": "ngtsc-wraps"
+    },
+    "break": {
+      "description": "TypeScript 7 removes that API, so Angular is building a new compiler — and that is what makes your bundler a choice.",
+      "start": "ts7"
+    }
+  },
+  "faces": {
+    "archivo": {
+      "family": "Archivo",
+      "href": "https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&display=swap"
+    },
+    "open-sans": {
+      "family": "Open Sans",
+      "href": "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
+    },
+    "ibm-plex-mono": {
+      "family": "IBM Plex Mono",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
+    }
+  },
+  "designSystems": []
+}

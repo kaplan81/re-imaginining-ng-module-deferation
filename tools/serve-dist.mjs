@@ -27,9 +27,13 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const APPS = ['shell', 'catalog', 'orders', 'top-lots', 'roast-queue'];
 
 const PIPELINES = {
-  1: { name: 'Angular CLI + Native Federation', base: 4200, dir: (a) => `dist/${a}/browser` },
-  2: { name: 'Rspack + classic MF', base: 4210, dir: (a) => `builds/rspack/${a}/dist/browser` },
-  3: { name: 'Vite + classic MF', base: 5173, dir: (a) => `builds/vite/${a}/dist` },
+  1: { name: 'Native Federation on Angular CLI', base: 4200, dir: (a) => `dist/${a}/browser` },
+  2: {
+    name: 'Module Federation on Rspack',
+    base: 4210,
+    dir: (a) => `builds/rspack/${a}/dist/browser`,
+  },
+  3: { name: 'Module Federation on Vite', base: 5173, dir: (a) => `builds/vite/${a}/dist` },
 };
 
 const TYPES = {

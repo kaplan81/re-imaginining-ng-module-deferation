@@ -1,5 +1,5 @@
 {
-  "1 · Angular CLI + Native Federation": {
+  "1 · Native Federation on Angular CLI": {
     "total": {
       "raw": 991,
       "code": 887,
@@ -130,7 +130,7 @@
       }
     ]
   },
-  "2 · Rspack + classic MF": {
+  "2 · Module Federation on Rspack": {
     "total": {
       "raw": 1175,
       "code": 546,
@@ -293,7 +293,7 @@
       }
     ]
   },
-  "3 · Vite + classic MF": {
+  "3 · Module Federation on Vite": {
     "total": {
       "raw": 997,
       "code": 483,

@@ -149,7 +149,7 @@ inside that component. `@defer` supplies the trigger ergonomics — `on viewport
 
 ### One manifest key, or many flat keys?
 
-Production classic-MF deployments tend to expose many flat keys rather than one
+Production Module Federation deployments tend to expose many flat keys rather than one
 manifest. `shop.lululemon.com` registers 12 remotes and instantiates 3 on its
 homepage; its `layout` remote alone exposes `./Root`, `./atoms/layout`,
 `./atoms/config` and `./utils/getNavData` — components, shared state and plain

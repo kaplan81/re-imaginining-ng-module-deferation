@@ -1,0 +1,33 @@
+<section id="choice" data-transition="fade" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:76px;font-weight:700;line-height:1.08;width:1460px">Compilation stops living inside the bundler</h2>
+<div style="display:flex;gap:40px;width:1664px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#191D24;border:1px solid #2A3039;border-radius:16px;padding:40px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#6B7684">Today</p>
+<h3 style="font-family:'Archivo', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2">ngtsc runs <i>inside</i> the bundler</h3>
+<p style="font-size:29px;line-height:1.5;color:#9AA6B2">As that bundler’s own plugin. No intermediate compiled JavaScript ever exists.</p>
+<p style="font-size:29px;line-height:1.5;color:#9AA6B2">So every other bundler needs <b style="color:#EEF2F7">a bespoke Angular adapter</b>.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#141A26;border:1px solid #2F4568;border-radius:16px;padding:40px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#6E9BF7">Where it is heading</p>
+<h3 style="font-family:'Archivo', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2">ngp emits a file, before it</h3>
+<p style="font-size:29px;line-height:1.5;color:#9AA6B2">Angular’s words: that output “can be fed to TypeScript <b style="color:#EEF2F7">or directly to a bundler</b>.”</p>
+<p style="font-size:29px;line-height:1.5;color:#9AA6B2">A bundler handed plain TypeScript needs <b style="color:#EEF2F7">no adapter</b>.</p>
+</div>
+</div>
+<p style="font-size:44px;line-height:1.3;width:1300px;color:#EEF2F7">So your bundler stops being a constraint and starts being <b style="color:#6E9BF7">a choice</b>.</p>
+<aside>Here is why I dragged you through a compiler slide.
+
+Today, Angular compilation does not happen before your bundler runs. It happens inside it. ngtsc is installed as that bundler’s own plugin — an esbuild plugin for the CLI, a loader for Rspack, a plugin for Vite. There is no folder of compiled JavaScript sitting between the two. That is why you cannot just point any bundler at an Angular project.
+
+It means every bundler that is not the one the CLI ships needs somebody to write and maintain an Angular adapter for it. Hold on to that word, adapter. It comes back later, and it turns out to be the most expensive word in this talk.
+
+Now look at the right-hand column. ngp does not install itself into your bundler. It emits a file. And the Angular team’s own wording is the part worth quoting — that output can be fed to TypeScript, or directly to a bundler like esbuild.
+
+A bundler that is handed plain TypeScript does not need to know what a component is. It does not need an adapter at all.
+
+I want to be careful here, because this has not shipped. It is pre-MVP, the experimental release is aimed at the end of this year, and the CLI integration is still a prototype. So I am not telling you the adapter problem is solved. I am telling you which direction Angular is walking, and that the commits are landing daily.
+
+And if that is the direction, then the question this talk is about becomes a real one rather than a theoretical one: if your bundler is a choice, what does each choice actually cost you?
+
+[Beat before the last line. It is the hinge of the whole talk.]</aside>
+</section>

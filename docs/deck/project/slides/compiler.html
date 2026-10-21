@@ -1,0 +1,56 @@
+<section id="compiler" data-transition="fade" style="display:flex; flex-direction:column; gap:28px; padding:112px 128px 150px; background:#111317">
+  <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:23px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:#e0824b">ngp · prototype · in angular/main since 8 October 2026 · not released</p>
+  <h2 style="width:1500px; font-family:Archivo, Arial, sans-serif; font-size:60px; font-weight:700; line-height:1.08; color:#eef2f7">Angular Preprocessor works out of the bundler</h2>
+  <div style="width:1330px; display:flex; flex-direction:column; gap:16px; padding:22px 30px; background:#15191f; border:1px solid #2a3039; border-radius:16px">
+    <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:20px; letter-spacing:3px; text-transform:uppercase; color:#6b7684">ngtsc</p>
+    <div style="width:760px; display:flex; flex-direction:column; gap:10px; padding:14px 18px; border:2px solid #4a525e; border-radius:14px">
+      <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:19px; letter-spacing:2px; text-transform:uppercase; color:#6b7684">your bundler</p>
+      <div style="display:flex; flex-direction:row; gap:16px; align-items:center; padding:14px 18px; background:#1c222b; border:1px solid #39414c; border-radius:10px">
+        <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:25px; color:#eef2f7">Angular compiler</p>
+        <p style="padding:7px 13px; font-family:'Open Sans', Verdana, sans-serif; font-size:19px; letter-spacing:2px; color:#e0824b; background:#231a14; border:1px solid #e0824b; border-radius:7px">FRONTEND</p>
+        <p style="padding:7px 13px; font-family:'Open Sans', Verdana, sans-serif; font-size:19px; letter-spacing:2px; color:#6e9bf7; background:#141a26; border:1px solid #6e9bf7; border-radius:7px">BACKEND</p>
+      </div>
+    </div>
+  </div>
+  <div style="width:1330px; display:flex; flex-direction:column; gap:16px; padding:22px 30px; background:#15191f; border:1px solid #2a3039; border-radius:16px">
+    <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:20px; letter-spacing:3px; text-transform:uppercase; color:#6b7684">ngp (experimental)</p>
+    <div style="display:flex; flex-direction:row; gap:18px; align-items:center">
+      <div style="display:flex; flex-direction:row; gap:14px; align-items:center; padding:14px 18px; background:#1c222b; border:1px solid #39414c; border-radius:10px">
+        <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:25px; color:#eef2f7">Angular compiler</p>
+        <p style="padding:7px 13px; font-family:'Open Sans', Verdana, sans-serif; font-size:17px; letter-spacing:2px; color:#e0824b; background:#231a14; border:1px solid #e0824b; border-radius:7px">FRONTEND · RUST + OXC</p>
+        <p style="padding:7px 13px; font-family:'Open Sans', Verdana, sans-serif; font-size:17px; letter-spacing:2px; color:#6e9bf7; background:#141a26; border:1px solid #6e9bf7; border-radius:7px">BACKEND</p>
+      </div>
+      <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:28px; color:#6b7684">→</p>
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <div style="padding:11px 16px; background:#1c222b; border:2px solid #eef2f7; border-radius:10px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:21px; color:#eef2f7">bean-grid.ng.ts</p></div>
+        <div style="padding:11px 16px; background:#1c222b; border:2px solid #eef2f7; border-radius:10px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:21px; color:#eef2f7">bean-grid.ngtypecheck.ts</p></div>
+      </div>
+      <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:28px; color:#6b7684">→</p>
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <div style="width:150px; padding:11px 16px; background:#1c222b; border:1px solid #39414c; border-radius:10px"><p style="font-family:'Open Sans', Verdana, sans-serif; font-size:21px; color:#9aa6b2">any bundler</p></div>
+        <div style="width:150px; padding:11px 16px; background:#1c222b; border:1px solid #39414c; border-radius:10px"><p style="font-family:'Open Sans', Verdana, sans-serif; font-size:21px; color:#9aa6b2">tsc</p></div>
+      </div>
+    </div>
+  </div>
+  <aside>So if the way in is closed, you stop going in. You build your own compiler.
+
+That is what this is. It is called ngp, it has been in Angular's main branch since the eighth of October, and their own README opens with the word Caution: early-stage prototype, not accepting outside contributions. So nothing here is a promise.
+
+Two things changed. One is interesting. The other is the one that matters.
+
+The interesting one is the frontend. The orange half — the global, slow half — has been rewritten in Rust, on oxc — the same toolchain underneath Vite. It is multithreaded, which is why it will be fast. The blue half did not move: the backend is still TypeScript, still the same template compiler Angular has always had. What changed in it is only the last step. The old backend handed its result to TypeScript, through ts.Transformer, which is why it had to run inside TypeScript. The new one prints the characters into a file. That is the whole reason it can stand on its own.
+
+The one that matters is in the shape of the picture, not in either box.
+
+Look at the top row. The compiler is inside the bundler. That was not a design choice anybody made for fun — it was forced. Angular's output never existed anywhere you could pick it up. It was a syntax tree, inside a running TypeScript process, for a few milliseconds. The only way to receive it was to be in that process, as a plugin. So the bundler had to host Angular's compiler inside itself.
+
+Which is why every bundler that builds Angular needs an adapter written specially for it. Somebody has to write the plugin that drives the compiler and hands the results around. That is what @nx/angular-rspack is. That is what the Analog plugin is for Vite. Somebody maintains each one.
+
+Now look at the bottom row. The compiler runs first, on its own, and leaves two files behind — one per job. The ng dot ts file is your code with the decorator already replaced; that is what the bundler takes. The ngtypecheck file is the templates rewritten as TypeScript; that is what tsc takes, to give you template errors. Same two jobs as before, but now each one ends in a file instead of inside somebody's process. And that is not a plan — it is already there. There is a command in the branch today: you point ngp at a tsconfig, give it an output directory, and it writes you a folder of TypeScript. No bundler involved, nothing hosting anything. Ordinary TypeScript, with the decorator already replaced by the definition.
+
+The bundler is no longer hosting anything. It is just reading TypeScript — which every bundler on earth already does. esbuild reads it. Rspack reads it. Vite reads it. Something you write this afternoon reads it.
+
+The adapter has nothing left to adapt.
+
+[Point at the nesting in the top row, then at the gap in the bottom row. That gap is the whole slide.]</aside>
+</section>
