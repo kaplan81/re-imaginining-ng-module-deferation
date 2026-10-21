@@ -1,0 +1,60 @@
+<section id="mf-is" data-transition="push" style="background:#111317;color:#EEF2F7;font-family:'Open Sans', Verdana, sans-serif;padding:112px 128px 150px;display:flex;flex-direction:column;gap:26px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#6E9BF7">2 - Module Federation</p>
+<h2 style="font-family:'Archivo', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1.08;width:1330px">Module Federation is a mental model</h2>
+<div style="position:relative;width:1330px;height:500px">
+
+<div style="position:absolute;left:385px;top:0px;width:560px;height:142px;background:#191D24;border:1px solid #2A3039;border-radius:14px;padding:18px 26px;display:flex;flex-direction:column;align-items:center;gap:8px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:18px;letter-spacing:3px;color:#6E9BF7;background:#141A26;border:1px solid #6E9BF7;border-radius:7px;padding:5px 14px">HOST</p>
+<p style="font-size:31px;font-weight:600;color:#EEF2F7">shell app</p>
+<p style="font-size:22px;color:#9AA6B2"><span style="font-family:'IBM Plex Mono', 'Courier New', monospace;color:#9BC0FA">remoteEntry</span> · exposes nothing</p>
+</div>
+
+<div style="position:absolute;left:0px;top:250px;width:560px;height:142px;background:#191D24;border:1px solid #2A3039;border-radius:14px;padding:18px 26px;display:flex;flex-direction:column;align-items:center;gap:8px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:18px;letter-spacing:3px;color:#E0824B;background:#231A14;border:1px solid #E0824B;border-radius:7px;padding:5px 14px">REMOTE</p>
+<p style="font-size:31px;font-weight:600;color:#EEF2F7">remote app</p>
+<p style="font-size:22px;color:#9AA6B2"><span style="font-family:'IBM Plex Mono', 'Courier New', monospace;color:#9BC0FA">remoteEntry</span> · exposes <span style="font-family:'IBM Plex Mono', 'Courier New', monospace;color:#F0A878">./Routes</span></p>
+</div>
+
+<div style="position:absolute;left:770px;top:250px;width:560px;height:142px;background:#191D24;border:1px solid #2A3039;border-radius:14px;padding:18px 26px;display:flex;flex-direction:column;align-items:center;gap:8px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:18px;letter-spacing:3px;color:#E0824B;background:#231A14;border:1px solid #E0824B;border-radius:7px;padding:5px 14px">REMOTE</p>
+<p style="font-size:31px;font-weight:600;color:#EEF2F7">remote app</p>
+<p style="font-size:22px;color:#9AA6B2"><span style="font-family:'IBM Plex Mono', 'Courier New', monospace;color:#9BC0FA">remoteEntry</span> · exposes <span style="font-family:'IBM Plex Mono', 'Courier New', monospace;color:#F0A878">./Widgets</span></p>
+</div>
+
+<x-connector x1="515" y1="142" x2="310" y2="246" head="end" head-end="filled" style="color:#4A525E;border-width:2px"></x-connector>
+<x-connector x1="285" y1="266" x2="490" y2="162" head="end" head-end="filled" style="color:#4A525E;border-width:2px"></x-connector>
+<x-connector x1="815" y1="142" x2="1020" y2="246" head="end" head-end="filled" style="color:#4A525E;border-width:2px"></x-connector>
+<x-connector x1="1045" y1="266" x2="840" y2="162" head="end" head-end="filled" style="color:#4A525E;border-width:2px"></x-connector>
+<p style="position:absolute;left:300px;top:186px;width:220px;font-size:21px;color:#6B7684;text-align:center">either direction</p>
+<p style="position:absolute;left:810px;top:186px;width:220px;font-size:21px;color:#6B7684;text-align:center">either direction</p>
+
+<div style="position:absolute;left:0px;top:428px;width:1330px;height:72px;background:#141A26;border:1px solid #2F4568;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#9BC0FA">shared</p>
+<p style="font-size:24px;color:#9AA6B2">one copy of <span style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:22px">@angular/core</span>, <span style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:22px">rxjs</span> … for all three, negotiated by version</p>
+</div>
+</div>
+<p style="font-size:29px;line-height:1.45;width:1330px;color:#9AA6B2">Every box publishes a <span style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;color:#9BC0FA">remoteEntry</span>. The addresses in them can change <b style="color:#EEF2F7">without rebuilding anything</b>.</p>
+<aside>So that third moment — resolving a name while the application is already running — has a name of its own once somebody wraps a protocol around it. It is called Module Federation.
+
+And the first thing to say is the thing most people have backwards. It is not a library. It is a mental model: a few roles, and a contract between them. Implementations exist, several of them, and they are quite different pieces of software — but what they implement is this picture.
+
+Three applications. Look at them before anything else and notice that they are the same kind of thing. Not a framework and its plugins. Not a parent and its children. Three identical boxes.
+
+Only the labels differ. One is playing host — and an application in that role is usually called the shell. The other two are playing remote.
+
+What a remote offers, it offers by name. One of these exposes its routes, the other exposes widgets, and that is all either of them offers. Everything else inside stays private; the host has no way to reach it.
+
+Now the part worth pausing on. Every one of the three publishes a remoteEntry. Not just the remotes. The host does too, and in the application we will look at later the shell's remoteEntry lists no exposes at all — an empty array — while still carrying the full shared table.
+
+Which tells you that host and remote are not opposites, and not ranks. They are roles. The same application can be a remote to the thing above it and a host to something it loads itself, at the same time.
+
+And look at the arrows, because they run both ways on purpose. A remote is not only a thing that gets consumed. It can consume back — load something the host exposes, or something a sibling exposes. The relationship is allowed to be circular, and in real systems it often is. Nothing in the model says this has to be a tree.
+
+And because each one is served from its own URL, you can simply open a remote in a browser and use it on its own. It is a complete application. It does not need the shell to exist.
+
+Which is also what makes the addresses changeable. None of this was decided at build time, so a remote can move tomorrow, or a new one can appear, and nothing has to be rebuilt for that to work.
+
+Then the band along the bottom: shared. Without it, three applications each bring their own Angular, and the browser runs three copies of the framework with three injector trees. Shared is the agreement that stops that — and it is more than a list of names. Each entry carries the version range it needs, the version it was built against, and whether it must be a singleton. At load time those get negotiated, and one copy wins.
+
+[Walk the three boxes first and say "these are the same kind of thing". Then the remoteEntry on all three. Then the shared band.]</aside>
+</section>

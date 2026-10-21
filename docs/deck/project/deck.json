@@ -1,9 +1,30 @@
 {
   "v": 4,
-  "createdOnFiles": { "v": 1, "at": "2026-10-20T12:00:00Z" },
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-20T12:00:00Z"
+  },
   "lists": "css",
   "title": "Re-imagining Module Federation in Angular",
-  "order": ["cover", "decorator", "ivy-output", "ngtsc-wraps", "phases", "ts7", "compiler", "three-ways", "specifier", "kinds", "static-dynamic", "resolution", "build-time", "load-time", "run-time"],
+  "order": [
+    "cover",
+    "decorator",
+    "ivy-output",
+    "ngtsc-wraps",
+    "phases",
+    "ts7",
+    "compiler",
+    "three-ways",
+    "specifier",
+    "kinds",
+    "static-dynamic",
+    "resolution",
+    "build-time",
+    "load-time",
+    "run-time",
+    "mf-basis",
+    "mf-is"
+  ],
   "sections": {
     "hook": {
       "description": "The decorator you write never runs, and what replaces it is plain JavaScript any bundler can read.",
@@ -24,6 +45,10 @@
     "modules": {
       "description": "A specifier is a name, not a location. What kinds exist, and the three moments at which something can resolve one.",
       "start": "specifier"
+    },
+    "federation": {
+      "description": "Module Federation is several builds interconnected: a module from another build, fetched at runtime, and the mental model of host, remote, remoteEntry, exposes and shared.",
+      "start": "mf-basis"
     }
   },
   "faces": {

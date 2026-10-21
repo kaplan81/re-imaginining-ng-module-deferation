@@ -156,15 +156,14 @@ of it is what the bundler does with those imports. Answer it three ways — buil
 time, load time, runtime — and Module Federation arrives as the third answer in a
 table the audience has already seen, instead of needing its own introduction.
 
-| Act                        | Slides | Beat                                                                                                                                                                       |
-| -------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1 · The compiler**       | 1–7    | The decorator is not a TypeScript decorator; it is read by a compiler and deleted. What ngtsc does to it, in six phases. TypeScript 7 removes the API that made it possible. `ngp` replaces it by printing a file. **DONE.** |
-| **2 · Already a choice**   | 8      | *Angular does not require esbuild.* Three bundlers and the plugin that builds Angular on each — `@angular/build`, `@nx/angular-rspack`, `@analogjs/vite-plugin-angular`. Pays off slide 7's "every bundler needs its own adapter": the adapters exist, and two of three are written by somebody outside the Angular team. Plants the Act 6 tax without naming it. No ports, no app counts, no federation — this slide explains a concept, it does not trail the demo. **DONE.** |
-| **3 · Modules**            | 9–15   | What a specifier is. The four types. Static vs dynamic imports. Module resolution, then one slide per moment with a real example: **build time** (`'@angular/core'` → `_angular_core.AnS7MGp98i.js`, from this repo's own build — the bundler had `node_modules`, the browser never will), **load time** (a real `<script type="importmap">`, a web standard since 2023, and the rule that it must be in the page before the first import), **runtime** (a URL that did not exist at build time, handed to a dynamic import). **DONE.** |
-| **4 · Module Federation**  | 12–14  | What MF is (separate builds + runtime composition; the five nouns). What it is **not** — not micro-frontends, not an architecture. What micro-frontends actually require: DI boundary, style isolation, fault isolation, all of which you write yourself. |
-| **5 · Three builds + demo**| 15–19  | The three answers side by side. What each remote ships: **data** vs **executable container**. Who resolves the module. **Demo.** Four rows of numbers.                        |
-| **6 · The cost of choice** | 20–22  | The adapter is the tax, with the Rsbuild evidence. The share-scope finding: build 2's shell takes 6 of its 9 shared packages from a widget it already has on disk. Real reasons to pick Rspack; why Vite is harder to justify today. |
-| **7 · Close**              | 23–24  | `ngp` retires the tax. Repo link, thanks.                                                                                                                                   |
+| Section | Slides | Beat |
+| --- | --- | --- |
+| **0 · Angular compilers** | 1–8 | **DONE.** The decorator is not a TypeScript decorator; it is read by a compiler and deleted. What `ngc` does to it, in six phases, 1–3 frontend and 4–6 backend. TypeScript 7 removes the API that made it possible, and `ngp` replaces it by printing a file. Closes on *Angular does not require esbuild* — three pipelines and the plugin that builds Angular on each. |
+| **1 · Modules** | 9–15 | **DONE.** What a specifier is. The four types. Static versus dynamic imports. Module resolution, then one slide per moment with a real example: build time, load time (a real `<script type="importmap">`), runtime. |
+| **2 · Module Federation** | 16–20 | **16–17 DONE.** *Modules can be federated* — code splitting is one build, federation is several builds interconnected. Then the mental model: one host, two remotes, identical boxes, `remoteEntry` on every one, arrows both ways. **Still to build:** the two implementations, both inside this section, because both implement this model. Native Federation is named here for the first time. Both ship a runtime and both decide at runtime; they differ in when the answer stops being negotiable — an import map published before the app starts, versus a share scope consulted on demand. What each publishes (`remoteEntry.json` is data; `remoteEntry.js` is code). The consequence: `registerRemotes` with `{force:true}` works on one and cannot work on the other. |
+| **3 · Three pipelines + demo** | 21– | The same product on three bundlers. Who resolves the module in each. **Demo.** Four rows of numbers. |
+| **4 · The cost of choice** | | The adapter is the tax, with the Rsbuild evidence. The share-scope finding: build 2's shell takes 6 of its 9 shared packages from a widget it already has on disk. Real reasons to pick Rspack; why Vite is harder to justify today. |
+| **5 · Close** | | `ngp` retires the tax. Repo link, thanks. |
 
 **On length.** Do not pace the deck by the narration's word count. Andres speaks
 to the slide rather than reading the notes, and times himself against a mirror
@@ -209,6 +208,102 @@ own production build. Never let a fact die in a retitled eyebrow.
 talking about what a specifier is or is not, say **module** or **file** — a
 specifier names a module; it does not say where that module's file is.
 
+### Cut 2026-10-21: "what it is not" and "what micro-frontends require"
+
+Both slides were written, published and then removed — the talk is long and they
+risked confusing an audience that does not need the micro-frontend argument to
+follow the build story. **The encapsulation point left with them.** If a one-line
+version is ever wanted back, its home is the `mf-is` speaker notes, not a slide:
+federation distributes code, it does not encapsulate it, which is why it is not by
+itself a micro-frontend architecture. The reasoning is kept below.
+
+### Encapsulation is the reason it is not micro-frontends
+
+Module Federation's own documentation calls it "an architectural pattern for the
+decentralization of JavaScript applications" and recommends it for building
+micro-frontends. So "it is not an architecture" is a weak line to take — the
+vendor says otherwise, and arguing it is a distraction.
+
+The defensible claim is narrower and sharper, and it is Andres's: **federation
+distributes code, it does not encapsulate it.** Independent deployment and runtime
+composition are distribution, and it supplies both. The DI boundary, style
+isolation and fault isolation are encapsulation, and it supplies none. Decentralising
+is not isolating. That organises both the `mf-is-not` and `mfe-requires` slides.
+
+### Deciding and fetching are different questions
+
+Both approaches ship a runtime — Native Federation's `initFederation` returns a
+`NativeFederationResult` handle that `projects/shell/src/federation.ts` stores, so
+"it is just import maps" is out of date. Both decide at runtime, because neither
+side knows the other's address at build time.
+
+**They differ in when the answer stops being negotiable.**
+
+- **Native Federation** decides everything up front: fetch the manifest and every
+  `remoteEntry.json`, negotiate versions, **publish an import map**, and only then
+  import the application. `federation.ts` states the guarantee in its own words —
+  "nothing in the application can load a remote before the runtime has negotiated
+  shared dependencies and published the import map." After that the table is fixed
+  and the browser performs every lookup from it. So the resolution is *specified at
+  load time*, even though it was *decided at runtime*.
+- **Module Federation** keeps the answers in its own share scope and consults them
+  on demand. Nothing is written down for the browser, so the arrangement can still
+  change while the page is open — which is what makes `registerRemotes` with
+  `{force: true}` possible on build 2 and impossible on build 1.
+
+That single difference explains most of the behavioural gap between the builds, and
+it is Act 5's spine. Act 4 states only the shared foundation plus one line that
+what happens next differs.
+
+### The bridge comes from the modules side
+
+Act 4 opens by contrasting federation with **code splitting**, not with bundling.
+Both produce chunks, both fetch on demand, both go through a dynamic import — the
+single difference is **which build produced the chunk**. That is a true contrast,
+it rests on something the audience already does every day, and it explains why
+resolution has to wait for runtime: your build could not resolve an address that
+did not exist yet.
+
+**Do not say "bundled versus federated."** A federated module is bundled, by
+somebody else's bundler into somebody else's output. Two earlier attempts made
+exactly this mistake and had to be withdrawn.
+
+The narration pairs it with the registry comparison: today a team publishes to npm,
+the consumer installs, rebuilds and redeploys — three steps and two builds for a
+text change. Federated, the producing team deploys and that is the whole procedure.
+
+`host` and `remote` are introduced here, as the third consequence, so the diagram
+on the next slide can use them rather than define them.
+
+Two earlier attempts at this bridge failed and are worth not repeating: a list of
+federation's *characteristics* (unreadable — every row needed vocabulary the next
+slide introduces) and a restatement of the three moments with *runtime* lit (true,
+but it floated free of the chapter it was supposed to follow from).
+
+### A bridge slide was tried and cut
+
+A slide listing federation's characteristics was written to sit between Act 3 and
+the diagram, connecting back to the three moments. It did not work: every
+characteristic needed vocabulary — `remoteEntry`, `exposes`, `shared` — that the
+diagram on the next slide was the one to introduce. Characteristics cannot precede
+the nouns. The one point it had that the diagram lacked, that addresses can change
+without a rebuild, moved onto the diagram; the connection back to Act 3 is now the
+diagram's opening sentence in the notes.
+
+### "Is" comes before "is not", and the model is the vocabulary
+
+Act 4's first slide states what Module Federation **is** — a mental model — and
+carries the five terms, because the model *is* those terms. A separate vocabulary
+slide was written and then removed: it repeated the same table one slide after the
+definition had already given it.
+
+### Native Federation is named in Act 5, not Act 4
+
+Act 4 is Module Federation only. Native Federation belongs with the three builds,
+where it is the build-1 answer and maps onto the load-time mechanism — introducing
+it earlier would mean explaining a second product before the first has been used
+for anything.
+
 ### Neither federation is named before Act 4
 
 The three resolution moments are deliberately presented as mechanisms with no
@@ -224,6 +319,17 @@ A slide may only use words the audience already has. Module Federation is not
 introduced until Act 4, so nothing in Acts 1–3 may name it, Native Federation, or
 any federation concept — not in a title, not in a row, not in passing. Act 2 is
 about **bundlers**; that is the whole of what has been earned by then.
+
+**This applies to the speaker notes as hard as to the slide**, and the notes are
+where it slips. The `mf-basis` notes used "remote" throughout, one slide before
+`mf-is` defines it. Spoken, that is worse than printed: the viewer cannot scroll
+back. Before writing notes, check which words exist at that point in the order and
+use plain English for the rest — "two applications, built separately" rather than
+"a remote".
+
+**Do not announce that a claim generalises.** "True of every implementation" was
+cut from that slide: the generalisation is earned by having checked, and stating it
+sounds defensive. Make the claim; the verification is what makes it safe to make.
 
 ### Voice — two rules, both learned the hard way
 
@@ -564,6 +670,22 @@ rows of the table.
 
 If you show transferred bytes, state the caveat: raw and uncompressed, same static
 server for all three. **Quote the ratio, not the absolute figures.**
+
+### Who emits a remote entry — verified 2026-10-21
+
+Checked across all three builds, and it is not uniform:
+
+| build | shell | a remote |
+| --- | --- | --- |
+| 1 · Native Federation | `remoteEntry.json`, `"exposes": []`, 6 shared entries | `remoteEntry.json` with its exposes |
+| 2 · MF on Rspack | `mf-manifest.json` only — **no** `remoteEntry.js` | `mf-manifest.json` + `remoteEntry.js` |
+| 3 · MF on Vite | `remoteEntry.js` | `mf-manifest.json` + `remoteEntry.js` |
+
+So "the host publishes one too" is true in build 1 and build 3, and false in
+build 2 — the Rspack host exposes nothing and emits no entry at all. Useful twice:
+on the `mf-is` slide it shows host and remote are roles rather than ranks, and in
+Act 5 it is a concrete difference between two implementations of the same model.
+The slide states the general shape; the per-build detail belongs with the builds.
 
 ### Findings worth slide time
 

@@ -1,0 +1,40 @@
+<section id="mf-basis" data-transition="push" style="display:flex; flex-direction:column; gap:30px; padding:120px 128px 150px; background:#111317">
+  <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:24px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:#6e9bf7">2 - Module Federation</p>
+  <h2 style="width:1400px; font-family:Archivo, Arial, sans-serif; font-size:72px; font-weight:700; line-height:1.08; color:#eef2f7">Modules can be federated</h2>
+  <div style="width:1400px; display:flex; flex-direction:row; gap:28px">
+    <div style="display:flex; flex-direction:column; gap:12px; flex:1; padding:28px 32px; background:#15191f; border:1px solid #262c35; border-radius:14px">
+      <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:19px; letter-spacing:3px; text-transform:uppercase; color:#5a6472">Code splitting</p>
+      <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:27px; line-height:1.4; color:#6b7684">Chunks from your own build.<br>Fetched when they are needed.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px; flex:1; padding:27px 31px; background:#141a26; border:2px solid #6e9bf7; border-radius:14px">
+      <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:19px; letter-spacing:3px; text-transform:uppercase; color:#6e9bf7">Federation</p>
+      <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:27px; line-height:1.4; color:#9bc0fa">Chunks from a different build,<br>on a different server.</p>
+    </div>
+  </div>
+  <p style="width:1400px; font-family:'Open Sans', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#6b7684">Code splitting: <span style="color:#9aa6b2"><b>one build</b></span>. Federation: <span style="color:#9aa6b2"><b>several builds, interconnected</b></span>.</p>
+  <div style="width:1400px; display:flex; flex-direction:column; gap:13px">
+    <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#9aa6b2">Each federated module has its own build, its own deployment, its own URL.</p>
+    <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#9aa6b2">The one that loads is the <span style="color:#eef2f7"><b>host</b></span>. The one being loaded is the <span style="color:#eef2f7"><b>remote</b></span>.</p>
+  </div>
+  <aside>We have spent a while on modules, so let us put federation where it belongs. It is something that can happen to a module, and the closest thing to it is something everybody here already does.
+
+Code splitting. A dynamic import, a chunk that is not downloaded until somebody opens that route. Nothing about that is exotic any more.
+
+Federation is the same shape, with one thing changed. The chunk comes from a different build. A different compile, on a different schedule, deployed to a different server — and your bundler never saw it.
+
+So it is not bundled against not bundled. Both of these are bundles. Both arrive on demand. The only difference is which build produced the thing you are fetching, and that single difference is what forces the resolution into the third moment. Your build could not have resolved an address that did not exist yet.
+
+Worth comparing to how this is normally done, because the contrast is sharp. Today, if one team has a component another team wants, it goes to a registry: publish the package, the other team installs it, rebuilds their entire application, and deploys. Three steps and two builds, for a change of text.
+
+Federated, the first team deploys. That is the whole procedure. The second application points at a URL and picks up whatever is there the next time somebody loads the page.
+
+Three consequences, and they are the whole of what this buys.
+
+Independence. A federated module has its own build, its own deployment, its own URL.
+
+The dependency can point both ways. This is not a parent and a child. Two applications can each load from the other, and in real systems they often do.
+
+And the vocabulary, which everything after this uses. In any one exchange, the side doing the loading is the host. The side being loaded is the remote. Roles in a transaction, not ranks — which is why both ways round is possible at all.
+
+[Lead with code splitting — they already know it. The whole slide is one changed word: whose build.]</aside>
+</section>
