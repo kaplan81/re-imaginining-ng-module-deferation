@@ -36,7 +36,7 @@ So compile makes the content. Emit makes the file.
 
 And emit is the only one of the six that writes back into TypeScript. It runs as a TypeScript custom transformer — ts.Transformer. The first five read from TypeScript's compiler; this is the one that hands it something. Angular gives TypeScript a function, and TypeScript calls it during its own emit.
 
-One detail that surprises people, including me: what gets printed is not always JavaScript. This repository sets isolatedModules, which tells Angular to apply only its own transformation and leave the rest of the TypeScript alone. So what the bundler receives here is TypeScript, and esbuild or Rspack does the rest.
+One detail that surprises people: what gets printed is not always JavaScript. This repository sets isolatedModules, which tells Angular to apply only its own transformation and leave the rest of the TypeScript alone. So what the bundler receives here is TypeScript, and esbuild or Rspack does the rest.
 
 Now the two halves. One is global and slow. The other is local and fast. Only one of them has been rewritten so far.
 

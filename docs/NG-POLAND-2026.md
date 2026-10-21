@@ -141,16 +141,55 @@ runtime. Where those artifacts get hosted is somebody else's talk.
 
 ---
 
-## 2. Running order — ~22 slides, ~26 min
+## 2. Running order — ~24 slides
 
-| Act                         | Time        | Slides | Beat                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --------------------------- | ----------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1 · Hook**                | 0:00–3:30   | 1–4    | The Angular compiler has a **frontend** and a **backend**. One diagram: `ng-analyze` marked Rust, `ng-preprocessor` marked JavaScript. It emits runtime code that goes **straight to a bundler**, so Angular compilation stops living _inside_ the bundler. Therefore your bundler becomes a choice. _"Most people think there's one way to bundle Module Federation in Angular. I built the same product three ways."_ |
-| **2 · Why MF is the lens**  | 3:30–8:00   | 5–8    | What MF actually is (separate builds + runtime composition; the five nouns). What it is **not** (not micro-frontends, not an architecture). What micro-frontends really require — DI boundary, style isolation, fault isolation: _you_ write those. Why MF is the right instrument: it makes you configure the bundler directly.                                                                                        |
-| **3 · The one mechanism**   | 8:00–12:00  | 9–12   | `import { Component } from '@angular/core'` — who turns that into a file? The kinds of specifier that exist **today**; bare is the problem. Import map vs a loader you ship. The three times: build / load / runtime.                                                                                                                                                                                                   |
-| **4 · Three builds + demo** | 12:00–21:00 | 13–17  | The three answers side by side. What each remote ships: **data** vs **executable container**. Who resolves the module. **Demo.** Then four rows of numbers.                                                                                                                                                                                                                                                             |
-| **5 · The cost of choice**  | 21:00–25:00 | 18–20  | The adapter is the tax, with the Rsbuild evidence. **Then the share-scope slide: build 2’s shell takes 6 of its 9 shared packages from a widget it already has on disk, so the host depends on a widget for `@angular/common`, `rxjs` and `tslib`.** Real reasons to pick Rspack; why Vite is harder to justify _today_ — and what oxc changes about that.                                                              |
-| **6 · Close**               | 25:00–27:00 | 21–22  | Back to `ngp`: when it ships, the tax retires. Repo link, thanks.                                                                                                                                                                                                                                                                                                                                                       |
+Revised 2026-10-21. The compiler section is built; the rest is not.
+
+**The correction that drives this order:** `ngp` does not make the bundler a
+choice. It is already a choice — builds 2 and 3 in this repo prove it on shipped
+Angular 22 tooling. What `ngp` changes is what that choice *costs*. So Act 1 ends
+by handing over to proof, not to a prediction.
+
+**Modules come before Module Federation**, which reverses the Zürich order. Slide 7
+ends with a compiled file full of `import` statements; the question that falls out
+of it is what the bundler does with those imports. Answer it three ways — build
+time, load time, runtime — and Module Federation arrives as the third answer in a
+table the audience has already seen, instead of needing its own introduction.
+
+| Act                        | Slides | Beat                                                                                                                                                                       |
+| -------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1 · The compiler**       | 1–7    | The decorator is not a TypeScript decorator; it is read by a compiler and deleted. What ngtsc does to it, in six phases. TypeScript 7 removes the API that made it possible. `ngp` replaces it by printing a file. **DONE.** |
+| **2 · Already a choice**   | 8      | *Angular does not require esbuild.* Three bundlers and the plugin that builds Angular on each — `@angular/build`, `@nx/angular-rspack`, `@analogjs/vite-plugin-angular`. Pays off slide 7's "every bundler needs its own adapter": the adapters exist, and two of three are written by somebody outside the Angular team. Plants the Act 6 tax without naming it. No ports, no app counts, no federation — this slide explains a concept, it does not trail the demo. **DONE.** |
+| **3 · Modules**            | 9–11   | What a specifier is. The kinds that exist today — bare is the problem. The three times: build / load / runtime.                                                               |
+| **4 · Module Federation**  | 12–14  | What MF is (separate builds + runtime composition; the five nouns). What it is **not** — not micro-frontends, not an architecture. What micro-frontends actually require: DI boundary, style isolation, fault isolation, all of which you write yourself. |
+| **5 · Three builds + demo**| 15–19  | The three answers side by side. What each remote ships: **data** vs **executable container**. Who resolves the module. **Demo.** Four rows of numbers.                        |
+| **6 · The cost of choice** | 20–22  | The adapter is the tax, with the Rsbuild evidence. The share-scope finding: build 2's shell takes 6 of its 9 shared packages from a widget it already has on disk. Real reasons to pick Rspack; why Vite is harder to justify today. |
+| **7 · Close**              | 23–24  | `ngp` retires the tax. Repo link, thanks.                                                                                                                                   |
+
+**On length.** Do not pace the deck by the narration's word count. Andres speaks
+to the slide rather than reading the notes, and times himself against a mirror
+once the whole thing exists. Build all of it, then cut. If it overruns, the demo
+is the first thing to drop — the repo link carries it — because the goal is clear
+concepts, not coverage.
+
+### No forward references
+
+A slide may only use words the audience already has. Module Federation is not
+introduced until Act 4, so nothing in Acts 1–3 may name it, Native Federation, or
+any federation concept — not in a title, not in a row, not in passing. Act 2 is
+about **bundlers**; that is the whole of what has been earned by then.
+
+### Voice — two rules, both learned the hard way
+
+**The speaker does not exist.** No "I built this", no "my repo", no "thank you for
+having me", no narrating the talk's own intentions. Andres is the author of the
+talk and the repo and should appear nowhere in either: he is a voice that
+explains. Say what is true, not who found it out.
+
+**Slide text is a cue, not a transcript.** The shortest true phrase, then stop. No
+em-dash appositives, no "which means", no consequence sentence under a diagram —
+all of that belongs in the `<aside>`. Table cells are phrases, not sentences.
+Do not tell the audience what to remember or what the talk will do next.
 
 ### What was cut from the Zürich deck, and why
 
@@ -677,7 +716,24 @@ Rewrite to the six-act structure in §2, drawing prose from §5. Because this is
 recorded video, the narration goes in the deck's **speaker notes**, written to be read
 aloud, with demo cues marked inline. Target ~26 minutes at a measured pace.
 
-### 5 · Build the deck — Act 1 done, 18 slides to go
+### 5 · Build the deck — Acts 1 and 2 done (8 slides), 16 to go
+
+**State on 2026-10-21, and where to resume.** Eight slides exist and are
+published: `cover`, `decorator`, `ivy-output`, `ngtsc-wraps`, `phases`, `ts7`,
+`compiler` (Act 1, the compiler) and `three-ways` (Act 2, the bridge). Narration
+runs 16:52 at 140 wpm — ignore that number for pacing; Andres speaks to the slide
+rather than reading the notes, and times himself against a mirror once the whole
+deck exists. Artifact: <https://claude.ai/artifact/XcyRCLzcqeFX78fwy4MypG>.
+
+**Resume at Act 3 — modules, three slides.** What a specifier is; the kinds that
+exist today, with bare being the problem; the three times, build / load / runtime.
+The third of those is where Module Federation arrives in Act 4, so Act 3 must not
+name it. Slide 8 ends, spoken, on the question those three slides answer: who
+turns `import { Component } from '@angular/core'` into a file?
+
+`docs/deck/drafts/choice.html` is **superseded** — slide 7 (`compiler`) does its
+job. Delete it or leave it; do not build on it.
+
 
 **`docs/deck/` is the source of truth for the deck**, not the published artifact and
 not a scratchpad. It holds `project/deck.json` and one `project/slides/<id>.html`

@@ -20,7 +20,7 @@
 <p style="flex:1;font-size:25px;line-height:1.4;color:#E0824B"><b>1 &amp; rf — create.</b> <span style="color:#9AA6B2">Runs once. Builds the DOM.</span></p>
 <p style="flex:1;font-size:25px;line-height:1.4;color:#6E9BF7"><b>2 &amp; rf — update.</b> <span style="color:#9AA6B2">Runs on every change detection.</span></p>
 </div>
-<aside>Here is the same component, pulled out of the production bundle of the repository we are going to run later. Nothing is simplified except the parts I replaced with an ellipsis.
+<aside>Here is the same component, pulled out of the production bundle of the repository we are going to run later. Nothing is simplified except the parts replaced with an ellipsis.
 
 Start at the top, because the top is the surprising part. Your class is still your class. The field is still a field. stockState is still an ordinary method, with the same ternary you wrote. If you pasted that class into the TypeScript playground with the decorator removed, you would get almost exactly these lines. The compiler did not touch your code.
 

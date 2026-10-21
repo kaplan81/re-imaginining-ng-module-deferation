@@ -3,7 +3,7 @@
   "createdOnFiles": { "v": 1, "at": "2026-10-20T12:00:00Z" },
   "lists": "css",
   "title": "Re-imagining Module Federation in Angular",
-  "order": ["cover", "decorator", "ivy-output", "ngtsc-wraps", "phases", "ts7", "compiler"],
+  "order": ["cover", "decorator", "ivy-output", "ngtsc-wraps", "phases", "ts7", "compiler", "three-ways"],
   "sections": {
     "hook": {
       "description": "The decorator you write never runs, and what replaces it is plain JavaScript any bundler can read.",
@@ -14,8 +14,12 @@
       "start": "ngtsc-wraps"
     },
     "break": {
-      "description": "TypeScript 7 removes that API, so Angular is building a new compiler — and that is what makes your bundler a choice.",
+      "description": "TypeScript 7 removes that API, so Angular is building a new compiler that leaves a file behind instead of running inside the bundler.",
       "start": "ts7"
+    },
+    "choice": {
+      "description": "The bundler is already a choice — the same product built three ways on Angular 22, and the one question all three answer differently.",
+      "start": "three-ways"
     }
   },
   "faces": {

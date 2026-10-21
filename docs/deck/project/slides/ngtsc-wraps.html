@@ -23,7 +23,7 @@
 
 The architectural fact underneath that is this: it does not replace the TypeScript compiler, and it is not a fork of it. It wraps it. NgtscProgram wraps TypeScript's Program. NgCompilerHost wraps TypeScript's CompilerHost — that is how it sneaks in extra files, like the template type-checking shims. And NgCompiler sits on top and drives all the Angular-specific work.
 
-Angular's own documentation puts it more bluntly than I would dare to: the decorator is the compiler. @Component is not configuration that gets read at runtime. It is an instruction to a compiler, and the compiler's entire job is to turn it into something else.
+Angular's own documentation puts it bluntly: the decorator is the compiler. @Component is not configuration that gets read at runtime. It is an instruction to a compiler, and the compiler's entire job is to turn it into something else.
 
 Because it wraps TypeScript rather than replacing it, everything Angular does to your code has to fit through TypeScript's own compiler API. Angular does not get to invent its own way in. It uses the doors TypeScript leaves open.
 
