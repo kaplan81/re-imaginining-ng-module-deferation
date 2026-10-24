@@ -1,0 +1,42 @@
+<section id="close" data-transition="fade" style="display:flex; flex-direction:column; gap:26px; padding:112px 128px 150px; background:#111317">
+  <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:24px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:#6e9bf7">3 - Bundlers</p>
+  <h2 style="width:1500px; font-family:Archivo, Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.08; color:#eef2f7">What ngp changes about all of this</h2>
+  <p style="width:1400px; font-family:'Open Sans', Verdana, sans-serif; font-size:29px; line-height:1.4; color:#9aa6b2">It compiles <span style="color:#eef2f7"><b>one file at a time</b></span>, so a bundler plugin can compile only the files a page actually reaches. That is <span style="color:#9bc0fa"><b>lazy compilation</b></span>, and it takes over part of what <span style="color:#eef2f7"><b>Module Federation</b></span> is for.</p>
+  <p style="width:1400px; font-family:'Open Sans', Verdana, sans-serif; font-size:29px; line-height:1.4; color:#9aa6b2">It can do <span style="color:#eef2f7"><b>separate builds</b></span>, like Module Federation does &mdash; but not <span style="color:#eef2f7"><b>separate deployments</b></span>, because the minimal deployable unit is <span style="color:#eef2f7"><b>the app</b></span>.</p>
+  <div style="width:1400px; display:flex; flex-direction:column; gap:14px; padding:20px 0 0; border-top:1px solid #2a2f38">
+    <div style="display:flex; flex-direction:row; gap:28px; align-items:baseline">
+      <p style="width:170px; font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:20px; letter-spacing:3px; text-transform:uppercase; color:#5a6472">Today</p>
+      <p style="flex:1; font-family:'Open Sans', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#6b7684">Every bundler that is not esbuild needs an adapter to host the Angular compiler. The adapter (or plugin) sets the ceiling.</p>
+    </div>
+    <div style="display:flex; flex-direction:row; gap:28px; align-items:baseline">
+      <p style="width:170px; font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:20px; letter-spacing:3px; text-transform:uppercase; color:#6e9bf7">With ngp</p>
+      <p style="flex:1; font-family:'Open Sans', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#9aa6b2">The compiler leaves a file. The bundler reads TypeScript. <span style="color:#eef2f7"><b>There is nothing left to adapt.</b></span></p>
+    </div>
+  </div>
+  <p id="43398c6d" style="position:absolute; top:682px; left:128px; width:1400px; font-family:'Open Sans', Verdana, sans-serif; font-size:29px; line-height:1.4; color:#9aa6b2"><b>It makes Angular more pluggable.</b></p>
+  <aside>So that is the whole argument, and there are two halves to it.
+
+The first half is lazy compilation. ngp can be asked for one file, and both halves of the compiler move together — the analysis and the code generation, for that one file, in one call. The old compiler could not do the analysis half without building a program over everything, so a per-file unit did not exist to ask for. Now it does, and a bundler plugin can ask for a file only when something actually wants it. One exception: packages do not go through this. Node modules are handled once, up front, by Angular's linker. Your own code is the lazy half.
+
+So why does a team split an Angular application into separately built pieces? Ask them and you hear about autonomy. Ask what actually drove the decision and it is more ordinary. The build got slow. Somebody waits minutes to see a change in a corner of the application they are not even touching. That is a build-time problem solved with a runtime architecture — a very large bill for a fast feedback loop.
+
+Hence that second line. Separate builds is the thing you no longer need federation for. One codebase, one build, and the compiler still only looks at what the page needs. This is not hot module replacement, in case anybody hears it that way — that swaps a piece of an application already built. This is about never building those pieces at all.
+
+Somebody will push back on the sharing, so have the answer ready. Federation really does guarantee one copy of Angular. But inside a single build you get that for nothing, and more firmly: the bundler resolves the specifier to one module, and every importer gets that instance. Sharing is a fix for a problem separate builds create. Five builds means five copies. One build never had five.
+
+Separate deployments is what no compiler reaches. One build is one deploy. No shipping your piece on Tuesday while another team ships theirs on Thursday, no two Angular versions side by side. All of that follows from separate deployments, and separate deployments is federation's alone.
+
+Notice the floor, though. The smallest thing you can deploy separately is a whole application. The widget microfrontends in this repository look like components and are not — each is a full project, with an entry point, a bootstrap, three tsconfigs, its own design tokens and a dev server port. To ship one component you build an application around it. Which is the real difference in grain: federation separates at the application, lazy compilation separates at the file. So lazy compilation does not replace Module Federation. It replaces the reason most teams reached for it.
+
+The second half is the two lines underneath, and it is why this talk exists now rather than a year ago. Every bundler that is not the one Angular ships with needs an adapter whose only job is to host the Angular compiler, because until now Angular's output never existed anywhere you could pick it up. One adapter per bundler, each maintained by somebody, each one a ceiling — and you find out which ones are still maintained on the day you try to upgrade. When the compiler leaves a file behind, the bundler is not hosting anything. It is reading TypeScript, which all of them already do. The adapter has nothing left to adapt.
+
+None of that is shipped. It is a prototype in a branch, and the caution in its README is their own word. But it has been merged, it is worked on every day, and the direction is not ambiguous.
+
+So if you take one thing: the bundler under your Angular application is a decision, it already was, and the thing that made it expensive is being removed. That is what the last line means. Angular becomes pluggable.
+
+Everything here — five applications, three pipelines, fifteen dev servers, the measurements and how they were taken — is in that repository. Clone it, and disagree.
+
+Thank you.
+
+[Separate builds, then separate deployments, then the floor. Slow down for the last two lines.]</aside>
+</section>

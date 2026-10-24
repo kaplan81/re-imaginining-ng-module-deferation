@@ -14,7 +14,6 @@
     "phases",
     "ts7",
     "compiler",
-    "three-ways",
     "specifier",
     "kinds",
     "static-dynamic",
@@ -24,7 +23,13 @@
     "run-time",
     "mf-basis",
     "mf-is",
-    "implementations"
+    "implementations",
+    "tool-vs-bundler",
+    "two-axes",
+    "vite-vs-default",
+    "rspack-vs-default",
+    "close",
+    "demo"
   ],
   "sections": {
     "hook": {
@@ -39,10 +44,6 @@
       "description": "TypeScript 7 removes that API, so Angular is building a new compiler that leaves a file behind instead of running inside the bundler.",
       "start": "ts7"
     },
-    "choice": {
-      "description": "The bundler is already a choice — the same product built three ways on Angular 22, and the one question all three answer differently.",
-      "start": "three-ways"
-    },
     "modules": {
       "description": "A specifier is a name, not a location. What kinds exist, and the three moments at which something can resolve one.",
       "start": "specifier"
@@ -50,6 +51,10 @@
     "federation": {
       "description": "Module Federation is several builds interconnected: a module from another build, fetched at runtime, and the mental model of host, remote, remoteEntry, exposes and shared.",
       "start": "mf-basis"
+    },
+    "bundlers": {
+      "description": "The same product on three pipelines — each a config file and an Angular plugin, varying independently in bundler and federation library — measured, and what the choice costs is an adapter per bundler.",
+      "start": "tool-vs-bundler"
     }
   },
   "faces": {

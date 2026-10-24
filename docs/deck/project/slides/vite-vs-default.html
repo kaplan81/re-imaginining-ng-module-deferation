@@ -1,0 +1,24 @@
+<section id="vite-vs-default" data-transition="push" style="display:flex; flex-direction:column; gap:38px; padding:112px 128px 150px; background:#111317">
+  <p style="font-family:'IBM Plex Mono', 'Courier New', monospace; font-size:24px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:#6e9bf7">3 - Bundlers</p>
+  <div style="width:1400px; display:flex; flex-direction:column; gap:14px">
+    <h2 style="font-family:Archivo, Arial, sans-serif; font-size:76px; font-weight:700; line-height:1.08; color:#eef2f7">Vite pipeline</h2>
+    <p style="font-family:Archivo, Arial, sans-serif; font-size:44px; font-weight:700; line-height:1.15; color:#f0a878">Why it is probably not an option</p>
+  </div>
+  <div style="width:1400px; display:flex; flex-direction:column; gap:22px">
+    <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:31px; line-height:1.45; color:#9aa6b2">There is no federation reason to use Vite, unless you are very interested in <span style="color:#eef2f7"><b>its ecosystem</b></span>.</p>
+    <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:31px; line-height:1.45; color:#eef2f7"><b>Chunk URL rewriting is not possible.</b></p>
+    <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:31px; line-height:1.45; color:#9aa6b2">Unused shared modules are <span style="color:#eef2f7"><b>not automatically pruned</b></span>.</p>
+    <p style="font-family:'Open Sans', Verdana, sans-serif; font-size:31px; line-height:1.45; color:#9aa6b2">There is no real advantage over the <span style="color:#eef2f7"><b>Angular CLI</b></span> capabilities.</p>
+  </div>
+  <aside>So: the two custom pipelines, one at a time, each against the thing you already have. The weaker case first.
+
+The first line is the honest headline. There is no federation reason to reach for Vite. What you would gain on the federation side does not come from Vite, it comes from Module Federation — and it is the same whichever bundler you run it on. What Vite does give you is its own ecosystem: Vitest for testing, Storybook for components in isolation, Astro if you are putting Angular into a documentation site. If you want that, want it for itself.
+
+Chunk URL rewriting is not possible, and the reason is Rolldown. It writes real import statements into the output with the paths inside them. The address of a chunk is in the statement, so there is no variable anywhere to reassign while the application is running.
+
+Shared modules are not pruned for you, and this one costs real bytes on the day. The federation plugin emits a chunk for every package you declare as shared, not for every one you actually use. Declare all your dependencies and the Angular compiler — six hundred kilobytes of it — ships into every application, for nothing. The Angular CLI prunes that automatically. Here you keep the list by hand.
+
+And the last line is the summary of the other three. Against the capabilities the CLI already gives you, there is nothing here you are gaining.
+
+[Four lines, read them plainly. The first is the one that does the work.]</aside>
+</section>

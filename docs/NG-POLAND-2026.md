@@ -141,7 +141,7 @@ runtime. Where those artifacts get hosted is somebody else's talk.
 
 ---
 
-## 2. Running order — ~24 slides
+## 2. Running order — 23 slides
 
 Revised 2026-10-21. The compiler section is built; the rest is not.
 
@@ -158,17 +158,18 @@ table the audience has already seen, instead of needing its own introduction.
 
 | Section | Slides | Beat |
 | --- | --- | --- |
-| **0 · Angular compilers** | 1–8 | **DONE.** The decorator is not a TypeScript decorator; it is read by a compiler and deleted. What `ngc` does to it, in six phases, 1–3 frontend and 4–6 backend. TypeScript 7 removes the API that made it possible, and `ngp` replaces it by printing a file. Closes on *Angular does not require esbuild* — three pipelines and the plugin that builds Angular on each. |
-| **1 · Modules** | 9–15 | **DONE.** What a specifier is. The four types. Static versus dynamic imports. Module resolution, then one slide per moment with a real example: build time, load time (a real `<script type="importmap">`), runtime. |
-| **2 · Module Federation** | 16–20 | **16–17 DONE.** *Modules can be federated* — code splitting is one build, federation is several builds interconnected. Then the mental model: one host, two remotes, identical boxes, `remoteEntry` on every one, arrows both ways. **Still to build:** the two implementations, both inside this section, because both implement this model. Native Federation is named here for the first time. Both ship a runtime and both decide at runtime; they differ in when the answer stops being negotiable — an import map published before the app starts, versus a share scope consulted on demand. What each publishes (`remoteEntry.json` is data; `remoteEntry.js` is code). The consequence: `registerRemotes` with `{force:true}` works on one and cannot work on the other. |
-| **3 · Bundlers** | 21– | The same product on three pipelines, side by side: what each one publishes, who resolves the module, and the numbers. **Demo.** Then the cost of the choice — the adapter is the tax, with the Rsbuild evidence; the share-scope finding (build 2's shell takes 6 of its 9 shared packages from a widget it already has on disk); real reasons to pick Rspack, and why Vite is harder to justify today. |
-| Close | | `ngp` retires the tax. Repo link, thanks. No section label, like the cover. |
+| **0 · Angular compilers** | 1–7 | **DONE.** The decorator is not a TypeScript decorator; it is read by a compiler and deleted. What `ngc` does to it, in six phases, 1–3 frontend and 4–6 backend. TypeScript 7 removes the API that made it possible, and `ngp` replaces it by printing a file. Closes on slide 7, *Angular Preprocessor works out of the bundler*. The per-file consequence that used to close this section moved to the deck's close on 2026-10-24. |
+| **1 · Modules** | 8–14 | **DONE.** What a specifier is. The four types. Static versus dynamic imports. Module resolution, then one slide per moment with a real example: build time, load time (a real `<script type="importmap">`), runtime. |
+| **2 · Module Federation** | 15–17 | **DONE.** *Modules can be federated* — code splitting is one build, federation is several builds interconnected. Then the mental model: one host, two remotes, identical boxes, `remoteEntry` on every one, arrows both ways. Then the two implementations, both inside this section, because both implement this model. Native Federation is named here for the first time. Both ship a runtime and both decide at runtime; they differ in when the answer stops being negotiable — an import map published before the app starts, versus a share scope consulted on demand. What each publishes (`remoteEntry.json` is data; `remoteEntry.js` is code). The consequence: `registerRemotes` with `{force:true}` works on one and cannot work on the other. |
+| **3 · Bundlers** | 18–22 | **DONE.** *A build tool is not a bundler* — a build tool contains a bundler plus a dev server, TypeScript, stylesheets and assets, and it has defaults. *Three build pipelines* — the same product three ways, in one table: config file, Angular plugin, bundler, federation library, with the bundler and the federation library varying independently. Then a verdict per custom pipeline: *Vite pipeline — why it is probably not an option*, and *Rspack pipeline — why it could be an option*. The section ends on the close, *What ngp changes about all of this*, which carries the section-3 eyebrow like the four slides before it. |
+| **Demo** | 23 | **Added 2026-10-24.** *Demo time* — the last slide, and the only one besides the cover with no section label. The screen recording runs from here. |
 
-**On length.** Do not pace the deck by the narration's word count. Andres speaks
-to the slide rather than reading the notes, and times himself against a mirror
-once the whole thing exists. Build all of it, then cut. If it overruns, the demo
-is the first thing to drop — the repo link carries it — because the goal is clear
-concepts, not coverage.
+**On length — settled 2026-10-24.** The deck is not paced by arithmetic. Andres
+knows the slides and improvises against them, so `docs/NARRATION.md` is a
+reference rather than a script and carries no word counts and no timings; the
+generator no longer produces any. Build all of it, then cut by judgement against
+the slides. If it overruns, the demo is the first thing to drop — the repo link
+carries it — because the goal is clear concepts, not coverage.
 
 ### Type-checking is backend work
 
@@ -193,7 +194,7 @@ numbered rows, with a line beneath saying so.
 
 There are four sections and no more: **0 - Angular compilers**, **1 - Modules**,
 **2 - Module Federation**, **3 - Bundlers**. The eyebrow on every slide names its
-section, nothing else. The cover carries none, and neither do the closing slides. It replaces the vertical
+section, nothing else. The cover carries none, and neither does the `demo` slide. The close does carry one: it is the last slide of section 3, not a standalone finale. It replaces the vertical
 stacks the slides.com deck used to show position, so the viewer always knows where
 they are. The cover has no section label.
 
@@ -464,16 +465,388 @@ and lets the commit traffic carry the weight. It does **not** assert that bundle
 adapters are going away — that conclusion is left standing on the Rsbuild evidence
 in Act 5, where it is a measurement rather than a prediction.
 
-**The checkable version, verified 2026-10-20.** The shipped
-`@angular/compiler-cli@22.2.3` — the one that builds this repo — contains **no
-`preprocessor` directory, no `ng-analyze`, and not one `.wasm` or `.node`
-artefact**. PR #71259 carried the label `target: minor`, so it lands in 22.3.0 at
+**The checkable version — CORRECTED 2026-10-24.** The earlier wording ("no
+`preprocessor` directory") is wrong and must not be said on stage. Re-checked against
+the installed `@angular/compiler-cli@22.2.3`:
+
+- **There IS `src/ngtsc/preprocessor.d.ts`**, declaring
+  `NgtscIsolatedPreprocessor`. Its own docblock: _"A driver for the Angular Compiler
+  that performs 'Source-to-Source' transformation. Unlike `NgtscProgram`, this driver
+  does NOT use `program.emit()`."_ It analyzes with `NgCompiler`, runs `ts.transform`
+  with the Ivy transformers, and **"prints the transformed AST back to a TypeScript
+  string"** — designed for _"a mode where the Angular Compiler acts as a pre-processor
+  for a downstream TypeScript compiler."_ Its one method is
+  `transformAndPrint(): { fileName, content }[]`.
+- **It is declaration-only.** `transformAndPrint`, `Source-to-Source` and
+  `IsolatedPreprocessor` appear in **zero** `.js`/`.mjs` files, and it is not
+  re-exported from the public entry points. A reserved API surface, no runtime.
+- **Still true:** no `ng-analyze`, no `.wasm`, no `.node`, no napi (the three `napi`
+  string hits in `node_modules` are inside `@babel/core`).
+- **And note what it is not.** It runs `ts.transform` — the preprocessor *shape* on
+  the old TypeScript machinery, not the Rust analyzer. The Rust half is still absent.
+
+**This is better material than the old claim.** Instead of "the package contains none
+of it", the line becomes: the shipped type declarations already describe a compiler
+that does not call `program.emit()` and prints TypeScript for somebody else to
+compile — go and open `preprocessor.d.ts` yourself. Checkable, and it shows direction
+rather than asserting it.
+
+PR #71259 carried the label `target: minor`, so the implementation lands in 22.3.0 at
 the earliest, and the blog only _aims_ the experimental build at the end of 2026.
 
 So the slide may never say Angular **is** half Rust. It says Angular **is being
 rewritten** that way. Put the disproof on the slide rather than in the notes — "the
 `@angular/compiler-cli` you installed this morning contains none of it" is a
 checkable line that buys credibility for everything after it.
+
+### The advantage of `ngp` is per-file compilation — merged into the close 2026-10-24
+
+**Where this lives now.** It was slide 8, `ngp-per-file`, from 2026-10-23 until
+2026-10-24, when Andres asked for it to be merged into the deck's close and the
+file deleted. Moving it fixed a forward reference: at position 8 the slide named
+Module Federation eight slides before the deck introduces it. The two cards —
+*separate builds YES* / *separate deployments NO* — did not survive his rewrite
+of the close; the claim is now one sentence, and the reasoning below is the
+record of where it came from.
+
+Added 2026-10-23, sourced from **Christopher Holder, _vite-plugin-ngp: Angular on
+Vite, one file at a time_, push-based.io, 22 October 2026**
+(<https://push-based.io/article/vite-plugin-ngp-angular-on-vite-one-file-at-a-time>,
+repo <https://github.com/push-based/vite-plugin-ngp>).
+
+**The mechanism, and it is the whole slide.** `ngc` cannot compile one file. Before
+it emits a line of output for a single component it builds a TypeScript program
+over every file in the project — not a flaw but the frontend doing its job, since a
+template may reference a directive declared anywhere. The consequence is that every
+Angular dev server in existence compiles the whole application before serving the
+first module. `ngp` can be asked for one file, with nothing built first.
+
+**Do not credit `ngp` with "on demand" — that is the plugin's half.** The article
+applies the phrase only to the plugin ("a Vite plugin that compiles Angular modules
+on demand"). What it attributes to `ngp` is narrower: it "can process Angular files
+individually." So the slide separates the two: `ngp` can compile one file, and
+*a plugin built on it* can therefore compile on demand. **The plugin is not a topic
+in the talk and is not named anywhere in it** — Andres cut the on-screen evidence
+strip on 2026-10-23 for exactly that reason. The figures survive only as spoken
+evidence in the notes, credited to Push-Based.
+
+**Nothing here happens in the browser, and the slide must never imply it does.**
+The phrase that invites the mistake is the article's "compiles each Angular file
+when the browser asks for it" — the browser supplies the *trigger*, over HTTP, and
+the compiling happens in the dev server, in Node, before the response goes back.
+This is still ahead-of-time compilation; the browser receives a finished
+definition. The plugin loads `ngp` as a **native Node binding**, which could not run
+in a page at all, and the plugin's README notes that Angular's linker runs over
+`node_modules` during pre-bundling so "the browser doesn't need the JIT compiler."
+Two senses of *just in time* are being conflated and only one applies: the
+scheduling is lazy, the compilation mode is not JIT. The notes say this out loud.
+
+**Verified against the plugin's source, 2026-10-23** (`@push-based/vite-plugin-ngp`
+v0.2.0. `ngp`'s own source is not in that repo — its `toolchain/` only fetches
+Angular — so these rest on the API the plugin calls, its tests and its decision log):
+
+- `ngp` is called **only** from Vite's `transform`, once per file. There is no
+  `buildStart` hook and no project-wide pass; the compiler is built lazily on the
+  first transform.
+- Initialisation is `createAnalyzer(tsconfig)` plus loading a native binding — **not
+  a program build**. Handed a tsconfig with `include: []`, the analyzer still
+  produces identical output: it reads a file the first time `processFile` asks and
+  follows that file's imports from there. First module on a 5,000-component app,
+  about 164 ms.
+- So the per-file ability is **genuinely `ngp`'s, not a caching trick in the
+  plugin**. The cache the plugin manipulates is `ngp`'s, and it only evicts from it.
+- `ngp` also decides staleness: `updateFileContent` returns the stale set, and the
+  plugin's contribution is mapping that onto Vite's module graph.
+- **Nothing is written to disk.** Compiled source comes back in memory as a
+  MagicString. The only side files are a generated tsconfig and, with type-checking
+  on, `.ngtypecheck.ts` blocks — both inside Vite's cache directory, never `.ng.ts`.
+  Writing a folder of `.ng.ts` is the standalone CLI mode, which slide 7 covers; do
+  not conflate the two on slide 8.
+- **The one asterisk**, from the plugin's own decision log: in optimize mode,
+  whole-program queries "see only the files read so far". So per-file means
+  per-file-given-what-the-analyzer-has-already-seen, not context-free. The slide's
+  wording — *nothing else has to be built first* — is the honest form of that. Do
+  not upgrade it to "it looks at nothing else."
+
+This is the *second* advantage, and slide 7 already carries the first. Keep them
+apart: slide 7 is structural (`ngp` leaves a file, so no adapter hosts a compiler);
+slide 8 is operational (`ngp` can answer for one file, so a dev server does less work).
+
+**The slide, as it finally stands (2026-10-23).** Title *ngp is revolutionary*, three
+bullets in Andres's own words — compiles one file at a time; compiled files can be
+fed to TypeScript or to a bundler; bundler plugins can enable lazy compilation — and
+nothing else. Five diagrams were tried and all five were rejected: a per-bullet icon
+row, a project-row-with-one-file-lit, a plain flow, a request/response sequence, and
+a route-granularity grouping. The objections were consistent and worth remembering:
+a row of file boxes reads as "already compiled", everything inside one container
+reads as "all at once", and a sequence of separate round trips for `main` →
+`bootstrap` → `app` reads as three independent on-demand decisions when they are
+really one boot chain. **The slide carries no figure. Do not add one back without
+asking.**
+
+**There are no numbers on this slide any more, on screen or spoken.** The measured
+figures were cut with the final notes rewrite. Available from the same source if
+wanted: template edit to page 111 ms against 3.0 s; a generated 5,000-component app
+reaching its first page in 1.6 s against 28.4 s; Ghostfolio (157 components, plugin
+/ Nx) restart to first page 3.2 s / 16.2 s and dev server memory 0.85 GB / 3.6 GB.
+
+**It was the longest slide in the deck by a wide margin.** Its notes were rewritten
+much shorter when it was merged into the close on 2026-10-24.
+
+**Three cautions.**
+
+- These are **somebody else's numbers**, from a prototype plugin on a prototype
+  compiler, measured on GitHub `ubuntu-latest` runners (medians of 5 runs, 10 for
+  edits) except the 5,000-component figure, which is an Apple M2 Max. If any of them
+  go back on the slide, credit Push-Based aloud, and never merge them into
+  `tools/measurements.md` or the four-row table in section 3. Different axis entirely: that table compares
+  **bundlers**, this compares **compilers**.
+- Super Productivity's `ng serve` baseline is a **JIT** build, as that app configures
+  it, so its row is not like-for-like. That is why the slide uses Ghostfolio, whose
+  baseline is Nx. Do not quote the Super Productivity numbers.
+- "Output identical to a full build" is a claim in the plugin's **README**, about the
+  analyzer, and the article does not repeat it. The article does note Ghostfolio's
+  initial JavaScript came out 17% larger gzipped. Do not assert equivalence.
+
+This does not weaken "a direction, not a fact" above — it is the first *measurement*
+of the direction, not evidence that it has arrived.
+
+**Two readings to refuse, both tempting.**
+
+- **It is lazy _compilation_, never lazy _loading_.** Lazy loading is a runtime
+  behaviour — the browser defers downloading and executing code, through lazy
+  routes, `@defer` and dynamic imports — and `ngp` changes none of it. What is
+  deferred here is *compiler work in the dev server*. Build time versus runtime is
+  the distinction section 1 spends three slides drawing; do not blur it in section 0.
+- **No "fast JIT in WASM".** The blog does say the WASM target makes browser-based
+  compilation possible, so it is not fantasy, but WASM is the **fallback** — a
+  native library "or falling back to WASM" — not the fast path, only the analyzer is
+  Rust, and nobody has announced browser compilation. Speculation, and ruled out by
+  "a direction, not a fact".
+
+**Scope: this is a dev-server result.** The article's scaling claim is about the dev
+server, and it says production builds are where the gains are smallest ("about the
+same memory as the CLI's"), though production build times did fall — 24.9 s → 14.4 s
+and 18.2 s → 14.3 s.
+
+### On the close: `ngp` attacks a reason people adopt federation
+
+The article, verbatim: per-file compilation **"does on its own what teams otherwise
+do by hand with trimmed route files or module federation"**, letting you **"compile
+only the part of the app you're working on."**
+
+This is the sharpest thing found for the close so far, because it lands on the
+talk's own seam. One real motivation for federation is build scalability — nobody
+wants to compile the whole monolith to change one page — and that is a *tooling*
+motivation wearing an architecture's clothes. The talk already separates what
+federation genuinely requires from what people reach for it to get. Here is a
+compiler coming for one of those reasons directly.
+
+Pair it with the existing close ("`ngp` retires the adapter tax"): the same compiler
+change removes a reason to pick a bundler adapter *and* a reason to pick federation.
+
+**DECIDED 2026-10-23 — this argument lives in slide 8's speaker notes.** Andres chose
+to put it there rather than hold it for the close, overriding the forward-reference
+objection below. Module Federation is therefore named aloud on slide 8, nine slides
+before `mf-basis` introduces it. That is a deliberate exception, not an oversight;
+if the cutting pass moves it to the close, the problem resolves itself.
+
+As written, the notes run it in five beats: why teams actually split an application
+(the build got slow, not autonomy); that this is a build-time problem answered with
+a runtime architecture; that federation's boundary is a deployable unit while lazy
+compilation's is the file you are touching, so component-level separation is
+something federation cannot give; that for a team whose real need was a fast loop
+and clear ownership it replaces federation outright; and where it stops — one build,
+one deployment, no independent cadence, no runtime composition. It lands on
+**"lazy compilation does not replace Module Federation; it replaces the reason most
+teams reached for it."**
+
+**The mechanism-by-mechanism breakdown**, which is the rigorous backing for all of
+the above. "Replaces federation" hides three different substitutions:
+
+_Genuinely replaced by lazy compilation:_
+
+- **Separate builds, for the dev loop.** The reason teams split is so they do not
+  recompile everything to change one page. Lazy compilation gives that inside one
+  build.
+- **Separate type-checking — partly.** The plugin defers checking to an idle pass in
+  a child `tsgo` process, so an error elsewhere does not block your loop. But it
+  still loops the project and will report, and a production build type-checks
+  everything. MF keeps that genuinely isolated; this does not.
+
+_Never federation's to begin with — Angular already has it:_
+
+- `loadRemote` and runtime module loading → ordinary dynamic `import()` plus the
+  bundler's chunk splitting. Lazy routes and `@defer` already fetch a route's code
+  only when visited. **Slide `mf-basis` already draws this line** — code splitting is
+  one build, federation is several interconnected. On-demand *loading* was always the
+  code-splitting half, so lazy compilation is not replacing it; nothing needs to.
+
+_Dissolves rather than being replaced:_
+
+- `exposes`, the container, `remoteEntry.js`, `remotes` registration, the share scope
+  and version negotiation all exist **because builds cannot see each other**. One
+  build, and none of them have a job. Concretely from this repo: 117 kB of
+  `remoteEntry.js` per remote disappears, and so does the `share-scope` finding (slide cut)
+  — the shell taking six of nine shared packages from a widget is a share-scope
+  artifact, and there is no share scope without separate builds.
+
+_Nothing replaces:_
+
+- Independent deployment, independent release cadence, teams on different Angular
+  versions, runtime composition of things built by different people at different
+  times.
+- **One instance of a package across separately deployed applications.** Distinct
+  from the share-scope bullet above, and the likeliest challenge from the room.
+
+**The package-sharing challenge, and the answer.** Asked 2026-10-23: does this really
+replace the way MF guarantees a single shared instance? Three parts:
+
+- **Inside one build it is structural, not negotiated.** The bundler resolves
+  `@angular/core` to one module and every importer gets that instance. Stronger than
+  a runtime negotiation, because it cannot drift.
+- **But MF's control is active where a bundler's is passive.** `singleton`,
+  `requiredVersion` and `strictVersion` assert and can fail loudly; a bundler just
+  resolves, so genuinely duplicated versions in the dependency tree get bundled twice
+  with no warning. Concede this.
+- **The framing that resolves it:** sharing is a fix for a problem separate builds
+  create. Five builds means five copies of Angular and the share scope exists to stop
+  you shipping all five. One build never had five. So lazy compilation does not need
+  to match the feature — the condition it answers does not arise.
+
+This repo is the cautionary half: the share scope worked (exactly one `@angular/core`,
+verified) and the price was the `share-scope` finding (slide cut) — the shell taking six of
+nine packages from a widget.
+
+**The precise claim, therefore:** federation bundles a build-time benefit with a
+deployment-time benefit. Lazy compilation takes the build-time one and delivers it
+inside a single build; code splitting already delivered the runtime loading. What is
+left of federation is **deployment independence alone** — a real requirement for some
+teams, and for many others never the thing they actually wanted.
+
+### The deployment floor is an application — verified 2026-10-23
+
+The sharpest fact in this whole argument, and it is one `ls` away. **A widget
+microfrontend is a full Angular application, not a thin wrapper around a component.**
+`projects/top-lots` and `projects/catalog` have *identical* structures: the same
+`src/` (`app`, `bootstrap.ts`, `index.html`, `main.ts`, `styles.scss`), the same
+`federation.config.mjs`, the same three tsconfigs, the same `styles/` folder. The
+only difference in the entire listing is that `catalog` has a `public/`.
+
+Add the rest from `AGENTS.md` and the floor is concrete: a dev server port, build and
+test scripts, byte-identical token copies, and **at least one spec or
+`@angular/build:unit-test` fails the whole workspace**. To ship one component you
+build an application around it.
+
+**Two consequences.**
+
+- **Federation's smallest deployable unit is an application, structurally, not
+  economically.** The earlier framing in this brief — that the unit is an app because
+  that is where the per-unit overhead amortises — was wrong. The tooling has nothing
+  smaller to deploy.
+- **So the grain difference is categorical, and Andres's original wording was closer
+  than my objection allowed.** Federation separates at the application; lazy
+  compilation separates at the file. The part of my objection that stands is narrow:
+  a compilation unit is still not a deployment unit, because a deployed thing needs
+  its specifiers resolved at runtime, a bundle rather than an intermediate, a
+  contract that survives type erasure, and an injector it does not control. None of
+  those is a compiler's job. But on *granularity* he was right.
+
+Slide `ngp-per-file` carried this as a card reading "Independent deployment — but
+the smallest unit is a whole application", conceding the capability and naming its
+floor in one line. On the close it is the clause "because the minimal deployable
+unit is **the app**".
+
+### Does lazy compilation improve HMR? — asked 2026-10-23
+
+Yes, for two of the five stages of the cycle, and not at all for the one that causes
+the bugs. Sourced from the plugin's API surface (agent read of
+`@push-based/vite-plugin-ngp` v0.2.0) and its README.
+
+- **HMR is first-class in `ngp`'s own API, not bolted on by the plugin.**
+  `createAnalyzer(tsconfig, { optimize, enableHmr, backend, nativeBinding })` takes an
+  HMR flag, and `emitHmrUpdateModule(file, className)` returns just the update module
+  for one changed component. The README: HMR "uses the same protocol as the Angular
+  CLI, so Angular's runtime applies component updates unchanged."
+- **The structural win is invalidation, not speed.**
+  `analyzer.updateFileContent([...])` returns the **stale set**, and the plugin
+  invalidates exactly those modules in Vite's graph. `ngp` knows the *Angular*
+  dependency graph — which template uses which directive — which no bundler can see.
+  Over-invalidate and you lose the state HMR exists to preserve; under-invalidate and
+  the output is stale. Getting that boundary right is what HMR lives on.
+- **The two compose well.** The modules that could need an update are exactly those
+  already compiled, which under lazy compilation is a small set.
+
+**Two cautions, both load-bearing if the figures are ever quoted.**
+
+- **The measured numbers are not an HMR-to-HMR comparison.** The Super Productivity
+  row is annotated "2.6 s (**full reload**)" — that baseline was reloading the page,
+  not hot-replacing. Quoting 111 ms against 3.0 s as an HMR speedup misstates it.
+- **Compile time was never HMR's hard part.** The hard part is preserving state
+  across the swap — a signal, a form, a scroll position, an open dialog. Angular's
+  runtime owns that, and no compiler change touches it. Lazy compilation makes the
+  recompile cheap and the boundary precise; it does not make the swap safer.
+
+Related: the close's notes warn that lazy compilation is **not** HMR — HMR swaps a
+piece of an application already built, this never builds those pieces at all. Keep
+the two distinct whenever either is mentioned.
+
+### Combining the two — now on the close
+
+Asked 2026-10-23: can Module Federation and lazy compilation together beat federation
+alone? Yes, three ways, and the third is already evidenced in this repo:
+
+- **The dev loop, multiplied.** Federated development means many dev servers —
+  fifteen here, and `tools/check-ports.mjs` gates them because only one stack can run
+  at a time. Each compiles its whole app at startup. Lazy compilation would have each
+  compile only what is requested; the measured drop was 3.6 GB to 0.85 GB per server.
+  Remotes nobody opens would compile nothing.
+- **It takes build speed out of the federation decision.** Teams split partly for
+  deployment and partly because the build is slow. Remove the second motive and you
+  federate only where independent deployment is genuinely needed — fewer remotes,
+  therefore a smaller share scope, therefore less of the `share-scope` coupling (slide cut),
+  which scales with remote count.
+- **The hard part is already documented here.** `AGENTS.md` records that Rspack's
+  `lazyCompilation` is on by default in `rspack serve` and had to be turned off: a
+  remote's second lazy level posts its compile trigger to the **host's** dev server,
+  the import never settles, and the route renders an empty outlet with no error. Lazy
+  compilation triggers are origin-sensitive and federation gives them the wrong
+  origin. Specific and fixable, not fundamental.
+
+Prescription, if the close wants one: **federate for deployment, compile lazily for
+development.**
+
+**Three limits the claim must respect, or it loses the room.** Andres first proposed
+(2026-10-23) that per-file compilation "can effectively replace module federation by
+providing fine grained separate compilations based on components instead of apps."
+The insight is sound; that sentence is not, and the notes above are the version that
+survives scrutiny. The three reasons:
+
+- **It removes a motivation, not a function.** Federation gives independent builds,
+  independent deployments and independent URLs — slide `mf-basis` says exactly that.
+  Lazy compilation gives one build, faster. What it displaces is the *dev build
+  speed* reason teams reach for federation, not federation itself.
+- **Category error.** `ngp`'s unit is a **file**, not a component, and it is a
+  *compilation* unit, not a *deployment* unit. "Components instead of apps" compares
+  two different kinds of boundary.
+- **Forward reference.** Federation is not introduced until slide 17. The claim can
+  only be made after that — which is why it is close material.
+
+### Rejected for slide 8: "WASM gives lightning-fast JIT"
+
+Proposed 2026-10-23 and **cut**, for the record, since the idea is tempting enough
+to come back:
+
+- WASM is the **fallback**, not the fast path. The blog's phrasing is a native
+  library "or falling back to WASM"; the napi native binding is the performance
+  choice, and the plugin loads exactly that.
+- Only the analyzer is Rust. A browser pipeline would be a WASM analyzer plus a
+  JavaScript backend — not obviously fast, and never benchmarked by anyone.
+- Angular spent a decade moving *away* from compiling in the browser. Ivy and AOT
+  exist because JIT cost bundle size and startup. A slide arguing JIT is the
+  exciting future argues against Angular's own direction.
+- The entire evidential basis is one word in the blog post — browser compilation is
+  "possible". Nobody has announced it. Ruled out by "a direction, not a fact".
 
 ---
 
@@ -733,11 +1106,29 @@ bundler properties, not Module Federation properties, and belong in section 3.
 So "no chunk URL rewriting" is a fact about Vite/Rolldown, not about Module
 Federation. Say it that way.
 
-**Unverified today:** build 2's `dist` is empty, so its output form could not be
-checked. Its config sets `library: { type: 'module' }` on remotes and
-`remoteType: 'module'` on the host, which means the *container boundary* is ESM
-even though Rspack's own module graph uses `__webpack_require__` with numeric ids
-internally. Rebuild it before claiming either on a slide.
+**RESOLVED 2026-10-23** — build 2 was rebuilt (`npm run build:rspack:all`, clean)
+and its output form is now checked rather than inferred. The hypothesis was right:
+
+- `remoteEntry.js` ends with a genuine ESM export —
+  `export{__webpack_exports__get as get,__webpack_exports__init as init}` — so the
+  **container boundary is ESM**, as `library: { type: 'module' }` promises.
+- Inside it, **103 `__webpack_require__` calls** and numeric module ids
+  (`o(7890)`). Zero top-level `import` statements.
+- So the honest sentence is: **ESM at the boundary, webpack's own runtime within.**
+  Not "Rspack ships webpack requires", and not "Rspack ships ESM" either.
+
+**Remote-entry sizes, measured on disk the same day.** Build 2 ships a
+**117–118 kB `remoteEntry.js` per remote**, confirming the ~117 kB network figure
+exactly. Build 1 ships **2.6–3.2 kB of `remoteEntry.json`**. That is the
+data-versus-code distinction with numbers on it.
+
+**And the two hosts differ.** Build 1's shell emits a `remoteEntry.json` (with an
+empty `exposes`). Build 2's shell emits `mf-manifest.json` and `mf-stats.json` and
+**no `remoteEntry.js` at all** — it exposes nothing, so no container is generated.
+
+**Re-verified 2026-10-23:** the five shared chunks (`542.js`, `common.js`, `65.js`,
+`597.js`, `178.js`) are still byte-identical between build 2's shell and `top-lots`
+in a fresh build — same md5, all five.
 
 ### Two API corrections — verified 2026-10-21
 
@@ -848,6 +1239,22 @@ on the `mf-is` slide it shows host and remote are roles rather than ranks, and i
 Act 5 it is a concrete difference between two implementations of the same model.
 The slide states the general shape; the per-build detail belongs with the builds.
 
+### The Rsbuild evidence, re-checked 2026-10-23 — it got stronger
+
+Registry, today:
+
+- `@nx/angular-rsbuild` — **still 21.2.0**, `time.modified` **2026-06-04**, peers
+  `@angular/common >=19.0.0 <21.0.0` and `@rsbuild/core >=1.0.5 <2.0.0`. So it is
+  behind on Angular *and* on Rsbuild itself.
+- `@nx/angular` — **24.0.0**.
+
+The brief previously recorded that sibling at 23.3.0. It has since gone to 24, so
+the gap is now **three majors** and nearly five months of silence, while Rsbuild
+itself ships. **The slide that used the 21-against-24 pair, `adapter-tax`, was cut on
+2026-10-24**, so nothing on screen depends on this any more. Keep the finding: it is
+the strongest evidence for the adapter-tax argument, and `close` still asserts that
+argument without evidencing it.
+
 ### Findings worth slide time
 
 Full write-ups: [`PLAN-RSBUILD.md`](PLAN-RSBUILD.md) §3, [`PLAN-VITE.md`](PLAN-VITE.md) §4.
@@ -899,6 +1306,10 @@ remote ships_. The four-stages table is dropped — the demo does that work now.
 ---
 
 ## 6. Demo runbook
+
+**There is a slide for it now.** `demo` — *Demo time* — is slide 23, the last in
+the deck, carrying no section label. Added 2026-10-24. Its speaker notes hold
+beats 1–5 below as stage directions.
 
 **Network panel is the proof.** This is the segment that makes the abstract
 concept visible.
@@ -1045,29 +1456,92 @@ Rewrite to the six-act structure in §2, drawing prose from §5. Because this is
 recorded video, the narration goes in the deck's **speaker notes**, written to be read
 aloud, with demo cues marked inline. Target ~26 minutes at a measured pace.
 
-### 5 · Build the deck — Acts 1 and 2 done (8 slides), 16 to go
+### 5 · Build the deck — complete first draft
 
-**State on 2026-10-22, and where to resume.** Eighteen slides exist and are
-published. Sections 0 (Angular compilers, slides 1–8), 1 (Modules, 9–15) and 2
-(Module Federation, 16–18) are **done**. Narration runs about 36 minutes at 140
-wpm — ignore that for pacing; Andres speaks to the slide and times himself against
-a mirror once the whole deck exists. Artifact:
+**State at the end of 2026-10-24.** Twenty-three slides, published. All four
+sections are built: 0 (Angular compilers, 1–7), 1 (Modules, 8–14), 2 (Module
+Federation, 15–17), 3 (Bundlers, 18–22, the close included), plus the
+sectionless `demo` divider at 23. Artifact:
 <https://claude.ai/artifact/XcyRCLzcqeFX78fwy4MypG>.
 
 Slide order: `cover`, `decorator`, `ivy-output`, `ngtsc-wraps`, `phases`, `ts7`,
-`compiler`, `three-ways`, `specifier`, `kinds`, `static-dynamic`, `resolution`,
-`build-time`, `load-time`, `run-time`, `mf-basis`, `mf-is`, `implementations`.
+`compiler`, `specifier`, `kinds`, `static-dynamic`, `resolution`, `build-time`,
+`load-time`, `run-time`, `mf-basis`, `mf-is`, `implementations`,
+`tool-vs-bundler`, `two-axes`, `vite-vs-default`, `rspack-vs-default`, `close`,
+`demo`.
 
-**Resume at section 3 — Bundlers.** The same product on three pipelines: what each
-publishes, who resolves the module, the demo, the numbers, the adapter tax with the
-Rsbuild evidence, the share-scope finding, and why Rspack over Vite today. Read
-"Two axes, and the Zürich deck conflated them" first — several Zürich claims filed
-under Module Federation are really bundler properties, and untangling them is what
-this section is for.
+**Two structural changes on 2026-10-24, both Andres's call.** `ngp-per-file` was
+merged into the close and its file deleted — §3 records what the slide said. And
+`demo` went in as the *last* slide rather than before the close, so the screen
+recording is the final beat. One consequence is still open: the close's notes
+end with "Thank you", which now lands one slide short of the end.
 
-All fifteen dev servers were running on 2026-10-21 and the import-map experiment
-was done against them; build 2's `dist` is empty and needs a rebuild before its
-output form goes on a slide.
+**Section 3 was rebuilt from scratch on 2026-10-24.** Four slides were written and
+then cut on the same day, and the reasons matter more than the slides did:
+
+- `numbers` — four rows of measurements. Cut because only one row (the version
+  ceiling) could change anybody's decision, and another slide told it better. See the
+  fuller note above. **Do not reinstate.**
+- `share-scope` — build 2's shell taking six of nine shared packages from a widget.
+  Cut as "it does not tell us anything". The finding itself is still in §4 and is
+  still true; it is simply not slide material.
+- `adapter-tax` — the fourth pipeline that could not be built, with the Rsbuild
+  evidence. Cut. The `close` still says the adapter is what the choice costs, but
+  **no slide evidences that any more** — if the close ever feels unsupported, this is
+  why.
+- `choices` — a combined pros-and-cons slide. Cut and replaced by the two
+  per-pipeline slides below, which is what Andres asked for from the start.
+
+**What section 3 is now.** `tool-vs-bundler` opens it: a build tool *contains* a
+bundler plus a dev server, TypeScript, stylesheets and assets, and the distinction is
+that **a build tool has defaults** — Rsbuild compiles `.ts` with no configuration
+where Rspack needs a rule pointing at a loader. Then `two-axes`, retitled *Three build
+pipelines*, one table with config file, Angular plugin, bundler and federation
+library. Then a verdict slide per custom pipeline, in Andres's own Zürich bullet
+format, worse case first: *Vite pipeline — why it is probably not an option* and
+*Rspack pipeline — why it could be an option*.
+
+**Two conventions that came out of building it.** Slide titles on those last two are a
+name plus a coloured subtitle (orange for the negative verdict, blue for the positive).
+And **nothing in the deck uses bullet lists** — 23 of 23 slides use cards, tables or
+stacked paragraphs. If a list is needed, stack paragraphs in muted grey with the key
+phrase in white.
+
+**`three-ways` was merged into `two-axes` on 2026-10-24** and its file deleted. The
+pipeline table gained a fourth column, Federation, so one grid now carries both axes
+instead of a separate 2×3 grid; the two unbuilt combinations (Module Federation on
+esbuild, Native Federation on Rspack) survive only in the notes. The `choice` section
+in `deck.json` started at `three-ways` and was removed with it. Consequence: section 0
+no longer closes on *Angular does not require esbuild* — that beat now opens
+section 3.
+
+**`numbers` was cut on 2026-10-24**, and the reasoning should survive the decision.
+Of its four rows, only one was decision-relevant and another slide already told it
+better. Cold build: a one-second spread across five applications — nobody chooses a
+bundler over that. Config lines: 304 / 427 / 355 — nobody chooses over 120 lines
+either. Transferred bytes: 779 / 1262 / 827 kB looks decisive, but the cause is
+build 2's share-scope picking a widget as provider, which is a configuration artifact
+rather than a property of Rspack, and `share-scope` told it causally. Version
+ceiling: genuinely go/no-go, and `adapter-tax` carried it with the Rsbuild evidence
+and a date. **Do not reinstate it** — and note both of those slides were themselves
+cut later the same day. The full table stays in `tools/measurements.md`
+for anyone who asks. Two lines were rehomed into `adapter-tax`'s notes — that all
+three build in about eight seconds, and that the default is not behind on any measure
+of that kind. `share-scope`'s notes no longer open by referring to "the byte count on
+the slide before".
+
+**Now the cutting pass, which is the next job.** It is a judgement call about which
+slides earn their place, not a word-count exercise — see §2, *On length*. Section 3
+has already been through a hard pass and is down to four slides plus the close; the
+untouched run is section 1, seven slides on modules, which is the longest stretch in
+the deck.
+
+**The demo slide exists** as of 2026-10-24: `demo`, slide 23, the last in the deck.
+`## 6. Demo runbook` describes what it hands over to. Whether the demo is kept at
+all is a call for the cutting pass.
+
+**Still unverified:** whether an unreachable remote at boot fails `initFederation`
+outright in Native Federation. It is the last open item in the section 2 comparison.
 
 `docs/deck/drafts/choice.html` is **superseded** — slide 7 (`compiler`) does its
 job. Delete it or leave it; do not build on it.
@@ -1081,12 +1555,13 @@ Publish from there, with `root` set to `docs/deck`.
 **`docs/NARRATION.md` is generated**, never hand-edited:
 
 ```bash
-node tools/deck-to-narration.mjs        # add --rate 160 for a faster pace
+node tools/deck-to-narration.mjs
 ```
 
-It flattens every slide into on-screen content plus speaker notes, with word counts
-and spoken-time estimates at 140 wpm, so the whole talk can be read, diffed and
-timed as one document. Regenerate it after any slide change. To change wording,
+It collects every slide's speaker notes into one file you can read top to bottom,
+diff and quote from. **No word counts, no timings, no on-screen content** — the
+deck itself shows what is on screen, and the talk is improvised, so the numbers were
+stripped out on 2026-10-24. Regenerate it after any slide change. To change wording,
 edit the slide and regenerate — never the other way round.
 
 A Slides artifact titled _Re-imagining Module Federation in Angular_ with **NG
@@ -1099,6 +1574,31 @@ reads perhaps a third of what a room full of people will.**
 
 ---
 
+## 8b. Perishable claims — re-check on the recording day
+
+**This is a recording with no Q&A.** A present-tense claim that goes false after
+publication cannot be corrected, so every time-sensitive fact on screen is written as
+a **dated snapshot**. A snapshot cannot go stale; a standing claim can. Swept
+2026-10-24.
+
+| Slide | On-screen claim | Why it can go false | Re-check |
+| --- | --- | --- | --- |
+| `compiler` | "In `angular/main` since 8 October 2026 — not released as of 24 October 2026" | The experimental `ngp` build is aimed at late 2026, i.e. now | `npm view @angular/compiler-cli versions`, and whether a `preprocessor` implementation ships |
+
+**If it changes, update the figure and the date — do not drop the slide.** The
+`close` row left this table on 2026-10-24: Andres's rewrite took the prototype
+caveat off that slide, so `compiler` is the only slide carrying a date now. The
+third row was `adapter-tax`, cut the same day; no registry figure is on screen
+any more. `rspack-vs-default` is now the only slide touching that ground
+and it names no versions, so it cannot go stale.
+
+**Safe, needs no re-check:** `ts7`'s "TypeScript 7 stable since July 2026" and
+`load-time`'s "every major browser since 2023" are historical — they can only become
+more true.
+
+**One soft spot, notes only:** the cover's "moving right now, this month". Harmless,
+but worth a different word if the recording slips far from the writing.
+
 ## 9. Verification
 
 - Run all three production builds clean, **twice**, and confirm every captured
@@ -1107,14 +1607,18 @@ reads perhaps a third of what a room full of people will.**
   `/catalog`, `/orders` and both widget slots.
 - Rehearse the demo against a **cold cache** and confirm each of the seven network
   beats is actually visible at recording resolution — the import map especially.
-- Read the speaker notes aloud end to end and time them. If it runs past 30
-  minutes, **cut from Act 3 first**.
+- Walk the deck end to end out loud, speaking to the slides. If it overruns,
+  **cut from Act 3 first**.
 - Re-check the `ngp` commit activity and the `@nx/angular-rsbuild` registry row on
   the recording day — both are live and both are load-bearing.
 
 ## 10. Open items
 
-- Slides not started. This document is the brief; the deck is not written.
+- **The cutting pass has not happened.** 23 slides against a 20–30 minute window.
+  §2 says to cut from Act 3 first, and that the demo is the first whole thing to
+  drop.
+- The repo URL appears only on the cover. It came off the close in Andres's
+  2026-10-24 rewrite, so nothing at the end of the talk points at the code.
 - `docs/ARCHITECTURE.md` is agent-generated prose and has not been re-read against
   the current three-build state — verify before quoting it on a slide.
 - [`PLAN-RSBUILD.md`](PLAN-RSBUILD.md) and [`PLAN-VITE.md`](PLAN-VITE.md) both
