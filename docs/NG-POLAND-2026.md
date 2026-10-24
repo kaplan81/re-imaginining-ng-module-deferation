@@ -1581,6 +1581,28 @@ stylesheets. The page is 1920 × 1080 of CSS length, which Chrome writes as
 sharp at any capture resolution. Regenerate it after any slide change, and commit
 the result — it is how anyone reading the repository sees the talk.
 
+**The deck also exports as one self-contained reveal.js page:**
+
+```bash
+node tools/deck-to-reveal.mjs          # --no-fonts to link the fonts instead
+```
+
+It writes `docs/Re-imagining-Module-Federation-in-Angular.html`, about 775 KB, with
+reveal.js, its stylesheet and fourteen woff2 font files inlined — so it presents in
+any browser with the network off, keeps the transitions, and carries the speaker
+notes as `<aside class="notes">`. That markup is also what slides.com imports, which
+is the only reason to go near slides.com: the talk is presented from a laptop.
+
+Two things to know about it. reveal shows and hides slides by setting `display` on
+the sections it owns, and this deck's own sections carry inline `display:flex`,
+which would beat it and show every slide at once — so each slide is wrapped, with
+the deck's section becoming a `<div class="deck-slide">` inside a bare reveal
+`<section>`. And reveal has no `push` transition, so `push` is mapped to `slide`.
+
+Both exporters read the deck through `tools/lib/deck-source.mjs`, which is also
+where `<x-connector>` is redrawn as SVG — one implementation, so the two formats
+cannot disagree.
+
 **`docs/NARRATION.md` is generated**, never hand-edited:
 
 ```bash

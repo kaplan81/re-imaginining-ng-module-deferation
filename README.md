@@ -38,16 +38,19 @@ and build configuration. The three-way comparison table is in
 
 ## The talk
 
-**[Re-imagining Module Federation in Angular](docs/Re-imagining-Module-Federation-in-Angular.pdf)**
-— the deck, 23 slides, as a PDF. Every page is 16:9, so it goes full screen on
-anything without black bars.
+**Re-imagining Module Federation in Angular** — 23 slides, in two formats:
+
+| File | What it is for |
+| --- | --- |
+| [`…-in-Angular.pdf`](docs/Re-imagining-Module-Federation-in-Angular.pdf) | Presenting. Opens in Preview or Keynote, every page exactly 16:9, text left as vector. |
+| [`…-in-Angular.html`](docs/Re-imagining-Module-Federation-in-Angular.html) | One self-contained reveal.js page — reveal, its stylesheet and all three web fonts inlined, so it presents in any browser with the network off. It is also the file to import into slides.com. |
 
 The deck's source lives in [`docs/deck/`](docs/deck) (one HTML file per slide, plus
 `deck.json` for the order), and the speaker notes are collected in
-[`docs/NARRATION.md`](docs/NARRATION.md). Rebuild the PDF from the source with:
+[`docs/NARRATION.md`](docs/NARRATION.md). Rebuild both from the source with:
 
 ```bash
-node tools/deck-to-pdf.mjs
+node tools/deck-to-pdf.mjs && node tools/deck-to-reveal.mjs
 ```
 
 ## Quick start

@@ -92,6 +92,7 @@
     "concurrently": "^10.0.5",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
+    "reveal.js": "^6.0.2",
     "typescript": "~6.0.2",
     "vite": "^8.2.2",
     "vitest": "^4.0.8"
