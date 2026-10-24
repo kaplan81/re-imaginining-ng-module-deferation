@@ -452,7 +452,7 @@ Everything so far has been one application at a time. Now the same product, buil
 
 Read the table left to right, because that is the order the decision happens in. You pick a pipeline. The pipeline loads an Angular plugin. The plugin determines which bundler ends up doing the bundling.
 
-The top row is the one everybody has. A file called angular dot json, the command ng build, the plugin at-angular-slash-build, and esbuild underneath. Most people have never needed to know the last two are there.
+The top row is the one everybody has: angular dot json, the command ng build, esbuild underneath. Two columns say the same thing on that row, and it is not a mistake — Native Federation ships a builder that replaces the CLI's own, so there the Angular plugin and the federation library are one package. It still wraps at-angular-slash-build, which is what actually hosts the compiler. Most people have never needed to know any of that is there.
 
 The other two are custom pipelines, and that phrase is doing real work. There is no angular dot json involved and the ng command never runs. Rspack dot config dot ts and rspack build, which loads a plugin from Nx and lands on Rspack. Vite dot config dot ts and vite build, which loads the plugin from the Analog project and lands on Rolldown.
 
