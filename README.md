@@ -36,6 +36,20 @@ between them: builds 2 and 3 contain no feature code at all, only entry points
 and build configuration. The three-way comparison table is in
 [`docs/PLAN-VITE.md` §8](docs/PLAN-VITE.md).
 
+## The talk
+
+**[Re-imagining Module Federation in Angular](docs/Re-imagining-Module-Federation-in-Angular.pdf)**
+— the deck, 23 slides, as a PDF. Every page is 16:9, so it goes full screen on
+anything without black bars.
+
+The deck's source lives in [`docs/deck/`](docs/deck) (one HTML file per slide, plus
+`deck.json` for the order), and the speaker notes are collected in
+[`docs/NARRATION.md`](docs/NARRATION.md). Rebuild the PDF from the source with:
+
+```bash
+node tools/deck-to-pdf.mjs
+```
+
 ## Quick start
 
 Start the remotes first: the shell fetches their `remoteEntry.json` during

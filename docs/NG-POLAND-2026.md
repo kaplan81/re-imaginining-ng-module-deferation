@@ -1404,6 +1404,21 @@ the Zürich deck" rule that a 1080p video needs anyway.
 All four Act 1 slides were rebuilt against this rule after it was discovered —
 check every new slide against it before publishing.
 
+**Swept 2026-10-24, all 23 slides, by measuring rendered pixels** rather than by
+eye: render the deck to one tall PNG with headless Chrome, then count pixels in
+each slide's 460 × 420 block that differ from the background. **Twenty-one are
+completely clear.** Two touch the block, both at its far left edge, which is the
+corner of the rectangle furthest from where a circular overlay actually sits:
+
+- `ivy-output` — the right edge of a code panel crosses x 1460 by **8px**, over
+  y 660–869. It is panel background, not text; nothing is readable there.
+- `tool-vs-bundler` — the tail of the line about Rsbuild and Rspack reaches
+  **x 1499** at y 701–724, so about 39px of one word. Narrow that paragraph to
+  `width:1300px` if it ever matters.
+
+Neither is worth a rebuild: the overlay is a circle roughly 288px across in the
+bottom-right corner, and at y ≈ 700 it is nowhere near x 1460.
+
 ## 8. Working plan
 
 ### 1 · Bump the repo to current — DONE (commit `f53d991`)
@@ -1551,6 +1566,20 @@ job. Delete it or leave it; do not build on it.
 not a scratchpad. It holds `project/deck.json` and one `project/slides/<id>.html`
 per slide, in the Slides artifact format (1920 × 1080, inline styles only).
 Publish from there, with `root` set to `docs/deck`.
+
+**The deck exports to PDF**, one slide per page, every page exactly 16:9:
+
+```bash
+node tools/deck-to-pdf.mjs
+```
+
+It writes `docs/Re-imagining-Module-Federation-in-Angular.pdf` from `docs/deck/`,
+drops the speaker notes, and redraws the artifact type's `<x-connector>` elements
+as inline SVG — so it needs no account and no network beyond the Google Fonts
+stylesheets. The page is 1920 × 1080 of CSS length, which Chrome writes as
+1440 × 810 points: the same 16:9 rectangle, with the text left as vector, so it is
+sharp at any capture resolution. Regenerate it after any slide change, and commit
+the result — it is how anyone reading the repository sees the talk.
 
 **`docs/NARRATION.md` is generated**, never hand-edited:
 
