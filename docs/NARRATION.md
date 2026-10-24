@@ -38,13 +38,7 @@ A reference, not a script. The talk is improvised against the slides, so there a
 
 ## 1 · `cover` — Re-imagining Module Federation in Angular
 
-Module Federation in Angular.
-
-The ground underneath Angular's build is moving right now, this month, and very little is being said about what that means for the people shipping applications on it.
-
-So this starts somewhere that looks like a detour. It is not one.
-
-[Hold the title for a beat, then move on.]
+Module Federation in Angular. The ground underneath Angular's build is moving right now, this month, and very little is being said about what that means for the people shipping applications on it. So this starts somewhere that looks like a detour. It is not one. [Hold the title for a beat, then move on.]
 
 ---
 

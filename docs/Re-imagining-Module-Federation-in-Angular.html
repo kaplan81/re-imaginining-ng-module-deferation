@@ -145,11 +145,13 @@
 <style>
   
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: 'Open Sans', Verdana, sans-serif; }
   p, h1, h2, h3, h4, ul, ol, li, table, figure { margin: 0; }
   table { border-collapse: collapse; }
 
   html, body, .reveal-viewport { background: #111317; }
   /* reveal centres its slide text; this deck lays everything out itself */
+  .reveal { font-family: 'Open Sans', Verdana, sans-serif; }
   .reveal .slides { text-align: left; }
   .reveal .slides > section { padding: 0; }
   .reveal .slides > section > .deck-slide {
@@ -247,8 +249,6 @@
     <tr><td style="padding:11px 16px">5</td><td style="padding:11px 16px">Compile</td><td style="padding:11px 16px">Build definition functions. ɵɵdefineComponent() will be assigned to ɵcmp<br>nothing is written yet</td><td style="padding:11px 16px; color:#6e9bf7">backend</td></tr>
     <tr><td style="padding:11px 16px">6</td><td style="padding:11px 16px">Emit</td><td style="padding:11px 16px">Put definitions in the class, delete the decorator, print the output<br>runs as a ts.Transformer</td><td style="padding:11px 16px; color:#6e9bf7">backend</td></tr>
   </tbody></table>
-  <p style="font-size:25px;line-height:1.4;width:1300px;color:#6B7684">All six run for every decorated class — component, directive, pipe, service.</p>
-  <p style="font-size:25px;line-height:1.4;width:1300px;color:#6B7684">The backend produces <b style="color:#EEF2F7">two outputs from the same analysis</b>: the type-check blocks, and the code that replaces the decorator.</p>
   <div style="width:1300px; display:flex; flex-direction:row; gap:36px">
     <p style="flex:1; font-family:'Open Sans', Verdana, sans-serif; font-size:24px; line-height:1.4; color:#e0824b"><b>Frontend</b> <span style="color:#9aa6b2">— understands decorators and how they are interconnected. Global and slow.</span></p>
     <p style="flex:1; font-family:'Open Sans', Verdana, sans-serif; font-size:24px; line-height:1.4; color:#6e9bf7"><b>Backend</b> <span style="color:#9aa6b2">— transforms file by file. Local and fast.</span></p>
@@ -312,7 +312,7 @@
       </div>
     </div>
   </div>
-  <p style="font-size:25px;line-height:1.4;width:1300px;color:#6B7684">Prototype. In <span style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:23px">angular/main</span> since 8 October 2026 — not released as of 24 October 2026.</p></div>
+  <p style="font-family:'Open Sans', Verdana, sans-serif;font-size:25px;line-height:1.4;width:1300px;color:#6B7684">Prototype. In <span style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:23px">angular/main</span> since 8 October 2026 — not released as of 24 October 2026.</p></div>
   <aside class="notes"><p>So if the way in is closed, you stop going in. You build your own compiler.</p><p>That is what this is. It is called ngp, it has been in Angular's main branch since the eighth of October, and their own README opens with the word Caution: early-stage prototype, not accepting outside contributions. So nothing here is a promise.</p><p>Two things changed. One is interesting. The other is the one that matters.</p><p>The interesting one is the frontend. The orange half — the global, slow half — has been rewritten in Rust, on oxc — the same toolchain underneath Vite. It is multithreaded, which is why it will be fast. The blue half did not move: the backend is still TypeScript, still the same template compiler Angular has always had. What changed in it is only the last step. The old backend handed its result to TypeScript, through ts.Transformer, which is why it had to run inside TypeScript. The new one prints the characters into a file. That is the whole reason it can stand on its own.</p><p>The one that matters is in the shape of the picture, not in either box.</p><p>Look at the top row. The compiler is inside the bundler. That was not a design choice anybody made for fun — it was forced. Angular's output never existed anywhere you could pick it up. It was a syntax tree, inside a running TypeScript process, for a few milliseconds. The only way to receive it was to be in that process, as a plugin. So the bundler had to host Angular's compiler inside itself.</p><p>Which is why every bundler that builds Angular needs an adapter written specially for it. Somebody has to write the plugin that drives the compiler and hands the results around. That is what @nx/angular-rspack is. That is what the Analog plugin is for Vite. Somebody maintains each one.</p><p>Now look at the bottom row. The compiler runs first, on its own, and leaves two files behind — one per job. The ng dot ts file is your code with the decorator already replaced; that is what the bundler takes. The ngtypecheck file is the templates rewritten as TypeScript; that is what tsc takes, to give you template errors. Same two jobs as before, but now each one ends in a file instead of inside somebody's process. And that is not a plan — it is already there. There is a command in the branch today: you point ngp at a tsconfig, give it an output directory, and it writes you a folder of TypeScript. No bundler involved, nothing hosting anything. Ordinary TypeScript, with the decorator already replaced by the definition.</p><p>The bundler is no longer hosting anything. It is just reading TypeScript — which every bundler on earth already does. esbuild reads it. Rspack reads it. Vite reads it. Something you write this afternoon reads it.</p><p>The adapter has nothing left to adapt.</p><p>[Point at the nesting in the top row, then at the gap in the bottom row. That gap is the whole slide.]</p></aside>
 </section>
 <section data-transition="slide">

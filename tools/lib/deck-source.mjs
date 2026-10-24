@@ -117,11 +117,20 @@ export function loadDeck(deckDir) {
 }
 
 /**
+ * The deck's body font. Almost every element names its own font inline, but a
+ * handful inherit — and with no base font declared they fall back to the browser
+ * default, which is a serif. One serif paragraph among twenty-two sans ones is
+ * very visible, so the exporters declare this and nothing can quietly fall through.
+ */
+export const BODY_FONT = "'Open Sans', Verdana, sans-serif";
+
+/**
  * The shared reset. The slides are absolutely laid out with inline styles, so an
  * exporter must not impose margins, and must let every declared background paint.
  */
 export const RESET_CSS = `
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: ${BODY_FONT}; }
   p, h1, h2, h3, h4, ul, ol, li, table, figure { margin: 0; }
   table { border-collapse: collapse; }
 `;

@@ -29,7 +29,7 @@
 import { readFileSync, writeFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
-import { loadDeck, RESET_CSS } from './lib/deck-source.mjs';
+import { loadDeck, RESET_CSS, BODY_FONT } from './lib/deck-source.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
@@ -109,6 +109,7 @@ ${fontLinks}
   ${RESET_CSS}
   html, body, .reveal-viewport { background: #111317; }
   /* reveal centres its slide text; this deck lays everything out itself */
+  .reveal { font-family: ${BODY_FONT}; }
   .reveal .slides { text-align: left; }
   .reveal .slides > section { padding: 0; }
   .reveal .slides > section > .deck-slide {

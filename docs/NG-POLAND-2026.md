@@ -1603,6 +1603,14 @@ Both exporters read the deck through `tools/lib/deck-source.mjs`, which is also
 where `<x-connector>` is redrawn as SVG — one implementation, so the two formats
 cannot disagree.
 
+**One trap, found 2026-10-24 and fixed in the reset.** Almost every element in the
+deck names its own font inline, but three did not and inherited instead — and with
+no base font declared, an exporter hands them the browser default, which is a
+serif. One serif paragraph among twenty-two sans ones is glaring. `deck-source.mjs`
+now exports `BODY_FONT` and the reset declares it, and the reveal exporter repeats
+it on `.reveal`, because reveal scopes its own styles there and a bare `body` rule
+loses. If a slide ever looks like it is set in Times, this is why.
+
 **`docs/NARRATION.md` is generated**, never hand-edited:
 
 ```bash
